@@ -1,9 +1,8 @@
 # ═══════════════════════════════════════════
 # Obsidian — 플러그인·캐시·UI 상태
 # ═══════════════════════════════════════════
-.obsidian/plugins/*
-!.obsidian/plugins/obsidian-git
-!.obsidian/plugins/obsidian-git/data.json
+.obsidian/plugins/*/data.json
+.obsidian/plugins/mcp-tools/
 .obsidian/workspace.json
 
 # ═══════════════════════════════════════════
