@@ -279,7 +279,7 @@ function Sync-BatchTargets {
                 if ($synced) { $script:syncCount++ }
             }
 
-            # [FIX: Prune] 소스에 없고 타겟에만 있는 stale 파일 삭제
+            # [FIX: Prune] 소스에 없고 타겟에만 있는 stale 파일 삭제 (기본 활성, -NoPrune으로 비활성화)
             if ((-not $NoPrune) -and (Test-Path $targetPath)) {
                 $targetFiles = Get-ChildItem -Path $targetPath -Recurse -File
                 foreach ($tFile in $targetFiles) {
