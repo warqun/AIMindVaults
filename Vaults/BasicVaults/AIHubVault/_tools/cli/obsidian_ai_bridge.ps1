@@ -1,6 +1,6 @@
 param(
   [Parameter(Mandatory=$true)]
-  [ValidateSet('vault-info','search','search-context','read','open','append','create','history','history-read','history-restore','diff','plugins-list','plugin-install','post-review')]
+  [ValidateSet('vault-info','search','search-context','read','append','create','history','history-read','history-restore','diff','plugins-list','plugin-install','post-review')]
   [string]$Action,
 
   [string]$VaultName,
@@ -53,13 +53,6 @@ switch($Action){
   'read' {
     if([string]::IsNullOrWhiteSpace($Path)){ throw 'Path is required for read' }
     Invoke-Obsidian -CliArgs @('read',"vault=$VaultName","path=$Path")
-  }
-  'open' {
-    $openArgs=@('open',"vault=$VaultName")
-    if(-not [string]::IsNullOrWhiteSpace($Path)){ $openArgs += "path=$Path" }
-    elseif(-not [string]::IsNullOrWhiteSpace($Query)){ $openArgs += "file=$Query" }
-    else { throw 'Path or Query(file name) is required for open' }
-    Invoke-Obsidian -CliArgs $openArgs
   }
   'append' {
     if([string]::IsNullOrWhiteSpace($Path)){ throw 'Path is required for append' }

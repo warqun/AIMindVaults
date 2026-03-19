@@ -4,7 +4,7 @@ tags:
   - Standards
   - AIMindVault
   - script-management
-updated: 2026-03-17
+updated: 2026-03-16
 agent: claude
 ---
 
@@ -28,6 +28,7 @@ agent: claude
 | `clone_vault.ps1` | `_tools/` | 볼트 전체 미러 복사 (robocopy) | codex | user |
 | `check_standards.ps1` | `_tools/` | `_Standards/` 디렉토리 구조 확인 | codex | codex, user |
 | `verify_structure.ps1` | `_tools/` | `_Standards/` 상세 구조 출력 | codex | codex, user |
+
 ---
 
 ## 일회성/완료 스크립트 (One-time)
@@ -49,13 +50,14 @@ agent: claude
 | `preflight_docs_encoding.ps1` | 2026-03-09 | `post_note_edit_review.ps1`과 기능 중복. 의존 파일(`VERIFY_ENCODING_AFTER_RESTORE.ps1`) 부재 |
 | `delegate-run.md` (skill) | 2026-03-09 | 위임 워크플로우 폐지 |
 | `delegate-analyze.md` (skill) | 2026-03-09 | 위임 워크플로우 폐지 |
-| `open_agents.ps1` | 2026-03-11 | 멀티볼트 루트에서 IDE를 한 번만 열면 되므로 볼트별 자동 실행 불필요. Shell Commands 이벤트(on-layout-ready) 해제 권장 |
-| `create_domain.ps1` | 2026-03-17 | 배포 정리 — 일회성 스크립트 제거. `_Standards/Domain/` 초기 생성은 수동으로 대체 |
-| `migrate_standards.ps1` | 2026-03-17 | 배포 정리 — `_Standards/` Core/Domain 구조 재편 완료, 재사용 불필요 |
-| `migrate_standards2.ps1` | 2026-03-17 | 배포 정리 — `_Standards/` 하위 폴더 이동 완료, 재사용 불필요 |
-| `create_MakeCloneVault.bat` | 2026-03-17 | 배포 정리 — 일회성 배치 파일 제거. clone_vault.ps1로 대체 |
-| `GitMirrorSync_DecisionPoints.md` | 2026-03-17 | 배포 정리 — Git 미러 동기화 결정 문서, 참조 완료 |
-| `RUN_OBSIDIAN_VAMSURLIKE.bat` | 2026-03-17 | 하드코딩 절대경로(`C:\Dev_Game\...`), Hub 배포 부적합. cli_launchers/ 정리 |
+| `open_agents.ps1` | 2026-03-11 | 멀티볼트 루트에서 IDE를 한 번만 열면 되므로 볼트별 자동 실행 불필요 |
+| `create_domain.ps1` | 2026-03-16 | AIHubVault 내용 하드코딩, clone_vault.ps1로 복제 시 이미 포함됨 |
+| `migrate_standards.ps1` | 2026-03-16 | 일회성 마이그레이션 완료. 배포 패키지에서 제거 |
+| `migrate_standards2.ps1` | 2026-03-16 | 일회성 마이그레이션 완료. 배포 패키지에서 제거 |
+| `antigravity.exe.txt` | 2026-03-16 | 개인 IDE 경로 파일. 배포 패키지에서 제거 |
+| `create_MakeCloneVault.bat` | 2026-03-16 | clone_vault.ps1과 기능 중복. 배포 패키지에서 제거 |
+| `GitMirrorSync_DecisionPoints.md` | 2026-03-16 | 개인 Git+Syncthing 동기화 정책 문서. 배포 패키지에서 제거 |
+| `cli_launchers/` (4개 bat) | 2026-03-16 | 개인 환경 실행기. 배포 패키지에서 제거 |
 
 ---
 
@@ -66,10 +68,8 @@ agent: claude
 | `post_note_edit_review.ps1` | Root/Scope 하드코딩 | Plan B 자동탐지 적용 | 2026-03-09 |
 | `obsidian_ai_bridge.ps1` | VaultName/Scope 하드코딩 | Plan B 자동탐지 적용 | 2026-03-09 |
 | `fix_false_positives.ps1` | VaultRoot 하드코딩 | Plan B 자동탐지 적용 | 2026-03-09 |
-| `migrate_standards.ps1` | Root 하드코딩 | 일회성이라 미수정 | — |
 | `check_standards.ps1` | Root 하드코딩 | 일회성이라 미수정 | — |
 | `verify_structure.ps1` | Root 하드코딩 | 일회성이라 미수정 | — |
-| `create_domain.ps1` | Root 하드코딩 | 일회성이라 미수정 | — |
 
 ---
 
