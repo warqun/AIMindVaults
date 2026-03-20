@@ -51,12 +51,20 @@ agent: antigravity
 |-----------|------|
 | `Core/WritingStandards.md` | 파일명·폴더·Frontmatter·상태 아이콘·표·링크 등 전체 작성 기준 |
 | `Core/NoteProperties.md` | 노트 속성(Frontmatter) 필드 정의·체크리스트 — **AI 노트 생성 시 필독** |
+| `Core/MultiAgent_Coordination_Pattern.md` | 멀티 에이전트 협업 패턴 참조 자료 |
+| `Core/AI_ObsidianCLI_Usage.md` | AI-First Obsidian CLI 운용 기준 |
+| `Core/AI_Collaboration_Strategy.md` | AI 협업 전략 |
+| `Core/AI_Note_Environment.md` | AI 노트 환경 설정 |
 | `Core/Encoding_BulkEdit_Safety.md` | 인코딩 안전 규칙 (대량 수정) |
-| `Core/Hub_Sync_Targets.md` | Hub-Sync 동기화 대상 정의 |
+| `Core/Grok_Usage_Guidelines.md` | Grok 활용 가이드라인 |
+| `Core/OLLAMA_ORCHESTRATION_GUIDE.md` | Ollama 오케스트레이션 구성/프롬프트 가이드 |
 | `Core/Juggl_StyleGuide_Operations.md` | Juggl 스타일 동기화 운영 규칙 |
+| `Core/Obsidian_CLI_Command_List.md` | Obsidian CLI 명령어 목록 |
 | `Core/Obsidian_Plugin_Environment.md` | Obsidian 플러그인 환경 |
+| `Core/Pre_Prompt_Commands.md` | 사전 프롬프트 명령어 |
 | `Core/Script_Creation_Rule.md` | 스크립트 생성/관리 규칙 |
 | `Core/Script_Registry.md` | 스크립트 등록 대장 |
+| `Core/Operations/` | 운영 체크리스트 |
 | `Core/Plugins/` | 플러그인 기능/문법 인덱스 |
 | `Core/NoteTemplates/` | 노트 템플릿 폴더 |
 | `Core/VaultTypes/` | 볼트 타입 스펙 (Domain / Project) |

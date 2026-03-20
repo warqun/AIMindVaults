@@ -14,12 +14,14 @@
 
 - **workspace 편집은 AIHubVault에서만 수행한다.** 다른 볼트의 workspace 파일은 `sync_workspace.ps1`로 자동 전파된다.
 - **Obsidian 플러그인 설치/설정도 workspace 편집이다.** `.obsidian/plugins/` 변경은 AIHubVault에서 수행 → 동기화로 전파한다. 개별 볼트에 직접 플러그인을 설치하지 않는다.
-- workspace 파일 수정 후 반드시 AIHubVault의 `_WORKSPACE_VERSION.md`에 버전을 기록한다.
+- workspace 파일을 수정하면 **즉시** AIHubVault의 `_WORKSPACE_VERSION.md`에 버전을 기록한다. 테스트·배포·후속 작업보다 버전 기록이 먼저다.
 
-1. 당일 최대 버전 번호 확인 → +1로 새 버전 생성 (형식: `YYYYMMDDNNNN`)
-2. 변경 내용을 테이블 최상단에 추가
+**workspace 편집 순서 (강제):**
+1. 파일 수정
+2. **즉시** `_WORKSPACE_VERSION.md`에 버전 기록 (당일 최대 번호 +1, 형식: `YYYYMMDDNNNN`)
+3. 그 다음 테스트·배포·동기화 등 후속 작업 진행
 
-**버전 기록 없이 workspace 작업을 완료 보고하지 않는다.**
+**버전 기록 없이 다음 단계로 넘어가지 않는다.**
 
 ## 루트 레벨 편집 — 버전 기록 (강제)
 

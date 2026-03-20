@@ -24,6 +24,8 @@
 | vault-route.md | 볼트 라우팅 및 진입 |
 | vault-update.md | 세션 종료 루틴 |
 | install-plugin.md | Obsidian 플러그인 설치 |
+| open-vault.md | Obsidian 볼트 열기 |
+| open-note.md | Obsidian 노트 열기 |
 
 ## custom/ — 사용자 스킬 (동기화 미대상)
 
