@@ -13,37 +13,12 @@
 | AIHubVault | `Vaults/BasicVaults/AIHubVault/` | **작업환경 원본(Hub)** — AI 작업환경 설계·개선·배포 허브 | active |
 | BasicContentsVault | `Vaults/BasicVaults/BasicContentsVault/` | 범용 콘텐츠 저장소 | active |
 
-### Domains (도메인 지식 볼트)
-
-| 볼트 ID | 경로 | 역할 | 상태 |
-|---------|------|------|------|
-| Unity | `Vaults/Domains_Game/Unity/` | Unity 엔진 도메인 지식 | active |
-| CapCut | `Vaults/Domains_Video/CapCut/` | CapCut 영상편집 도메인 지식 | active |
-| Notion | `Vaults/Domains_Infra/Notion/` | Notion 워크스페이스 운영 도메인 지식 | active |
-
-### Labs (도메인+프로젝트 복합 볼트)
-
-| 볼트 ID | 경로 | 역할 | 상태 |
-|---------|------|------|------|
-| ObsidianDev | `Vaults/Lab_Infra/ObsidianDev/` | Obsidian 플러그인 개발 (지식 축적 + 실제 개발) | active |
-
-### Projects (프로젝트 볼트)
-
-| 볼트 ID | 경로 | 역할 | 상태 |
-|---------|------|------|------|
-| Project_VamSurLike | `Vaults/Projects_Game/Project_VamSurLike/` | 뱀서라이크 게임 프로젝트 | active |
-
-### References (참조 전용)
-
-| 볼트 ID | 경로 | 역할 | 상태 |
-|---------|------|------|------|
-| Unity_Documentation | `References/Unity_Documentation/` | Unity 6.3 공식 매뉴얼·스크립트 API (조회 전용) | readonly |
+> 새 볼트는 `/create-vault` 스킬로 생성한다. Domain, Lab, Project 등 용도별 카테고리로 자동 배치된다.
 
 ### 기타 루트 폴더
 
 | 폴더 | 용도 |
 |------|------|
-| `Archives/` | 볼트 형태가 아닌 일반 자료 보관 |
 | `Backup/` | 백업 |
 
 ## 볼트 진입 프로토콜 (강제)
@@ -51,14 +26,9 @@
 1. **대상 볼트 식별**
    - 명시적 지정: "AIHubVault에서 ~", "BasicContentsVault ~"
    - 키워드 추론:
-     - "AI 워크플로우", "에이전트", "_Standards", "_forge" → AIHubVault
+     - "AI 워크플로우", "에이전트", "_Standards", "_forge", "workspace" → AIHubVault (workspace 전용 Hub)
      - "콘텐츠", "노트 작성", "지식 관리" → BasicContentsVault
-     - "Unity", "유니티 엔진" → Vaults/Domains_Game/Unity
-     - "CapCut", "영상편집" → Vaults/Domains_Video/CapCut
-     - "Notion", "노션 운영" → Vaults/Domains_Infra/Notion
-     - "Obsidian 플러그인", "플러그인 개발" → Vaults/Lab_Infra/ObsidianDev
-     - "뱀서", "VamSurLike" → Vaults/Projects_Game/Project_VamSurLike
-     - "Unity 매뉴얼", "스크립트 API", "Unity 문서" → References/Unity_Documentation (readonly)
+     - 기타 도메인/프로젝트 키워드 → `_STATUS.md` 볼트 레지스트리에서 대상 볼트 확인. 없으면 `/create-vault`로 생성 안내.
    - 파일 경로 포함 시 → 경로에서 볼트 추출
    - 모호하면 → 사용자에게 확인
 
@@ -104,6 +74,7 @@
 - 임시 파일 관리 (`temp-file-management.md`)
 - 스크립트 생성 승인 (`script-creation-approval.md`)
 - 배포 동기화 (`distribution-sync.md`)
+- Obsidian 설정 안전 편집 (`obsidian-config-safety.md`)
 
 ### 네임스페이스 구조
 
