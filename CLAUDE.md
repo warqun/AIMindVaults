@@ -6,18 +6,29 @@
 
 ## 볼트 레지스트리
 
+### BasicVaults (작업환경 허브)
+
 | 볼트 ID | 경로 | 역할 | 상태 |
 |---------|------|------|------|
 | AIHubVault | `Vaults/BasicVaults/AIHubVault/` | **작업환경 원본(Hub)** — AI 작업환경 설계·개선·배포 허브 | active |
 | BasicContentsVault | `Vaults/BasicVaults/BasicContentsVault/` | 범용 콘텐츠 저장소 | active |
+
+> 새 볼트는 `/create-vault` 스킬로 생성한다. Domain, Lab, Project 등 용도별 카테고리로 자동 배치된다.
+
+### 기타 루트 폴더
+
+| 폴더 | 용도 |
+|------|------|
+| `Backup/` | 백업 |
 
 ## 볼트 진입 프로토콜 (강제)
 
 1. **대상 볼트 식별**
    - 명시적 지정: "AIHubVault에서 ~", "BasicContentsVault ~"
    - 키워드 추론:
-     - "AI 워크플로우", "에이전트", "_Standards", "_forge" → AIHubVault
+     - "AI 워크플로우", "에이전트", "_Standards", "_forge", "workspace" → AIHubVault (workspace 전용 Hub)
      - "콘텐츠", "노트 작성", "지식 관리" → BasicContentsVault
+     - 기타 도메인/프로젝트 키워드 → `_STATUS.md` 볼트 레지스트리에서 대상 볼트 확인. 없으면 `/create-vault`로 생성 안내.
    - 파일 경로 포함 시 → 경로에서 볼트 추출
    - 모호하면 → 사용자에게 확인
 
@@ -50,10 +61,28 @@
 
 ## 공통 강제 규칙 참조
 
-아래 규칙은 `.claude/rules/`에 정의되어 모든 볼트에 자동 적용:
+아래 규칙은 `.claude/rules/core/`에 정의되어 모든 볼트에 자동 적용:
 - 인코딩 안전 (`encoding-safety.md`)
 - 편집 모드 분리 (`edit-mode-separation.md`)
 - Post-Edit Review (`post-edit-review.md`)
 - 스크립트 관리 (`script-management.md`)
 - Juggl 스타일 동기화 (`juggl-style-sync.md`)
 - 노트 작성 패턴 (`note-writing.md`)
+- 볼트 라우팅 (`vault-routing.md`)
+- 세션 종료 (`session-exit.md`)
+- 토큰 최적화 (`token-optimization.md`)
+- 임시 파일 관리 (`temp-file-management.md`)
+- 스크립트 생성 승인 (`script-creation-approval.md`)
+- 배포 동기화 (`distribution-sync.md`)
+- Obsidian 설정 안전 편집 (`obsidian-config-safety.md`)
+
+### 네임스페이스 구조
+
+```
+.claude/rules/core/     ← 배포 규칙 (동기화 대상)
+.claude/rules/custom/   ← 사용자 규칙 (동기화 미대상)
+.claude/commands/core/   ← 배포 스킬 (동기화 대상)
+.claude/commands/custom/ ← 사용자 스킬 (동기화 미대상)
+```
+
+각 폴더의 `MANIFEST.md`에 배포 파일 목록이 명시되어 있다.

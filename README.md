@@ -28,11 +28,24 @@ AIMindVaults/                        ← AI 에이전트 프로젝트 루트
 ├── CODEX.md                         ← Codex 라우팅 허브
 ├── .claude/rules/                   ← 공통 AI 규칙 (전 볼트 자동 적용)
 ├── Vaults/
-│   └── BasicVaults/
-│       ├── AIHubVault/              ← 작업환경 원본 (Hub)
-│       └── BasicContentsVault/      ← 범용 콘텐츠 저장소
+│   ├── BasicVaults/                 ← 작업환경 허브
+│   │   ├── AIHubVault/              ← 규칙/도구/표준 원본 (Hub)
+│   │   └── BasicContentsVault/      ← 범용 콘텐츠 저장소
+│   ├── Domains_*/                   ← 도메인 지식 볼트 (지식 축적 전용)
+│   ├── Lab_*/                       ← Lab 볼트 (지식 축적 + 실제 개발)
+│   └── Projects_*/                  ← 프로젝트 볼트 (실행 전용)
 └── References/                      ← 참조 전용 자료
 ```
+
+### 볼트 유형
+
+| 유형 | 접두사 | 역할 |
+|------|--------|------|
+| **Basic** | `BasicVaults/` | 작업환경 허브, 범용 템플릿 |
+| **Domain** | `Domains_*/` | 특정 주제의 지식 축적 전용 |
+| **Lab** | `Lab_*/` | 지식 축적 + 실제 개발이 함께 이루어지는 복합 볼트 |
+| **Project** | `Projects_*/` | 실전 프로젝트 실행 전용 |
+| **Reference** | `References/` | 외부 자료 조회 전용 (읽기 전용) |
 
 ---
 
@@ -103,8 +116,11 @@ AI 에이전트가 따르는 규칙은 3단계입니다:
 
 ## 볼트 추가하기
 
-1. `_forge/clone_vault.ps1`로 AIHubVault를 복제하거나 직접 만들기
-2. `Vaults/` 안에 적절한 위치에 배치
+1. `/create-vault <카테고리>/<볼트명>` 스킬 실행 (BasicContentsVault 기반 복제)
+2. 볼트 유형에 맞는 카테고리에 배치:
+   - 지식 축적만: `Domains_<영역>/`
+   - 지식 + 개발: `Lab_<영역>/`
+   - 실행 전용: `Projects_<영역>/`
 3. Obsidian에서 볼트 등록 + Shell Commands 설정
 4. 루트 `CLAUDE.md`의 볼트 레지스트리 테이블에 추가
 
