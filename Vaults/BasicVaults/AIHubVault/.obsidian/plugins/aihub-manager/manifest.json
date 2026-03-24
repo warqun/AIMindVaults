@@ -1,0 +1,10 @@
+{
+  "id": "aihub-manager",
+  "name": "AIHub Manager",
+  "version": "0.1.0",
+  "minAppVersion": "1.4.0",
+  "description": "Manage .claude/rules, Claudian settings, MCP server, and vault automation for AIMindVaults",
+  "author": "AIMindVaults",
+  "authorUrl": "",
+  "isDesktopOnly": true
+}

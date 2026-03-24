@@ -4,6 +4,7 @@
 .obsidian/plugins/*/data.json
 !.obsidian/plugins/obsidian-shellcommands/data.json
 .obsidian/plugins/mcp-tools/
+.obsidian/plugins/aihub-manager/node_modules/
 .obsidian/workspace.json
 
 # ═══════════════════════════════════════════
