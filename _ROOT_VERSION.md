@@ -3,7 +3,7 @@ type: version-log
 tags:
   - AIMindVault
   - root
-updated: 2026-03-21
+updated: 2026-04-01
 ---
 
 # Root Version Log
@@ -12,6 +12,19 @@ updated: 2026-03-21
 
 | 버전 | 날짜 | 변경 내용 |
 |------|------|----------|
+| R029 | 2026-04-01 | 세션 핸드오프 에이전트별 분리. `_SESSION_HANDOFF.md` → `_SESSION_HANDOFF_CLAUDE.md` + `_SESSION_HANDOFF_CODEX.md`. `session-exit.md` 규칙 갱신, `CLAUDE.md` 진입 프로토콜 갱신 |
+| R028 | 2026-04-01 | JissouGame 신규 볼트 생성. `Projects_Game` 카테고리 신설, 루트 `AGENTS.md`, `CLAUDE.md`, `_STATUS.md`, `.claude/rules/core/vault-individualization.md` 갱신 |
+| R027 | 2026-04-01 | TileMapToolKit 신규 볼트 생성. 루트 `AGENTS.md`, `CLAUDE.md`, `_STATUS.md`에 레지스트리/라우팅 추가 |
+| R026 | 2026-04-01 | `note-writing.md` — frontmatter `agent` 필드 규칙 명시: 최신 작업자만이 아니라 해당 노트에 작업한 에이전트를 누적 기록 |
+| R025 | 2026-03-23 | 볼트 개별화 규칙 신설 (`.claude/rules/core/vault-individualization.md`) — 볼트 생성 시 이름/분류/CLAUDE.md/태그 표준화 |
+| R024 | 2026-03-23 | 멀티볼트 개인화 규칙 신설 (`.claude/rules/custom/multivault-personalization.md`) — 에이전트/플러그인/스킬 커스텀 설정 |
+| R023 | 2026-03-21 | Personal 카테고리 신설 + `Vaults/Personal/Diary/` 다이어리 볼트 생성. 루트 CLAUDE.md, _STATUS.md에 등록. 라우팅 키워드 추가 |
+| R022 | 2026-03-21 | 세션 핸드오프 시스템 도입. 루트 `_SESSION_HANDOFF.md` 신규, `session-exit.md` 핸드오프 작성 규칙 추가, 루트 `CLAUDE.md` 진입 프로토콜에 핸드오프 읽기 추가 |
+| R021 | 2026-03-21 | 신규 볼트 2개 생성: `Vaults/Domains_Infra/AI` (AI 도메인), `Vaults/Projects_Infra/Project_AIMindVaults` (프로젝트) — AIHubVault 콘텐츠 분리 준비 |
+| R020 | 2026-03-21 | `note-writing.md` 위키링크 필수 규칙 추가 — 새 노트 생성 시 같은 볼트 내 관련 노트 위키링크 1개 이상 강제 |
+| R019 | 2026-03-21 | `note-writing.md` H1 제목 규칙 추가 — URI 예약문자·이모지 금지 (강제). 파일명에도 이모지 금지 추가 |
+| R018 | 2026-03-21 | `Vaults/Domains_Infra/Search/` 신규 볼트 생성. 검색 엔진·인덱싱·텍스트 매칭 도메인 지식 허브. 루트 CLAUDE.md, _STATUS.md에 등록 |
+| R017 | 2026-03-21 | `Vaults/Domains_Infra/CICD/` 신규 볼트 생성. CI/CD 및 배포 동기화 도메인 지식 허브. 루트 CLAUDE.md, _STATUS.md에 등록 |
 | R016 | 2026-03-21 | Codex 데스크탑 앱 전환. 루트+11볼트 `AGENTS.md` 신규 생성(2단계 라우팅+실행 구조). playbooks → `.codex/skills/` SKILL.md 형식 변환. `.antigravity/workflows/` → `.codex/skills/`로 이관. `agent-ownership.md` 충돌 방지 규칙 신규. 기존 CODEX.md, .antigravity에 deprecated 표시 |
 | R015 | 2026-03-19 | `.claude/rules/vault-routing.md` 신규: 볼트 라우팅 강제 규칙. BasicContentsVault 직접 작업 금지, 콘텐츠 배치 전 볼트 레지스트리 확인 필수 |
 | R014 | 2026-03-19 | 에이전트 규칙 정본 참조 방식 전환. Cursor/Codex/Antigravity 복제 규칙 8개 삭제 → `.claude/rules/` 정본 참조 + 에이전트 고유 `agent-rules` 파일로 대체. AIHubVault 내부 Codex/Antigravity 진입점에도 정본 참조 추가 |

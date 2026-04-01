@@ -27,8 +27,13 @@
 | token-optimization.md | 토큰 절약 |
 | vault-routing.md | 볼트 라우팅 |
 | obsidian-config-safety.md | Obsidian 설정 파일 안전 편집 |
+| vault-individualization.md | 볼트 개별화 (생성 시 이름/분류/역할 구체화) |
 
 ## custom/ — 사용자 규칙 (동기화 미대상)
 
 사용자가 자유롭게 추가하는 개인 규칙.
 배포 동기화가 이 폴더를 건드리지 않는다.
+
+| 파일명 | 용도 |
+|--------|------|
+| multivault-personalization.md | 멀티볼트 개인화 (에이전트/플러그인/스킬 커스텀) |

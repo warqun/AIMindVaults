@@ -1,6 +1,6 @@
 ---
 type: status-hub
-updated: 2026-03-21
+updated: 2026-04-01
 ---
 
 # STATUS HUB — 멀티볼트 레지스트리

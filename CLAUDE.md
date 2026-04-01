@@ -75,6 +75,7 @@
 - 스크립트 생성 승인 (`script-creation-approval.md`)
 - 배포 동기화 (`distribution-sync.md`)
 - Obsidian 설정 안전 편집 (`obsidian-config-safety.md`)
+- 볼트 개별화 (`vault-individualization.md`)
 
 ### 네임스페이스 구조
 

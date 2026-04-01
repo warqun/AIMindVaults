@@ -74,8 +74,10 @@ $robocopyArgs = @(
     "/COPY:DAT",
     "/R:3", "/W:1",
     "/XD", ".git", ".stfolder", "smart-connections", "cache",
+           ".smart-env", ".trash", ".bkit", ".playwright-mcp", ".pdca-snapshots",
     "/XF", "workspace.json", "workspace-mobile.json", "graph.json",
            "backlink-in-document.json", ".stignore", ".sync-conflict-*",
+           "recent_files.txt", ".bkit-memory.json", ".pdca-status.json",
     "/NP", "/NJH", "/NJS"
 )
 
