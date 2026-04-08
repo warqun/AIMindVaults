@@ -16,9 +16,15 @@ $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $VaultRoot = (Resolve-Path "$ScriptDir\..").Path
 $syncScript = Join-Path $ScriptDir "sync_workspace.ps1"
 
+# 자기 자신이 Hub이면 sync 불필요 (탐색 전 조기 판정)
+$normalizedVault = (Resolve-Path $VaultRoot).Path.TrimEnd('\')
+if (Test-Path (Join-Path $VaultRoot ".sync\.hub_marker")) {
+    Write-Host "[PRE_SYNC] 현재 볼트가 Hub입니다. 동기화 불필요." -ForegroundColor Cyan
+    exit 0
+}
+
 # Hub 경로 탐지 (sync_workspace.ps1과 동일 로직)
 $HubPath = ""
-$normalizedVault = (Resolve-Path $VaultRoot).Path.TrimEnd('\')
 
 # 1차: 스크립트 위치 기반
 $HubFromScript = (Resolve-Path "$ScriptDir\..").Path.TrimEnd('\')
@@ -26,7 +32,7 @@ if ($HubFromScript -ne $normalizedVault -and (Test-Path (Join-Path $HubFromScrip
     $HubPath = $HubFromScript
 }
 
-# 2차: AIMindVaults 루트에서 _forge 마커 탐색
+# 2차: AIMindVaults 루트에서 .sync/.hub_marker 탐색
 if (-not $HubPath) {
     $walkDir = $VaultRoot
     $rootDir = ""
@@ -56,12 +62,6 @@ if (-not $HubPath -or -not (Test-Path $HubPath)) {
     Write-Host "[PRE_SYNC] Hub를 찾을 수 없습니다. sync_workspace.ps1을 그대로 실행합니다." -ForegroundColor DarkYellow
     & $syncScript
     exit $LASTEXITCODE
-}
-
-# 자기 자신이 Hub이면 sync 불필요
-if ($normalizedVault -eq (Resolve-Path $HubPath).Path.TrimEnd('\')) {
-    Write-Host "[PRE_SYNC] 현재 볼트가 Hub입니다. 동기화 불필요." -ForegroundColor Cyan
-    exit 0
 }
 
 # ── 스크립트 버전 비교 ──
