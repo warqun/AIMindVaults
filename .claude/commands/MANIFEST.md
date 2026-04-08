@@ -28,6 +28,9 @@
 | open-note.md | Obsidian 노트 열기 |
 | reindex.md | 볼트 콘텐츠 인덱스 재빌드 |
 | open-notes.md | 복수 Obsidian 노트 새 탭 열기 (local-rest-api) |
+| note-from-video.md | 영상 → 볼트 노트 변환 파이프라인 |
+| note-from-article.md | 웹 글/텍스트 → 볼트 노트 변환 파이프라인 |
+| note-from-pdf.md | PDF → 볼트 노트 변환 파이프라인 |
 
 ## custom/ — 사용자 스킬 (동기화 미대상)
 
