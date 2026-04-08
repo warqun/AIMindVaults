@@ -16,13 +16,13 @@
 
 AIMindVaults는 Obsidian 기반 멀티볼트 지식 관리 시스템이다.
 
-- 기본 2개 볼트(AIHubVault, BasicContentsVault)가 제공되며, 용도별로 볼트를 추가하여 확장한다.
+- 27개 이상의 볼트가 용도별로 분류되어 있다 (도메인 지식, 프로젝트, 개인 기록, 참조 문서 등).
 - AIHubVault가 단일 원본(Hub)으로, 모든 볼트의 작업환경(규칙, 스크립트, 표준)을 동기화한다.
 - 볼트 추가 시 `BasicContentsVault/.sync/clone_vault.ps1`로 BasicContentsVault를 클론하여 생성한다.
 
 ### 환경 설정
 
-- 새 환경에서는 각 볼트를 Obsidian 볼트 매니저에서 등록한 뒤, 동기화와 인덱스 빌드가 자동 실행된다.
+- 새 환경에서는 `_tools/setup_new_environment.ps1`을 실행하여 볼트 등록, 동기화, 인덱스 빌드를 자동화할 수 있다.
 - 외부 소프트웨어 설치 가이드: `SETUP_GUIDE.md` 참조.
 - 환경 진단 결과에서 미설치 항목이 있으면 `SETUP_GUIDE.md`의 설치 방법을 안내한다.
 
@@ -32,16 +32,20 @@ AIMindVaults는 Obsidian 기반 멀티볼트 지식 관리 시스템이다.
 
 전체 레지스트리는 `CLAUDE.md` 또는 `AGENTS.md`에 있다. 주요 카테고리:
 
-| 카테고리 | 경로 패턴 | 설명 |
+| 카테고리 | 경로 패턴 | 예시 |
 |----------|----------|------|
-| BasicVaults | `Vaults/BasicVaults/` | AIHubVault (Hub), BasicContentsVault (클론 템플릿) |
-| Domains_* | `Vaults/Domains_*/` | 도메인 지식 볼트 (Game, Infra, Video, Art 등) |
-| Lab_* | `Vaults/Lab_*/` | 도메인+프로젝트 복합 볼트 |
-| Projects_* | `Vaults/Projects_*/` | 프로젝트 작업물 볼트 |
-| Personal | `Vaults/Personal/` | 개인 기록 |
-| References | `References/` | 참조 전용 (readonly) |
-
-기본 제공: AIHubVault + BasicContentsVault. 필요에 따라 `/create-vault`로 볼트를 추가한다.
+| BasicVaults | `Vaults/BasicVaults/` | AIHubVault (Hub), BasicContentsVault (템플릿) |
+| Domains_Game | `Vaults/Domains_Game/` | Unity, GameDesign, GameArt |
+| Domains_Video | `Vaults/Domains_Video/` | CapCut |
+| Domains_Infra | `Vaults/Domains_Infra/` | Notion, CICD, Search, AI, AppFlowy |
+| Domain_Art | `Vaults/Domain_Art/` | LightAndColor |
+| Domains_Business | `Vaults/Domains_Business/` | Funding |
+| Lab_Infra | `Vaults/Lab_Infra/` | ObsidianDev |
+| Lab_Game | `Vaults/Lab_Game/` | CombatToolKit, TileMapToolKit |
+| Projects_Game | `Vaults/Projects_Game/` | JissouGame |
+| Projects_Infra | `Vaults/Projects_Infra/` | Project_AIMindVaults |
+| Personal | `Vaults/Personal/` | Diary |
+| References | `References/` | Unity_Documentation (readonly) |
 
 ---
 
@@ -75,8 +79,8 @@ AIMindVaults/                    ← 멀티볼트 루트
         ├── CLAUDE.md            ← 볼트 전용 규칙
         └── .sync/               ← 동기화 미러 (Hub에서 전파)
             ├── _Standards/Core/ ← 운영 표준
-            ├── _tools/cli/      ← CLI 도구 (검증, 인덱서, 런처)
-            └── _tools/data/     ← 인덱스 데이터 (vault_index.json)
+            ├── _tools/cli/      ← CLI 도구 (검증, 인덱서)
+            └── _tools/data/     ← 인덱스 데이터
 ```
 
 ---
@@ -105,7 +109,34 @@ AIMindVaults/                    ← 멀티볼트 루트
 
 ---
 
-## 6. 편집 모드 분리
+## 6. 환경 점검 (온보딩 완료 후)
+
+이 문서와 에이전트별 온보딩을 읽은 직후, 실제 작업에 들어가기 전에 아래를 점검한다. 문제를 발견하면 **수정하지 말고 사용자에게 보고**한다.
+
+### 필수 점검
+
+| 점검 항목 | 확인 방법 | 이상 시 |
+|-----------|----------|---------|
+| 진입점 파일 존재 | `CLAUDE.md` 또는 `AGENTS.md` 루트에 존재 | 누락 보고 |
+| 볼트 레지스트리 | `_STATUS.md`의 볼트 목록과 `Vaults/` 실제 폴더 비교 | 미등록 볼트 보고 |
+| Hub 마커 | `Vaults/BasicVaults/AIHubVault/.sync/.hub_marker` 존재 | Hub 식별 불가 보고 |
+| 동기화 버전 | 대상 볼트의 `_WORKSPACE_VERSION.md` 최상단 버전과 Hub 비교 | 버전 차이 보고 |
+
+### 선택 점검 (이상 징후 발견 시)
+
+- **문서-실제 불일치**: 규칙/온보딩이 참조하는 경로에 실제 파일이 없으면 보고
+- **인덱스 부재**: 대상 볼트에 `vault_index.json`이 없으면 `/reindex` 실행 제안
+- **구경로 잔재**: 스크립트/설정에서 `.sync/` 구조 이전의 경로(`_tools/cli/` 등)를 발견하면 보고
+
+### 점검 원칙
+
+- **수정보다 보고 우선**: 점검 단계에서는 파일을 수정하지 않는다. 발견한 문제를 목록으로 정리하여 사용자에게 보고한 뒤, 사용자 판단에 따라 수정한다.
+- **작업 차단 아님**: 점검 결과가 현재 요청된 작업을 막지 않는다면, 보고 후 작업을 진행한다. 작업에 직접 영향을 주는 문제만 선행 해결을 제안한다.
+- **반복 점검 금지**: 같은 세션에서 동일 점검을 반복하지 않는다. 첫 진입 시 1회만 수행.
+
+---
+
+## 7. 편집 모드 분리
 
 모든 편집은 두 모드 중 하나를 선언한 후 수행한다. 모드 혼합 금지.
 
@@ -123,7 +154,7 @@ AIMindVaults/                    ← 멀티볼트 루트
 
 ---
 
-## 7. 노트 작성 규약
+## 8. 노트 작성 규약
 
 ### Frontmatter 필수
 ```yaml
@@ -152,7 +183,7 @@ local: 파일명_without_extension
 
 ---
 
-## 8. 세션 종료 규약
+## 9. 세션 종료 규약
 
 세션 종료 시 아래를 **모두** 수행해야 한다. 하나라도 빠지면 세션 종료 불가.
 
@@ -173,7 +204,7 @@ local: 파일명_without_extension
 
 ---
 
-## 9. Hub-Sync 동기화
+## 10. Hub-Sync 동기화
 
 - AIHubVault가 단일 원본(Hub). `.sync/` 폴더 안의 모든 파일이 동기화 대상.
 - Hub 식별: `.sync/.hub_marker` 파일 존재 여부.
@@ -183,7 +214,7 @@ local: 파일명_without_extension
 
 ---
 
-## 10. Post-Edit Review
+## 11. Post-Edit Review
 
 노트 편집 완료 직후 실행:
 ```powershell
@@ -199,7 +230,7 @@ powershell -ExecutionPolicy Bypass -File {볼트경로}\.sync\_tools\cli\vault_i
 
 ---
 
-## 11. 콘텐츠 인덱서
+## 12. 콘텐츠 인덱서
 
 각 볼트의 `Contents/**/*.md`를 크롤링하여 `.sync/_tools/data/`에 JSON 인덱스 생성.
 
@@ -209,7 +240,7 @@ powershell -ExecutionPolicy Bypass -File {볼트경로}\.sync\_tools\cli\vault_i
 
 ---
 
-## 12. 스크립트 관리
+## 13. 스크립트 관리
 
 - 새 스크립트 생성 전 `.sync/_Standards/Core/Script_Registry.md`에서 중복 확인.
 - **생성 전 사용자 승인 필수.** 목적, 경로, 영향 범위, 일회성 여부를 보고.
@@ -218,7 +249,7 @@ powershell -ExecutionPolicy Bypass -File {볼트경로}\.sync\_tools\cli\vault_i
 
 ---
 
-## 13. 인코딩 안전
+## 14. 인코딩 안전
 
 - `Contents` 대량 수정 전 인코딩 검증 필수.
 - 대량 수정은 UTF-8 고정 I/O만 허용.
@@ -227,7 +258,7 @@ powershell -ExecutionPolicy Bypass -File {볼트경로}\.sync\_tools\cli\vault_i
 
 ---
 
-## 14. 토큰 절약
+## 15. 토큰 절약
 
 - **핀포인트 접근**: 필요한 파일만 정확히 지정. 광범위 검색 금지.
 - 경로를 모르면 사용자에게 먼저 확인.
@@ -237,7 +268,7 @@ powershell -ExecutionPolicy Bypass -File {볼트경로}\.sync\_tools\cli\vault_i
 
 ---
 
-## 15. 임시 파일 관리
+## 16. 임시 파일 관리
 
 - CLI 명령 실행 시 임시 파일은 `$env:TEMP` 하위에만 생성.
 - 볼트 내에 임시 파일(`.vtt`, `.json`, `.tmp`, `.log` 등) 방치 금지.
@@ -245,7 +276,7 @@ powershell -ExecutionPolicy Bypass -File {볼트경로}\.sync\_tools\cli\vault_i
 
 ---
 
-## 16. Obsidian 노트/볼트 열기
+## 17. Obsidian 노트/볼트 열기
 
 이 환경의 `.md` 노트는 Obsidian 볼트 안에 있다. 노트를 열 때는 Obsidian URI를 사용한다.
 
@@ -272,7 +303,7 @@ Start-Process 'obsidian://open?vault=볼트명&file=볼트루트기준_상대경
 
 ---
 
-## 17. 보안 안내
+## 18. 보안 안내
 
 이 시스템은 네트워크 서비스나 별도 인증 체계 없이 **로컬 파일 + 로컬 에이전트**로만 동작한다.
 
