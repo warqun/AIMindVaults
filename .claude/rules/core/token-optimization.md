@@ -3,10 +3,61 @@
 > 모든 볼트에 동일 적용. 모든 에이전트 공통.
 > 배경: Antigravity 등 백그라운드 에이전트의 과도한 토큰 소모 방지 목적.
 
+## 0. 콘텐츠 인덱서 우선 검색 (강제)
+
+볼트 내 노트를 찾거나, 내용을 점검하거나, 파일 목록을 파악할 때 **반드시 콘텐츠 인덱서를 먼저 사용**한다.
+
+### 검색 순서 (강제)
+
+```
+1단계: vault_index_search.ps1 — 인덱스 기반 키워드/태그/타입 검색
+2단계: 인덱서 결과가 불충분할 때만 → Grep, Glob, Read 등 직접 파일 탐색
+```
+
+**인덱서를 거치지 않고 바로 파일 탐색(Grep, Glob, find, ls)에 들어가지 않는다.**
+
+### 사용법
+
+```powershell
+# 키워드 검색
+powershell -ExecutionPolicy Bypass -File "{볼트경로}/.sync/_tools/cli/vault_index_search.ps1" -VaultRoot "{볼트경로}" -Query "검색어"
+
+# 태그 필터
+powershell -ExecutionPolicy Bypass -File "{볼트경로}/.sync/_tools/cli/vault_index_search.ps1" -VaultRoot "{볼트경로}" -Tag "태그명"
+
+# 타입 필터
+powershell -ExecutionPolicy Bypass -File "{볼트경로}/.sync/_tools/cli/vault_index_search.ps1" -VaultRoot "{볼트경로}" -Type "knowledge"
+
+# AI 컨텍스트용 압축 출력
+... -Format compact -Top 5
+```
+
+### 파라미터
+
+| 파라미터 | 용도 | 기본값 |
+|---------|------|--------|
+| `-Query` | 키워드 검색 (title, tags, headings에 가중 랭킹) | |
+| `-Tag` | 태그 필터 | |
+| `-Type` | frontmatter type 필터 | |
+| `-Format` | 출력 형식 (`table` / `compact`) | `table` |
+| `-Top` | 상위 N건 | 10 |
+
+### 인덱서 fallback 조건
+
+아래 경우에만 직접 파일 탐색으로 전환한다:
+- `vault_index.json`이 존재하지 않거나 빌드된 적 없는 볼트
+- 인덱서 검색 결과가 0건이고, 파일이 존재할 가능성이 높은 경우
+- 인덱서에 포함되지 않는 파일 (`.obsidian/`, `_tools/`, 스크립트 등 비콘텐츠)
+
+### 인덱스 최신성 확인
+
+- 인덱서 결과가 의심스러우면 `/reindex` 스킬로 증분 빌드 후 재검색
+- 대량 노트 추가/삭제 후에는 `/reindex` 실행을 권장
+
 ## 1. 파일 탐색 최소화
 
 - 파일을 읽거나 찾을 때 **핀포인트 접근**만 허용한다. 광범위 검색(`find`, `grep` 전체 스캔) 금지.
-- 정확한 경로를 모르면 **사용자에게 먼저 경로를 묻는다**. 추측으로 여러 경로를 탐색하지 않는다.
+- 정확한 경로를 모르면 **인덱서 검색을 먼저 시도**하고, 그래도 없으면 사용자에게 경로를 묻는다.
 - 대형 파일(100줄 이상)은 **필요한 부분만** 읽는다. 전체 로드 금지.
 - 같은 파일을 세션 내에서 **반복 읽기 금지**. 한 번 읽은 내용은 기억해서 재사용한다.
 

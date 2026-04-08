@@ -17,6 +17,18 @@
 - 등록 항목: 볼트명, 타입 (카테고리에서 추론), 콘텐츠 설명, 작업 에이전트
 - 사용자가 직접 생성한 볼트도 동일하게 적용.
 
+## 볼트 첫 접근 시 인덱스 빌드 (강제)
+
+에이전트가 볼트에 처음 접근할 때 (신규 생성이든, 사용자가 만든 볼트든) `vault_index.json`이 없으면 **콘텐츠 인덱스를 빌드**한다.
+
+```powershell
+powershell -ExecutionPolicy Bypass -File "{볼트경로}/.sync/_tools/cli/vault_index_build.ps1" -VaultRoot "{볼트경로}"
+```
+
+- 인덱서 스크립트(`.sync/_tools/cli/vault_index_build.ps1`)가 없으면 스킵하고 로그 남김
+- 빌드 완료 후 `vault_index_search.ps1`를 통한 검색이 가능해진다
+- 이후 노트 탐색/점검 시 인덱서 우선 검색 규칙(`token-optimization.md` § 0) 적용
+
 ## 라우팅 규칙
 
 - 도메인 지식 (Unity, CapCut, Notion, Git 등) → 해당 `Vaults/Domains_*/` 볼트

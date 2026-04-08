@@ -75,6 +75,12 @@ powershell -ExecutionPolicy Bypass -File "<BasicContentsVault경로>/_tools/clon
 1. workspace 동기화 실행 (Hub에서 Core 파일 전파)
 2. 루트 `_STATUS.md` 볼트 레지스트리에 등록
 3. 루트 `CLAUDE.md` 볼트 진입 프로토콜에 키워드 추가
+4. **초기 콘텐츠 인덱스 빌드** (강제):
+```powershell
+powershell -ExecutionPolicy Bypass -File "{볼트경로}/.sync/_tools/cli/vault_index_build.ps1" -VaultRoot "{볼트경로}"
+```
+   - 인덱서 스크립트가 없으면 workspace 동기화가 안 된 것이므로 1번부터 재확인
+   - 빌드 완료 후 `vault_index.json` 생성을 확인
 
 ## 배포 동기화 대상 제외 항목
 
