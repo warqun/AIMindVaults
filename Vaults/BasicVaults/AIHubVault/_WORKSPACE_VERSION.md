@@ -15,6 +15,7 @@ updated: 2026-04-13
 
 | 버전           | 변경 내용 |
 | ------------ | ----- |
+| 202604130009 | cli-node Phase 4: sync 엔진 포팅 (sync-workspace, pre-sync). fs-mirror에 noPrune 옵션 추가. aimv sync/pre-sync 커맨드 등록 |
 | 202604130008 | cli-node Phase 3: post-edit-review 포팅 (UTF-8 검증 + 자동 인덱서 호출). aimv review 커맨드 등록 |
 | 202604130007 | cli-node Phase 2: 인덱서 4개 커맨드 포팅 (index-build, index-search, master-index-build, master-index-search). bin/cli.js에 index 서브커맨드 등록 |
 | 202604130006 | cli-node Phase 0+1: Node.js CLI 스캐폴딩 + lib 유틸리티 (vault-path, config, fs-mirror, frontmatter, logger). commander + gray-matter 의존성 |

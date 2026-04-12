@@ -82,6 +82,26 @@ program
   });
 
 // Phase 4: sync commands
-// program.command('sync').description('Workspace sync');
+program
+  .command('sync')
+  .description('Workspace sync between vault and Hub')
+  .option('-r, --vault-root <path>', 'Vault root path (auto-detect from CWD)')
+  .option('--hub-path <path>', 'Hub vault path (auto-detect via .hub_marker)')
+  .option('-d, --dry-run', 'Preview changes without executing')
+  .option('--no-prune', 'Skip deleting target-only files')
+  .option('--verify-content', 'Force file hash verification even if versions match')
+  .action(async (opts) => {
+    const { syncWorkspace } = await import('../src/commands/sync-workspace.js');
+    await syncWorkspace({ vaultRoot: opts.vaultRoot, hubPath: opts.hubPath, dryRun: opts.dryRun, noPrune: opts.noPrune, verifyContent: opts.verifyContent });
+  });
+
+program
+  .command('pre-sync')
+  .description('Auto-update cli-node from Hub, then run sync')
+  .option('-r, --vault-root <path>', 'Vault root path')
+  .action(async (opts) => {
+    const { preSync } = await import('../src/commands/pre-sync.js');
+    await preSync({ vaultRoot: opts.vaultRoot });
+  });
 
 program.parse();

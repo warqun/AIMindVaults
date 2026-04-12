@@ -19,6 +19,7 @@ import { join, relative, basename } from 'node:path';
  * @param {string[]} [options.excludeDirs=[]] - Directory names to skip.
  * @param {string[]} [options.excludeFiles=[]] - File names to skip.
  * @param {boolean} [options.dryRun=false] - Log actions without executing.
+ * @param {boolean} [options.noPrune=false] - Skip deleting target-only files.
  * @param {(msg: string) => void} [options.log] - Logger function.
  * @returns {Promise<{ copied: number, deleted: number, unchanged: number }>}
  */
@@ -27,6 +28,7 @@ export async function mirrorDirectory(source, target, options = {}) {
     excludeDirs = [],
     excludeFiles = [],
     dryRun = false,
+    noPrune = false,
     log = () => {},
   } = options;
 
@@ -40,12 +42,12 @@ export async function mirrorDirectory(source, target, options = {}) {
     await mkdir(target, { recursive: true });
   }
 
-  await syncDir(source, target, excludeDirs, excludeFiles, dryRun, log, stats);
+  await syncDir(source, target, excludeDirs, excludeFiles, dryRun, noPrune, log, stats);
 
   return stats;
 }
 
-async function syncDir(source, target, excludeDirs, excludeFiles, dryRun, log, stats) {
+async function syncDir(source, target, excludeDirs, excludeFiles, dryRun, noPrune, log, stats) {
   // Ensure target dir exists
   if (!existsSync(target) && !dryRun) {
     await mkdir(target, { recursive: true });
@@ -57,8 +59,8 @@ async function syncDir(source, target, excludeDirs, excludeFiles, dryRun, log, s
 
   const sourceNames = new Set(sourceEntries.map(e => e.name));
 
-  // Delete target entries not in source
-  for (const entry of targetEntries) {
+  // Delete target entries not in source (unless noPrune)
+  if (!noPrune) for (const entry of targetEntries) {
     if (excludeDirs.includes(entry.name) || excludeFiles.includes(entry.name)) continue;
 
     if (!sourceNames.has(entry.name)) {
@@ -84,7 +86,7 @@ async function syncDir(source, target, excludeDirs, excludeFiles, dryRun, log, s
     const targetPath = join(target, entry.name);
 
     if (entry.isDirectory) {
-      await syncDir(sourcePath, targetPath, excludeDirs, excludeFiles, dryRun, log, stats);
+      await syncDir(sourcePath, targetPath, excludeDirs, excludeFiles, dryRun, noPrune, log, stats);
     } else {
       const needsCopy = await shouldCopyFile(sourcePath, targetPath);
       if (needsCopy) {
