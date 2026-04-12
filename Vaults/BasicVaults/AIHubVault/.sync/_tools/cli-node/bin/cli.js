@@ -70,7 +70,16 @@ index
   });
 
 // Phase 3: review commands
-// program.command('review').description('Post-edit review');
+program
+  .command('review')
+  .description('Post-edit UTF-8 validation + auto index build')
+  .option('-r, --vault-root <path>', 'Vault root path (auto-detect if omitted)')
+  .option('-s, --scope <name>', 'Content scope folder (auto-detect: Contents/Project/docs)')
+  .option('-v, --verbose', 'Verbose output')
+  .action(async (opts) => {
+    const { postEditReview } = await import('../src/commands/post-edit-review.js');
+    await postEditReview({ vaultRoot: opts.vaultRoot, scope: opts.scope, verbose: opts.verbose });
+  });
 
 // Phase 4: sync commands
 // program.command('sync').description('Workspace sync');
