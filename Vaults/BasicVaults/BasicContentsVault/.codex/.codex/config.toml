@@ -1,9 +1,0 @@
-# Codex 프로젝트 설정
-# 기준: https://developers.openai.com/codex/config-advanced/
-
-# CODEX.md 파일 최대 읽기 크기 (기본 32KB → 64KB로 확장)
-# .codex/rules/ 전체를 로딩 지시에 담기 위해 여유분 확보
-project_doc_max_bytes = 65536
-
-# 하위 디렉토리에서 대신 읽을 파일명 목록 (CODEX.md 기준)
-project_doc_fallback_filenames = ["CODEX.md"]
