@@ -21,14 +21,14 @@
 - 카테고리 폴더가 없으면 생성 불가 — 사용자에게 확인
 - 이미 존재하는 볼트명이면 중단
 
-### 2. clone_vault.ps1 실행 (강제 — 수동 복사 금지)
+### 2. clone 커맨드 실행 (강제 — 수동 복사 금지)
 
-```powershell
-powershell -ExecutionPolicy Bypass -File "C:/AIMindVaults/Vaults/BasicVaults/BasicContentsVault/.sync/clone_vault.ps1" -TargetPath "C:/AIMindVaults/Vaults/<카테고리>/<볼트명>" -ProjectName "<볼트명>"
+```bash
+node "{BasicContentsVault}/.sync/_tools/cli-node/bin/cli.js" clone -t "C:/AIMindVaults/Vaults/<카테고리>/<볼트명>" -n "<볼트명>"
 ```
 
-- 소스: **BasicContentsVault** (범용 볼트 템플릿)
-- 반드시 이 스크립트를 사용한다. `Copy-Item`, `cp`, `xcopy` 등 수동 복사 금지.
+- 소스: **BasicContentsVault** (범용 볼트 템플릿, 자동 감지)
+- 반드시 이 CLI를 사용한다. `Copy-Item`, `cp`, `xcopy` 등 수동 복사 금지.
 - AIHubVault는 소스로 사용하지 않음 (작업환경 허브라 구조가 무거움)
 - 상세: `.claude/rules/core/vault-individualization.md` § 볼트 생성 방법
 

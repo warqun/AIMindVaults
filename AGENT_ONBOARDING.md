@@ -18,13 +18,14 @@ AIMindVaults는 Obsidian 기반 멀티볼트 지식 관리 시스템이다.
 
 - 27개 이상의 볼트가 용도별로 분류되어 있다 (도메인 지식, 프로젝트, 개인 기록, 참조 문서 등).
 - AIHubVault가 단일 원본(Hub)으로, 모든 볼트의 작업환경(규칙, 스크립트, 표준)을 동기화한다.
-- 볼트 추가 시 `BasicContentsVault/.sync/clone_vault.ps1`로 BasicContentsVault를 클론하여 생성한다.
+- 볼트 추가 시 `aimv clone`으로 BasicContentsVault를 클론하여 생성한다.
 
 ### 환경 설정
 
-- 새 환경에서는 `_tools/setup_new_environment.ps1`을 실행하여 볼트 등록, 동기화, 인덱스 빌드를 자동화할 수 있다.
 - 외부 소프트웨어 설치 가이드: `SETUP_GUIDE.md` 참조.
-- 환경 진단 결과에서 미설치 항목이 있으면 `SETUP_GUIDE.md`의 설치 방법을 안내한다.
+- 시스템 아키텍처 상세: `docs/architecture.md` 참조.
+- CLI 도구 레퍼런스: `docs/cli-reference.md` 참조.
+- 사용자 커스터마이징: `docs/customization.md` 참조.
 
 ---
 
@@ -79,8 +80,7 @@ AIMindVaults/                    ← 멀티볼트 루트
         ├── CLAUDE.md            ← 볼트 전용 규칙
         └── .sync/               ← 동기화 미러 (Hub에서 전파)
             ├── _Standards/Core/ ← 운영 표준
-            ├── _tools/cli/      ← CLI 도구 (검증, 인덱서)
-            └── _tools/data/     ← 인덱스 데이터
+            └── _tools/cli-node/ ← Node.js CLI 도구 (aimv)
 ```
 
 ---
@@ -157,11 +157,28 @@ AIMindVaults/                    ← 멀티볼트 루트
 
 ## 8. 노트 작성 규약
 
+### 타입과 태그 시스템 (신규 사용자 안내)
+
+> **에이전트 필수**: 사용자가 첫 노트를 작성하거나 "타입이 뭐야?", "태그 어떻게 쓰는 거야?" 등 질문하면, 아래 내용을 기반으로 간결하게 설명한다.
+
+모든 노트의 frontmatter에는 `type`과 `tags` 두 가지 분류 체계가 있다.
+
+**`type`** — 노트의 유형. 목록에서 선택하는 고정값이다.
+- 학습 정리 → `study-note`, 도메인 지식 → `knowledge`, 설계서 → `design`, 계획서 → `plan`
+- 리서치 → `research`, 참고 자료 → `reference`, 보고서 → `report`, 가이드 → `guide`
+- 이슈 관련 → `issue`, `issue-spec`, `issue-design`, `issue-report`
+- 전체 목록: `.claude/rules/core/note-writing.md` § "코어 타입 목록"
+
+**`tags`** — 노트의 내용 키워드. 검색과 상세 분류용이다.
+- 기본 형식: kebab-case (`skill-system`, `game-design`), 고유명사는 원래 표기 (`Unity`, `AI`)
+- **태그 형식은 사용자가 자유롭게 정할 수 있다.** 볼트 `CLAUDE.md`에 `## 태그 규칙`을 선언하면 기본 형식 대신 적용된다.
+- 역할 분담: 노트 유형 → `type`, 대주제 → 볼트명·폴더, 상세 키워드 → `tags`
+
 ### Frontmatter 필수
 ```yaml
 ---
-type: domain          # 또는 plan, idea, meta 등
-tags: [볼트태그, 주제태그]
+type: knowledge       # 코어 타입 목록에서 선택
+tags: [Unity, skill-system]  # 내용 기반 검색 키워드
 agent: claude         # 작업한 에이전트 누적 기록 (claude, codex 등)
 updated: 2026-04-08
 ---
@@ -209,8 +226,8 @@ local: 파일명_without_extension
 
 - AIHubVault가 단일 원본(Hub). `.sync/` 폴더 안의 모든 파일이 동기화 대상.
 - Hub 식별: `.sync/.hub_marker` 파일 존재 여부.
-- 동기화 실행: `pre_sync.ps1` → 버전 비교 → `.sync/` 미러링 → 플러그인 머지.
-- Obsidian에서 볼트를 열면 `on-layout-ready` 이벤트로 `pre_sync.ps1`이 자동 실행된다 (Shell Commands 플러그인).
+- 동기화 실행: `node cli.js pre-sync` → 버전 비교 → `.sync/` 미러링 → 플러그인 머지.
+- Obsidian에서 볼트를 열면 `on-layout-ready` 이벤트로 `node cli.js pre-sync`가 자동 실행된다 (Shell Commands 플러그인).
 - workspace 편집은 반드시 AIHubVault에서 수행 → 동기화로 전파.
 
 ### Shell Commands 설정 확인 시 주의
@@ -219,32 +236,32 @@ local: 파일명_without_extension
 
 **정상 상태 기준** (모든 볼트 공통):
 - `shell_commands[0].id` = `"syncworkspace"`
-- `shell_commands[0].platform_specific_commands.default`에 `{{vault_path}}\\.sync\\pre_sync.ps1` 포함
+- `shell_commands[0].platform_specific_commands.default`에 `node "{{vault_path}}/.sync/_tools/cli-node/bin/cli.js" pre-sync` 포함
 - `shell_commands[0].events.on-layout-ready.enabled` = `true`
 
-위 3가지가 확인되면 자동 동기화 설정은 정상이다. `_tools\cli\pre_sync.ps1`(구경로)이 아닌 `.sync\pre_sync.ps1`(현재 경로)인지 주의.
+위 3가지가 확인되면 자동 동기화 설정은 정상이다.
 
 ---
 
 ## 11. Post-Edit Review
 
 노트 편집 완료 직후 실행:
-```powershell
-powershell -ExecutionPolicy Bypass -File {볼트경로}\.sync\_tools\cli\post_note_edit_review.ps1 -Root {볼트경로} -Scope Contents
+```bash
+node "{볼트경로}/.sync/_tools/cli-node/bin/cli.js" review -r "{볼트경로}" -s Contents
 ```
 - 검증: frontmatter 무결성, 인코딩 안전, WikiLink 존재.
 - `POST_EDIT_REVIEW_BAD=0` 확인 전 완료 보고 금지.
-- 통과 시 콘텐츠 인덱서 증분 빌드 자동 호출 (`vault_index_build.ps1 -Incremental`).
+- 통과 시 콘텐츠 인덱서 증분 빌드 자동 호출 (`aimv index build -i`).
 - `POST_EDIT_INDEX_UPDATED=1` 확인이 완료 조건. 실패 시 수동 인덱싱:
-```powershell
-powershell -ExecutionPolicy Bypass -File {볼트경로}\.sync\_tools\cli\vault_index_build.ps1 -VaultRoot {볼트경로} -Incremental
+```bash
+node "{볼트경로}/.sync/_tools/cli-node/bin/cli.js" index build -r "{볼트경로}" -i
 ```
 
 ---
 
 ## 12. 콘텐츠 인덱서
 
-각 볼트의 `Contents/**/*.md`를 크롤링하여 `.sync/_tools/data/`에 JSON 인덱스 생성.
+각 볼트의 `Contents/**/*.md`를 크롤링하여 `.vault_data/`에 JSON 인덱스 생성.
 
 - 추출: path, title, type, tags, headings, summary, links_to, links_from, mtime, hash
 - 증분 빌드: mtime/hash 비교로 변경된 노트만 갱신.
@@ -327,7 +344,7 @@ Start-Process 'obsidian://open?vault=볼트명&file=볼트루트기준_상대경
 ### 주의사항
 
 - **클라우드 동기화 폴더 회피**: OneDrive 등 자동 동기화 폴더에 볼트를 두면 노트가 클라우드에 평문 노출된다. 민감한 연구 데이터를 다루는 경우 동기화 폴더 밖에 배치한다.
-- **자동 실행 스크립트**: Obsidian에서 볼트를 열면 `.sync/pre_sync.ps1`이 자동 실행되어 Hub→위성볼트 설정 동기화를 수행한다. 내용은 해당 파일에서 확인 가능하다.
+- **자동 실행 스크립트**: Obsidian에서 볼트를 열면 `node cli.js pre-sync`가 자동 실행되어 Hub→위성볼트 설정 동기화를 수행한다. 소스: `.sync/_tools/cli-node/src/commands/pre-sync.js`
 - **프롬프트 인젝션**: 에이전트가 노트를 읽을 때, 노트 내용에 포함된 악의적 지시를 따를 가능성이 있다. 외부에서 가져온 노트는 내용을 확인한 후 볼트에 추가한다.
 
 ---

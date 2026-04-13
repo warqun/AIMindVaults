@@ -82,14 +82,14 @@ Obsidian에서 **Open folder as vault**로 아래 두 폴더를 각각 볼트로
 
 AIHubVault가 유일한 원본입니다. 규칙, 도구, 표준 문서는 **여기서만 수정**합니다.
 
-다른 볼트를 Obsidian에서 열면 `sync_workspace.ps1`이 자동 실행되어 Hub와 버전을 비교하고, 차이가 있으면 알아서 동기화합니다.
+다른 볼트를 Obsidian에서 열면 `aimv pre-sync`가 자동 실행되어 Hub와 버전을 비교하고, 차이가 있으면 알아서 동기화합니다.
 
 ### 편집 모드 분리
 
 볼트 안에서의 편집은 두 종류로 나뉩니다:
 
 - **Contents 모드**: `Contents/` 안의 콘텐츠만 작업 (지식 정리, 프로젝트 관리)
-- **workspace 모드**: `.sync/` 내 `_Standards/`, `_tools/` 등 환경 설정만 작업 (AIHubVault에서만)
+- **workspace 모드**: `_Standards/`, `_tools/` 등 환경 설정만 작업 (AIHubVault에서만)
 
 한 작업에서 두 모드를 섞지 않습니다.
 
@@ -105,10 +105,11 @@ AI 에이전트가 따르는 규칙은 3단계입니다:
 
 | 단계 | 위치 | 뭘 하는 건지 |
 |------|------|-------------|
-| 공통 규칙 | `.claude/rules/core/` (15개) | 전 볼트 자동 적용. 인코딩 안전, 편집 모드, 스크립트 관리 등 |
+| 공통 규칙 | `.claude/rules/` (11개) | 전 볼트 자동 적용. 인코딩 안전, 편집 모드, 스크립트 관리 등 |
 | 볼트 규칙 | 각 볼트 `CLAUDE.md` | 볼트별 역할, 진입 절차, 편집 범위 |
+| 운용 규칙 | 각 볼트 `_WORKFLOW.md` | 상태 공유, 태그, CLI 사용법 등 상세 절차 |
 
-공통 규칙 15개의 상세 내용은 볼트 안에서 확인:
+공통 규칙 11개의 상세 내용은 볼트 안에서 확인:
 → `Vaults/BasicVaults/AIHubVault/_Standards/Core/AI_Rules_Index.md`
 
 ---
@@ -129,9 +130,11 @@ AI 에이전트가 따르는 규칙은 3단계입니다:
 
 | 문서 | 내용 |
 |------|------|
+| `docs/architecture.md` | 시스템 아키텍처 — Hub-Sync, 편집 모드, 규칙 체계, 상태 관리 |
+| `docs/cli-reference.md` | Node.js CLI 도구 레퍼런스 — 14개 커맨드 상세 |
+| `docs/customization.md` | 사용자 커스터마이징 — 볼트 추가, 규칙/스킬/태그 커스텀 |
+| `AGENT_ONBOARDING.md` | AI 에이전트 온보딩 문서 |
 | `Vaults/BasicVaults/AIHubVault/README.md` | 설치 가이드, 플러그인 목록, AI 에이전트 연동법 |
-| `Vaults/BasicVaults/AIHubVault/CORE_CONCEPTS.md` | 핵심 개념 다이어그램 (Hub-Sync, 라우팅, 편집 모드) |
-| `Vaults/BasicVaults/AIHubVault/.sync/_tools/TOOLS_INDEX.md` | 사용자용·AI용 도구 목록 |
 
 ---
 

@@ -12,6 +12,14 @@ updated: 2026-04-08
 
 | 버전 | 날짜 | 변경 내용 |
 |------|------|----------|
+| R052 | 2026-04-13 | `docs/` 신설 (architecture, cli-reference, customization). core commands 6개 PS1→Node.js CLI 전환. AGENT_ONBOARDING.md PS1 참조 전환 + docs 연동. README.md docs 참조 추가 |
+| R051 | 2026-04-13 | core/custom rules 8개 PS1→Node.js CLI 참조 전환. PS1 전체 제거. standards 커맨드 추가. Script_Registry 전면 개편 |
+| R050 | 2026-04-13 | TestVault 삭제. GameDesign, Blender, Git, AI_Gen4Game 4개 볼트 루트 `CLAUDE.md` 레지스트리 + 라우팅 키워드 등록. `Domains_3D`, `Domains_VCS`, `Domains_AI_Asset` 카테고리 신설 |
+| R049 | 2026-04-13 | frontmatter `tags` 표준화. 계층 태그 flatten, PascalCase→kebab-case 변환, 볼트 식별 태그 제거 (2차에 걸쳐 ~696파일). `note-writing.md` 태그 규칙 추가 — 기본 형식 + 사용자 오버라이드 구조. `AGENT_ONBOARDING.md` §8에 타입/태그 시스템 설명 섹션 추가 |
+| R048 | 2026-04-13 | 빈 타입 86건 처리. `folder-index` 코어 타입 신설 (note-writing.md). Domain.md/Project.md 51건 folder-index, CombatToolKit Legacy 27건 design, Grok 로그 5건 reference, 개별 3건 (plan/knowledge/study-note) 부여 |
+| R047 | 2026-04-13 | `master_index_build.ps1` Resolve-Path trailing backslash 버그 수정 (TrimEnd 추가). `/sync-all` 코어 스킬 신설 — 전체 위성 볼트 워크스페이스 일괄 동기화. MANIFEST 등록 |
+| R046 | 2026-04-13 | frontmatter `type` 표준화. `note-writing.md`에 코어 타입 목록(21개) + 볼트 전용 타입 확장 규칙 추가. 동의어 통합 72개(standards→standard, knowledge-note/domain→knowledge, planning-note→plan, research-note→research), 1회성 타입 12개 흡수, 위성 볼트 EXAMPLE_JUGGL 노트 156개 제거. ObsidianDev·Unity CLAUDE.md에 전용 타입 선언 |
+| R045 | 2026-04-13 | `Vaults/Domains_Dev/JavaScript/` 신규 볼트 생성. 루트 `CLAUDE.md`, `_STATUS.md`에 JavaScript 레지스트리와 라우팅 키워드 추가 |
 | R044 | 2026-04-13 | `vault-individualization.md` CLAUDE.md 필수 항목에 수집 범위·경계 추가. `vault-routing.md` 라우팅 판단 시 후보 볼트 CLAUDE.md 수집 범위 참조 규칙 추가 |
 | R043 | 2026-04-08 | `user-guidance.md` 코어 규칙 신설. 12개 코어 기능별 유저 혼란 상황 + 에이전트 안내 지침. MANIFEST 등록. `create-vault.md`, `open-vault.md`에 Obsidian 미등록 볼트 URI 금지 규칙 추가. `AGENT_ONBOARDING.md` §16에 볼트 등록 안내 추가 |
 | R042 | 2026-04-08 | `temp-file-management.md`에 "무한 재귀 경로 삭제 (Incident Rule)" 섹션 추가. PowerShell flatten-and-delete 1순위, robocopy mirror 2순위. 실패하는 방법(7z, Remove-Item, rd, .NET Delete) 명시 |
