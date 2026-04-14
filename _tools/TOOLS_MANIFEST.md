@@ -14,8 +14,8 @@
 
 | 파일 | 용도 |
 |------|------|
-| clone_vault.ps1 | 볼트 미러 복제 |
-| MakeCloneVault.bat | 볼트 복제 런처 |
+| MakeCloneVault.bat | 볼트 복제 런처 (BasicContentsVault/.sync/clone_vault.ps1 호출) |
+| setup_new_environment.ps1 | 새 환경 초기 설정 (볼트 등록, 동기화, 인덱스) |
 | cli/obsidian_ai_bridge.ps1 | Obsidian CLI 래퍼 |
 | cli/post_note_edit_review.ps1 | 노트 편집 후 품질 검증 |
 | cli/sync_workspace.ps1 | Hub → 볼트 workspace 동기화 |

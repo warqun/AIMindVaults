@@ -1,12 +1,13 @@
 ---
 type: standard
 tags:
-  - AIMindVault
   - domain
-updated: 2026-03-10
+updated: 2026-03-23
 ---
 
 # CONTENTS_GLOSSARY — AIMindVault 용어
+
+> 관련: [[CONTENTS_AI_RULES]] | [[CONTENTS_INDEX]]
 
 | 용어 | 정의 |
 |------|------|

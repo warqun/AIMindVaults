@@ -21,7 +21,7 @@ echo.
 echo  Will clone to: %TARGET_PATH%
 echo.
 
-powershell -ExecutionPolicy Bypass -File "%~dp0..\Vaults\BasicVaults\BasicContentsVault\.sync\clone_vault.ps1" -TargetPath "%TARGET_PATH%" -ProjectName "%VAULT_NAME%"
+powershell -ExecutionPolicy Bypass -File "%~dp0clone_vault.ps1" -TargetPath "%TARGET_PATH%" -ProjectName "%VAULT_NAME%"
 
 echo.
 pause

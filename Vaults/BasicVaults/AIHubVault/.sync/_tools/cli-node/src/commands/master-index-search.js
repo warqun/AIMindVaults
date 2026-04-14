@@ -5,7 +5,8 @@
 
 import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
-import { join, sep } from 'node:path';
+import { join, dirname, sep } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import * as log from '../lib/logger.js';
 
 /**
@@ -153,7 +154,7 @@ export async function masterIndexSearch(opts = {}) {
 }
 
 function detectAIMindVaultsRoot() {
-  let dir = import.meta.url.replace('file:///', '').replace(/\//g, sep);
+  let dir = dirname(fileURLToPath(import.meta.url));
   dir = join(dir, '..');
   for (let i = 0; i < 10; i++) {
     const parent = join(dir, '..');

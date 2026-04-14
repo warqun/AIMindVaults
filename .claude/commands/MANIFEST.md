@@ -31,6 +31,8 @@
 | note-from-video.md | 영상 → 볼트 노트 변환 파이프라인 |
 | note-from-article.md | 웹 글/텍스트 → 볼트 노트 변환 파이프라인 |
 | note-from-pdf.md | PDF → 볼트 노트 변환 파이프라인 |
+| hub-broadcast.md | Hub 파일 전체 볼트 즉시 전파 |
+| sync-all.md | 전체 위성 볼트 워크스페이스 일괄 동기화 |
 
 ## custom/ — 사용자 스킬 (동기화 미대상)
 

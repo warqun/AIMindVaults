@@ -129,6 +129,20 @@ program
     await hubBroadcast({ relativePath: opts.relativePath, dryRun: opts.dryRun, force: opts.force, exclude: opts.exclude, vaultsRoot: opts.vaultsRoot });
   });
 
+// Phase 7: deploy commands
+program
+  .command('deploy')
+  .description('Deploy distribution to SellingVault (cross-platform)')
+  .requiredOption('-t, --target <path>', 'Target path (e.g. C:/SellingVault/Korean/AIMindVaults)')
+  .option('-s, --source <path>', 'Source AIMindVaults root (auto-detect from CWD)')
+  .option('-d, --dry-run', 'Preview changes without executing')
+  .option('-f, --force', 'Overwrite protected files (CLAUDE.md, _STATUS.md, etc.)')
+  .option('-v, --verbose', 'Show detailed file operations')
+  .action(async (opts) => {
+    const { deployDist } = await import('../src/commands/deploy-dist.js');
+    await deployDist({ source: opts.source, target: opts.target, dryRun: opts.dryRun, force: opts.force, verbose: opts.verbose });
+  });
+
 // Phase 6: utility commands
 program
   .command('trash-clean')

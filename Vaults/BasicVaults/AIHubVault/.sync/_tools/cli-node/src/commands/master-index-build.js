@@ -5,7 +5,8 @@
 
 import { readdir, readFile, writeFile, mkdir, stat } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
-import { join, relative, sep } from 'node:path';
+import { join, dirname, relative, sep } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import * as log from '../lib/logger.js';
 
 /**
@@ -152,7 +153,7 @@ export async function masterIndexBuild(opts = {}) {
  * Detect AIMindVaults root by walking up from current file location.
  */
 function detectAIMindVaultsRoot() {
-  let dir = import.meta.url.replace('file:///', '').replace(/\//g, sep);
+  let dir = dirname(fileURLToPath(import.meta.url));
   dir = join(dir, '..'); // start from file's parent
   for (let i = 0; i < 10; i++) {
     const parent = join(dir, '..');

@@ -3,7 +3,7 @@ type: workspace-changelog
 tags:
   - AIMindVault
   - Meta
-updated: 2026-03-21
+updated: 2026-04-08
 ---
 
 # Workspace Changelog (Hub 전용)
@@ -13,6 +13,8 @@ updated: 2026-03-21
 
 | 버전           | 변경 내용                                                                                                                          |
 | ------------ | ------------------------------------------------------------------------------------------------------------------------------ |
+| 202604080002 | 콘텐츠 인덱싱 완료 판정 보강 — `.sync/_tools/cli/post_note_edit_review.ps1`가 `vault_index_build.ps1`를 동일 세션에서 직접 호출하지 않고 별도 PowerShell 프로세스로 실행해 종료 코드를 안정적으로 판정하도록 수정. root `.codex/skills/create-video-note`, `create-article-note`, `create-pdf-note`에 `POST_EDIT_INDEX_UPDATED=1` 확인과 수동 인덱싱 fallback 절차 명시 |
+| 202604080001 | 콘텐츠 인덱서 경로 자동탐지 수정 — `.sync/_tools/cli/post_note_edit_review.ps1`가 `.sync` 구조에서도 `vault_index_build.ps1`를 찾고 `-VaultRoot`로 호출하도록 수정. `vault_index_build.ps1`, `vault_index_search.ps1`도 `.sync/_tools/data/` 기준으로 동작하도록 경로 자동탐지 보강 |
 | 202603210013 | _WORKSPACE_VERSION.md 경량화 — 개발 로그를 _WORKSPACE_CHANGELOG.md (Hub 전용)로 분리. 배포본은 최신 버전 1행만 포함 |
 | 202603210012 | pre_sync.ps1 트램펄린 패턴 적용 — 자기 업데이트 시 새 프로세스로 재실행 후 구버전 종료. chicken-and-egg 구조적 해결                      |
 | 202603210011 | Obsidian 리로드 로직을 sync_workspace.ps1로 이동 (chicken-and-egg 해결). pre_sync.ps1에서 제거, PLUGIN_ONLY+풀동기화 양쪽에서 리로드 |

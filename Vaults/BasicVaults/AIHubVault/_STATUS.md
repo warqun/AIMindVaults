@@ -1,6 +1,6 @@
 ---
 type: status
-updated: 2026-03-21
+updated: 2026-04-13
 ---
 # STATUS — 현재 진행 현황
 
@@ -16,23 +16,26 @@ updated: 2026-03-21
 
 ## Now (현재 집중)
 
-- **Workspace 3계층 구조 (Core/Custom/Vault-local) 구현** — sync_workspace.ps1 배치 재구성, 플러그인 Core 4개 분리 완료
-- **Linter Core 활성화** — frontmatter 자동 정렬, updated 자동 갱신, Core data.json 강제 동기화
-- **멀티볼트 개인화 + 볼트 개별화 규칙 신설** — 에이전트 진입점 배포 제외 명시
+- **cli-node Phase 0~6 전체 완료 + 배포** — 10개 PS1 스크립트 → Node.js ESM 포팅 완료 (2,475→1,840 LOC, 26% 감소). SellingVault 6회 배포 + GitHub push 완료
+- Phase별 commit: `51c5fcc` (0-1), `e874636` (2), `222b6b3` (3), `0cd51cd` (4), `a5abfbc` (5), `06a6a56` (6)
+- _WORKSPACE_VERSION 202604130006~11 기록 완료
 
 ## Next (다음 작업)
 
-- Custom override 메커니즘 구현 (볼트별 플러그인/가이드 제외)
-- Core 영역 Obsidian UI 숨김 처리
-- **배포 레포 동기화 + git push** — 변경분 반영
-- 배포 버전 점검 (남동생 데스크탑 설치용)
+- Shell Commands에서 PS1 → JS 전환 등록 (Obsidian 설정)
+- PS1 fallback 제거 (JS only 전환)
+- Mac/Linux에서 `node cli.js sync`, `node cli.js index build` 실테스트
 
 ## Blocked (막힘/결정 필요)
 
-- 없음
+없음
 
 ## Decisions (결정 사항)
 
+- (2026-04-09) **배포본 Codex 테스트 통과**: 온보딩 문서 기반으로 Codex가 코어 규칙 15개를 전부 준수함을 확인. 배포본 실사용 가능 상태 확정
+- (2026-04-09) **pre_sync.ps1 자기참조 판정 위치 변경**: Hub 탐색 로직이 현재 볼트를 제외하는 구조이므로, .hub_marker 존재 확인을 탐색 전에 수행
+- (2026-04-08) **노트 작업 완료 조건 강화**: 노트 추가/편집 작업은 `POST_EDIT_REVIEW_BAD=0`만으로 끝내지 않고 `POST_EDIT_INDEX_UPDATED=1`까지 확인해야 완료다. `SKIPPED=1` 또는 `UPDATED=0`이면 수동 인덱싱 후 다시 확인한다
+- (2026-04-08) **Codex 소스 노트 파이프라인 분리 유지**: 영상/웹 글/PDF 노트화 절차는 root `.codex/skills/`에서 Codex 전용으로 관리하고 `.claude/commands/custom/`를 공유하지 않는다
 - (2026-03-23) **Workspace 3계층**: Core(강제 동기화) / Custom(동기화되지만 prune 가능) / Vault-local(미동기화)
 - (2026-03-23) **Core 플러그인 4개 확정**: local-rest-api, dataview, templater, linter
 - (2026-03-23) **Juggl_StyleGuide Custom 격하**: Core → Custom Batch로 이동

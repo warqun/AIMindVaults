@@ -1,9 +1,8 @@
 ---
 type: standard
 tags:
-  - AIMindVault
   - domain
-updated: 2026-03-10
+updated: 2026-03-23
 ---
 
 # CONTENTS_AI_RULES — AIMindVault 전용 AI 작업 규칙
@@ -27,6 +26,7 @@ updated: 2026-03-10
 - Frontmatter 규칙: `_Standards/Core/NoteProperties.md` 참조
 - `type`: `standard` | `template` | `guide` | `idea` | `plan` | `report`
 - `tags`에 `AIMindVault` 필수 포함
+- 용어 정의: [[CONTENTS_GLOSSARY]] 참조
 
 ## 금지 사항
 
