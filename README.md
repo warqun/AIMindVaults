@@ -1,6 +1,6 @@
 # AIMindVaults
 
-> Obsidian + AI 에이전트를 위한 멀티볼트 지식관리 시스템.
+> AI 에이전트의 영속적 작업 환경을 만드는 Obsidian 멀티볼트 시스템.
 
 ---
 
