@@ -133,6 +133,7 @@ AI 에이전트가 따르는 규칙은 3단계입니다:
 | `docs/architecture.md` | 시스템 아키텍처 — Hub-Sync, 편집 모드, 규칙 체계, 상태 관리 |
 | `docs/cli-reference.md` | Node.js CLI 도구 레퍼런스 — 14개 커맨드 상세 |
 | `docs/customization.md` | 사용자 커스터마이징 — 볼트 추가, 규칙/스킬/태그 커스텀 |
+| `docs/context-optimization.md` | 컨텍스트 창 최적화 — MCP/플러그인 전역·프로젝트별 분리 |
 | `AGENT_ONBOARDING.md` | AI 에이전트 온보딩 문서 |
 | `Vaults/BasicVaults/AIHubVault/README.md` | 설치 가이드, 플러그인 목록, AI 에이전트 연동법 |
 
