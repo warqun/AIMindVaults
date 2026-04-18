@@ -123,8 +123,17 @@
 
 ## 9. 공통 규칙 적용
 
-Codex도 `.claude/rules/core/`의 강제 규칙 14개를 모두 따른다.
+Codex도 `.claude/rules/core/`의 강제 규칙을 모두 따른다.
 `AGENTS.md` §공통 규칙에 명시: "세션 시작 시 `.claude/rules/` 디렉토리의 모든 규칙 파일을 읽고 따른다."
+
+### Skill Router 동적 로드 (Codex 동작)
+
+공통 온보딩 §15 "규칙 동적 로드 구조"의 Codex 실행 방식:
+
+- 매 사용자 메시지마다 `.claude/rules/core/_skill-router.md` 테이블을 검토한다.
+- 매칭되는 트리거 키워드가 있으면 테이블의 `.claude/rules-archive/` 규칙 파일을 Read로 로드한다.
+- Skill 호출 행(Claude Code 전용)은 해당 Skill이 통합한 archive 규칙들을 직접 Read로 대체한다.
+- 세션 내 이미 읽은 archive 파일은 재로드하지 않는다.
 
 주요 규칙 요약:
 

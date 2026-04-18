@@ -89,10 +89,58 @@ AI 에이전트를 사용하려면 해당 에이전트를 설치한다.
 
 ---
 
-## 컨텍스트 창 최적화 (선택)
+## 컨텍스트 창 튜닝 (선택)
 
-AI 에이전트의 베이스라인 컨텍스트를 줄이려면 `docs/context-optimization.md`를 참조하여 MCP 서버·플러그인을 전역/프로젝트별로 분리하세요.
+사용자가 추가 설치한 MCP 서버·플러그인이 AI 에이전트의 베이스라인을 늘릴 수 있습니다. 아래 기능으로 범위를 조정하세요. (배경·아키텍처 설명은 README, 상세 수치·해석은 `docs/context-optimization.md` 참조)
 
-- 기본 상태: Memory files ~23k (AIMindVaults 규칙 주입 구조로 이미 최적화됨)
-- 추가 최적화: MCP tools 67k → 15k, Custom agents 6k → 0k (프로젝트별 분리 시)
-- 전체 베이스라인 170k → 80k (약 53% 절감) 달성 가능
+### 1. MCP 서버 범위 분리
+
+**전역 `~/.claude/settings.json`** — 모든 세션에 필요한 서버만 유지:
+
+```json
+{
+  "mcpServers": {
+    "notion": { "command": "npx", "args": ["-y", "@notionhq/notion-mcp-server"] }
+  }
+}
+```
+
+**프로젝트별 `.claude/settings.json`** — 도메인 전용 서버는 해당 프로젝트로 이동:
+
+```json
+{
+  "mcpServers": {
+    "blender": { "command": "uvx", "args": ["blender-mcp"] }
+  }
+}
+```
+
+해당 프로젝트를 CWD로 Claude Code 실행 시에만 로드됩니다.
+
+### 2. 플러그인 범위 설정
+
+전역 비활성화:
+
+```json
+{
+  "enabledPlugins": { "bkit@bkit-marketplace": false }
+}
+```
+
+필요한 프로젝트에서만 재활성화:
+
+```json
+{
+  "enabledPlugins": { "bkit@bkit-marketplace": true }
+}
+```
+
+### 3. Desktop / Claude.ai 커넥터
+
+Claude Code 설정으로 제어되지 않는 항목입니다. 사용하지 않는 Desktop MCP · Claude.ai Connector는 각 앱 설정에서 직접 비활성화하세요.
+
+### 설정 변경 전 백업
+
+```bash
+cp ~/.claude/settings.json ~/.claude/settings.json.backup-$(date +%Y%m%d)
+```

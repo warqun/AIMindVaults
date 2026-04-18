@@ -76,11 +76,12 @@
 ```
 .claude/
 ├── rules/
-│   ├── core/           ← 강제 규칙 14개 (모든 에이전트 공통, 배포 동기화 대상)
-│   ├── custom/         ← 개인 규칙 (배포 미대상)
+│   ├── core/           ← 강제 규칙 (모든 에이전트 공통, 상시 주입, 배포 동기화 대상)
+│   ├── custom/         ← 개인 규칙 (상시 주입, 배포 미대상)
 │   └── MANIFEST.md     ← core/ 목록
+├── rules-archive/      ← 자동 주입 제외, Skill Router 트리거 시 Read
 ├── commands/
-│   ├── core/           ← 스킬 17개 (배포 동기화 대상)
+│   ├── core/           ← 스킬 (배포 동기화 대상)
 │   ├── custom/         ← 개인 스킬 (배포 미대상)
 │   └── MANIFEST.md     ← core/ 목록
 └── settings.local.json ← Claude Code 로컬 설정
@@ -91,6 +92,15 @@
 - **core/**: 모든 사용자에게 적용되는 제품 규칙. `aimv sync`로 자동 전파.
 - **custom/**: 사용자 개인 규칙. 배포 동기화 대상 아님. 자유롭게 추가/수정.
 - 신규 규칙은 custom/에 우선 생성 → 검증 후 core/로 격상.
+
+### Skill Router 동적 로드 (Claude Code 동작)
+
+공통 온보딩 §15 "규칙 동적 로드 구조"의 Claude Code 실행 방식:
+
+- `_skill-router.md`의 트리거 키워드와 사용자 메시지를 매 턴 대조한다.
+- 매칭되면 `Skill` 도구로 해당 스킬(`/distribute`, `/create-vault` 등)을 호출한다. 스킬 본문이 추가로 필요한 archive 규칙 파일을 지시하면 `Read` 도구로 로드한다.
+- 파일만 지정된 행은 `Skill` 호출 없이 `Read` 도구로 바로 로드한다.
+- 세션 내 이미 호출한 스킬/로드한 규칙은 재실행하지 않는다.
 
 ---
 
