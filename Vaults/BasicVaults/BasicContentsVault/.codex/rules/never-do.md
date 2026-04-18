@@ -64,7 +64,7 @@ Get-ChildItem Domain/**/*.md | ForEach { ... Set-Content ... }
 ## 🚫 스크립트 무단 생성 금지
 
 - `_Standards/Core/Script_Registry.md` 확인 없이 새 스크립트 생성 금지
-- `_tools/`, `_forge/` 폴더에 중복 기능 스크립트 배치 금지
+- `_tools/` 폴더에 중복 기능 스크립트 배치 금지
 - 스크립트 생성 후 `Script_Registry.md` 미등록 금지
 - 경로 하드코딩 금지 — 반드시 스크립트 위치 기반 자동탐지 사용
 - 상세 규칙: `_Standards/Core/Script_Creation_Rule.md`

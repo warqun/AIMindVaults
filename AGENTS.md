@@ -84,7 +84,7 @@
 
 1. 명시적 볼트 지정 우선
 2. 키워드 추론:
-   - "AI 워크플로우", "에이전트", "_Standards", ".forge" → AIHubVault
+   - "AI 워크플로우", "에이전트", "_Standards" → AIHubVault
    - "Unity", "유니티 엔진" → Unity
    - "CapCut", "영상편집" → CapCut
    - "Notion", "노션 운영" → Notion

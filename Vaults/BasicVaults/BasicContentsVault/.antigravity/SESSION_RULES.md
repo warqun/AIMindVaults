@@ -16,7 +16,7 @@ agent: antigravity
 
 ## 이 볼트의 역할
 
-**AI 작업환경 설계·개선·배포 허브** — `_Standards`, `_tools`, `.claude`, `_forge` 등 AI 운영 구조 관리.
+**AI 작업환경 설계·개선·배포 허브** — `_Standards`, `_tools`, `.claude` 등 AI 운영 구조 관리.
 게임 개발/기획 작업은 이 볼트에서 수행하지 않음.
 
 ## 세션 시작 루틴 (강제)

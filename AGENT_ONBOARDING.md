@@ -145,10 +145,10 @@ AIMindVaults/                    ← 멀티볼트 루트
 - 대상: `Contents/**` 하위 파일
 - 콘텐츠(노트) 작성/수정 전용
 - 하위 분기: `[Contents/Domain]` (지식 축적) 또는 `[Contents/Project]` (작업 관리)
-- 금지: `.sync/`, `.claude/`, `.forge/` 등 workspace 파일 수정
+- 금지: `.sync/`, `.claude/` 등 workspace 파일 수정
 
 ### Workspace 모드
-- 대상: `.sync/`, `.claude/`, `.codex/`, `.forge/`, 볼트 루트 파일
+- 대상: `.sync/`, `.claude/`, `.codex/`, 볼트 루트 파일
 - **AIHubVault에서만 수행** (강제). 다른 볼트는 동기화로 자동 전파.
 - 수정 후 `_WORKSPACE_VERSION.md`에 버전 기록 필수 (형식: `YYYYMMDDNNNN`).
 - 버전 기록 없이 작업 완료 보고 금지.

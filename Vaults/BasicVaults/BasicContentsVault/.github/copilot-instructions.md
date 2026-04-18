@@ -59,7 +59,7 @@ $t = [System.IO.File]::ReadAllText($p, [Text.Encoding]::UTF8)
 모든 편집은 두 모드 중 하나에 속한다. 혼합 금지.
 
 - **`[Domain]` 모드**: `Domain/**` 콘텐츠만 수정. workspace 파일 수정 금지.
-- **`[workspace]` 모드**: 볼트 인프라(`_Standards/`, `_tools/`, `.claude/`, `.codex/`, `_forge/`, `Tags/`, vault 루트 파일) 수정. `Domain/**` 본문 수정 금지.
+- **`[workspace]` 모드**: 볼트 인프라(`_Standards/`, `_tools/`, `.claude/`, `.codex/`, `Tags/`, vault 루트 파일) 수정. `Domain/**` 본문 수정 금지.
 - 작업 시작 시 모드 선언 필수. 전환 시 명시적 선언.
 - 상세 규칙: `_WORKFLOW.md` § 6)
 

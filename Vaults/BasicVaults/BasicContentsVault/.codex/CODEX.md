@@ -55,8 +55,8 @@ Do not start editing before finishing that order.
 
 All edits belong to one of two modes. Never mix.
 
-- **`[Domain]` mode**: Edit `Domain/**` content only. Do not touch `_Standards/`, `_tools/`, `.claude/`, `.codex/`, `_forge/`, or vault root files.
-- **`[workspace]` mode**: Edit vault infrastructure (`_Standards/`, `_tools/`, `.claude/`, `.codex/`, `_forge/`, `Tags/`, vault root files). Do not modify `Domain/**` body content.
+- **`[Domain]` mode**: Edit `Domain/**` content only. Do not touch `_Standards/`, `_tools/`, `.claude/`, `.codex/`, or vault root files.
+- **`[workspace]` mode**: Edit vault infrastructure (`_Standards/`, `_tools/`, `.claude/`, `.codex/`, `Tags/`, vault root files). Do not modify `Domain/**` body content.
 - Declare mode before editing. Switching requires explicit declaration.
 - Full rules: `_WORKFLOW.md` § 6)
 

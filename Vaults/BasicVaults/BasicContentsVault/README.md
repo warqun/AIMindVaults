@@ -8,7 +8,6 @@
 - **AI 에이전트 협업 설정** — Claude Code, Codex, Copilot Agent 설정 파일 및 규칙
 - **`_Standards/`** — Frontmatter 규칙, 플러그인 운영 표준, 인코딩/편집 안전 가이드
 - **`Contents/`** — 볼트 콘텐츠 (Domain: 지식 축적, Project: 작업 관리)
-- **`_forge/`** — 볼트 복제 스크립트 (clone_vault) 및 실험/스테이징 허브
 - **Juggl 스타일 가이드** — 지식 그래프 시각화 표준
 
 ---
@@ -104,7 +103,6 @@ AIMindVault/
 │   └── Project/           # 작업 관리 (아이디어, 계획)
 ├── _Standards/            # Vault 일관성 기준 및 플러그인 운영 표준
 ├── _tools/                # 자동화 스크립트 (PowerShell CLI)
-├── _forge/                # 볼트 복제·초기화 허브
 ├── Juggl_StyleGuide/      # Juggl 그래프 스타일 가이드
 ├── Tags/                  # 태그 정의 노트
 ├── _VaultReview/          # 에이전트 검토 보고서

@@ -52,7 +52,7 @@ agent: claude
 ## 4) Obsidian CLI 브리지 규칙
 
 - 도구 목록: `_tools/TOOLS_INDEX.md`
-- 원칙: 가능한 작업은 Obsidian CLI(`obsidian_ai_bridge.ps1`)로 우선 수행하고, 미지원 작업만 플러그인/MCP로 보완한다.
+- 원칙: 가능한 작업은 Obsidian CLI(`aimv bridge`)로 우선 수행하고, 미지원 작업만 플러그인/MCP로 보완한다.
 - 사용 가능 액션: `vault-info`, `search`, `search-context`, `read`, `open`, `append`, `create`, `history`, `history-read`, `history-restore`, `diff`, `plugins-list`, `plugin-install`, `post-review`
 
 ## 5) 편집 모드 분리 (강제)
@@ -63,7 +63,7 @@ agent: claude
 
 - **대상**: `Contents/**` 하위 파일
 - **성격**: 볼트 주제 관련 콘텐츠 작성·수정
-- **금지**: `_Standards/`, `_tools/`, `.claude/`, `.codex/`, `.forge/`, vault 루트 파일 수정
+- **금지**: `_Standards/`, `_tools/`, `.claude/`, `.codex/`, vault 루트 파일 수정
 - **예외**: `_VAULT-INDEX.md`에 새 문서 등록, `_STATUS.md` 상태 업데이트는 허용
 
 #### Contents 모드 참조 순서
@@ -86,14 +86,14 @@ agent: claude
 
 ### workspace 모드 (환경 작업)
 
-- **대상**: `_Standards/`, `_tools/`, `.claude/`, `.codex/`, `.forge/`, vault 루트 파일, `Tags/`, `Juggl_StyleGuide/`
+- **대상**: `_Standards/`, `_tools/`, `.claude/`, `.codex/`, vault 루트 파일, `Tags/`, `Juggl_StyleGuide/`
 - **성격**: 볼트 구조·설정·규칙·스크립트·에이전트 설정 변경
 - **금지**: `Contents/**` 본문 콘텐츠 수정
 - **예외**: `Contents/` 내 frontmatter 태그/메타데이터 일괄 갱신은 workspace 작업으로 허용
 
 #### workspace 모드 — AIHubVault 전용 (강제)
 
-- **workspace 편집은 AIHubVault에서만 수행한다.** 다른 볼트의 workspace 파일은 `sync_workspace.ps1`로 자동 전파된다.
+- **workspace 편집은 AIHubVault에서만 수행한다.** 다른 볼트의 workspace 파일은 `aimv sync`로 자동 전파된다.
 - workspace 파일 수정 후 반드시 `_WORKSPACE_VERSION.md`에 버전을 기록한다.
 
 1. 당일 최대 버전 번호 확인 → +1로 새 버전 생성 (형식: `YYYYMMDDNNNN`)
