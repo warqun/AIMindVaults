@@ -30,7 +30,7 @@ node "{BasicContentsVault}/.sync/_tools/cli-node/bin/cli.js" clone -t "C:/AIMind
 - 소스: **BasicContentsVault** (범용 볼트 템플릿, 자동 감지)
 - 반드시 이 CLI를 사용한다. `Copy-Item`, `cp`, `xcopy` 등 수동 복사 금지.
 - AIHubVault는 소스로 사용하지 않음 (작업환경 허브라 구조가 무거움)
-- 상세: `.claude/rules/core/vault-individualization.md` § 볼트 생성 방법
+- **상세 규칙(필수 결정 항목·후속 작업·상위 폴더 분류·배포 제외 항목) 참조**: `.claude/rules-archive/vault-individualization.md` Read
 
 ### 3. 생성 후 필수 작업
 

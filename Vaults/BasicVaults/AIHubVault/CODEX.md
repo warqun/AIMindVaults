@@ -79,8 +79,8 @@ node ".sync/_tools/cli-node/bin/cli.js" review -r . -s Contents
 
 모든 편집은 두 모드 중 하나에 속한다. 혼합 금지.
 
-- **`[Domain]` 모드**: `Domain/**` 콘텐츠만 수정. `_Standards/`, `_tools/`, `.claude/`, `.codex/`, `_forge/`, vault 루트 파일 수정 금지.
-- **`[workspace]` 모드**: 볼트 인프라(`_Standards/`, `_tools/`, `.claude/`, `.codex/`, `_forge/`, `Tags/`, vault 루트 파일) 수정. `Domain/**` 본문 콘텐츠 수정 금지.
+- **`[Domain]` 모드**: `Domain/**` 콘텐츠만 수정. `_Standards/`, `_tools/`, `.claude/`, `.codex/`, vault 루트 파일 수정 금지.
+- **`[workspace]` 모드**: 볼트 인프라(`_Standards/`, `_tools/`, `.claude/`, `.codex/`, `Tags/`, vault 루트 파일) 수정. `Domain/**` 본문 콘텐츠 수정 금지.
 - 작업 시작 시 모드 선언 필수. 전환 시 명시적 선언.
 - 상세 규칙: `_WORKFLOW.md` § 6)
 

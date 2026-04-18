@@ -21,7 +21,7 @@
 1. **대상 볼트 식별**
    - 명시적 지정: "AIHubVault에서 ~", "BasicContentsVault ~"
    - 키워드 추론:
-     - "AI 워크플로우", "에이전트", "_Standards", ".forge", "workspace", "동기화 스크립트" → AIHubVault
+     - "AI 워크플로우", "에이전트", "_Standards", "workspace", "동기화 스크립트" → AIHubVault
      - 그 외 주제 → 사용자에게 확인 (볼트가 없으면 생성 안내)
    - 파일 경로 포함 시 → 경로에서 볼트 추출
    - 모호하면 → 사용자에게 확인

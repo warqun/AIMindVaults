@@ -70,7 +70,7 @@ function Show-SyncToast {
 }
 
 # ── Hub 경로 자동탐지 ──
-# Hub 식별 마커: _forge/ 디렉토리 (AIHubVault 전용, 동기화 제외 대상)
+# Hub 식별 마커: .sync/.hub_marker 파일 (AIHubVault 전용)
 if (-not $HubPath) {
     $normalizedVault = (Resolve-Path $VaultRoot).Path.TrimEnd('\')
 
@@ -78,10 +78,10 @@ if (-not $HubPath) {
     $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
     $HubFromScript = (Resolve-Path "$ScriptDir\..\..").Path.TrimEnd('\')
 
-    if ($HubFromScript -ne $normalizedVault -and (Test-Path (Join-Path $HubFromScript "_forge"))) {
+    if ($HubFromScript -ne $normalizedVault -and (Test-Path (Join-Path $HubFromScript ".sync\.hub_marker"))) {
         $HubPath = $HubFromScript
     } else {
-        # 2차: 로컬 사본 실행 — AIMindVaults 루트(Vaults/ 보유 조상)에서 _forge/ 마커 재귀 탐색
+        # 2차: 로컬 사본 실행 — AIMindVaults 루트(Vaults/ 보유 조상)에서 .hub_marker 재귀 탐색
         $rootDir = ""
         $walkDir = $VaultRoot
         for ($i = 0; $i -lt 10; $i++) {
@@ -100,7 +100,7 @@ if (-not $HubPath) {
                 Where-Object {
                     $candidatePath = (Resolve-Path $_.FullName).Path.TrimEnd('\')
                     ($candidatePath -ne $normalizedVault) -and
-                    (Test-Path (Join-Path $_.FullName "_forge"))
+                    (Test-Path (Join-Path $_.FullName ".sync\.hub_marker"))
                 } |
                 Select-Object -First 1
             if ($hubCandidate) {

@@ -4,7 +4,7 @@ tags:
   - AIMindVault
   - TileMapToolKit
   - Meta
-updated: 2026-04-13
+updated: 2026-04-15
 ---
 
 # Workspace Version
@@ -15,6 +15,8 @@ updated: 2026-04-13
 
 | 버전           | 변경 내용 |
 | ------------ | ----- |
+| 202604180001 | `.forge/` 디렉토리 전면 제거 (R063). AIHubVault 내부 문서 `.forge`/`_forge` 참조 정리 — CLAUDE.md, AGENTS.md, CODEX.md, .codex/CODEX.md, .codex/rules/never-do.md, .antigravity/SESSION_RULES.md, .github/copilot-instructions.md, CORE_CONCEPTS.md, README.md, _Standards/CONTENTS_SPEC.md, Contents/CONTENTS_GLOSSARY.md, Contents/CONTENTS_AI_RULES.md, _STATUS.md. `.sync/_WORKFLOW.md`에서도 `.forge/` 나열 제거. 루트 `_tools/cli/pre_sync.ps1`, `sync_workspace.ps1`의 Hub 마커를 `_forge/` → `.sync/.hub_marker`로 변경 |
+| 202604150001 | deploy 커맨드 추가 (크로스플랫폼 배포 동기화). config.js에 DEPLOY_TARGETS/PROTECTED_FILES 상수 추가 |
 | 202604130013 | PS1 전체 제거 + 규칙 Node.js CLI 전환. standards 커맨드 추가. Script_Registry Node.js 기준 전면 개편 |
 | 202604130012 | Shell Commands: pre_sync.ps1 → node cli.js pre-sync 전환. 크로스플랫폼 CLI 완전 전환 |
 | 202604130011 | cli-node Phase 6: 보조 도구 4개 포팅 (trash-clean, open-vault, obsidian-bridge, task-router). 전체 마이그레이션 완료 |

@@ -32,7 +32,7 @@ updated: 2026-03-15
 
 - **AIHubVault**가 유일한 원본(Hub). `_Standards/Core/`, `_tools/`, `_WORKFLOW.md` 등 workspace 파일은 여기서만 편집.
 - 다른 볼트(Spoke)는 이 파일들을 받기만 한다. 직접 수정하면 다음 동기화 시 덮어씌워짐.
-- Hub 식별 마커: `_forge/` 디렉토리 (AIHubVault에만 존재).
+- Hub 식별 마커: `.sync/.hub_marker` 파일 (AIHubVault에만 존재).
 
 ---
 
@@ -141,7 +141,6 @@ updated: 2026-03-15
   │  동기화 안 됨 (Hub 전용)            │
   │  ├── Contents/          ← 볼트 고유 │
   │  ├── _Standards/Contents/← 볼트 고유│
-  │  ├── _forge/            ← Hub 전용  │
   │  ├── .claude/           ← 볼트 고유 │
   │  ├── .antigravity/      ← 볼트 고유 │
   │  └── ...                           │

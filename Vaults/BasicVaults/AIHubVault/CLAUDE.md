@@ -14,7 +14,7 @@ agent: claude
 
 ## 이 볼트의 역할
 
-**AI 작업환경 설계·개선·배포 허브** — `_Standards`, `_tools`, `.claude`, `.forge` 등 AI 운영 구조를 설계하고 다른 볼트에 배포하는 원본(Hub).
+**AI 작업환경 설계·개선·배포 허브** — `_Standards`, `_tools`, `.claude` 등 AI 운영 구조를 설계하고 다른 볼트에 배포하는 원본(Hub).
 
 > **콘텐츠 분리 완료 (2026-03-21)**: 기존 Contents/Domain/ → `Vaults/Domains_Infra/AI/`, Contents/Project/ → `Vaults/Projects_Infra/Project_AIMindVaults/`로 이관됨. 이 볼트는 workspace 전용 Hub로 운영.
 
@@ -52,7 +52,7 @@ agent: claude
 
 ### workspace 모드 (AIHubVault 전용)
 
-- **대상**: `_Standards/`, `_tools/`, `.claude/`, `.codex/`, `.forge/`, `Tags/`, `Juggl_StyleGuide/`, 볼트 루트 파일
+- **대상**: `_Standards/`, `_tools/`, `.claude/`, `.codex/`, `Tags/`, `Juggl_StyleGuide/`, 볼트 루트 파일
 - **금지**: `Contents/**` 본문 콘텐츠 수정
 - **예외**: `Contents/` 내 frontmatter 태그/메타데이터 일괄 갱신은 workspace 작업으로 허용
 - 수정 후 `_WORKSPACE_VERSION.md`에 버전 기록 필수 (형식: `YYYYMMDDNNNN`)

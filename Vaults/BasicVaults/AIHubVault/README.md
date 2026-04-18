@@ -29,7 +29,7 @@ AIMindVaults/                    <- 멀티볼트 루트 (AI 에이전트 작업 
 - **이 볼트가 작업환경의 원본(Single Source of Truth)**입니다.
 - `_Standards/Core/`, `_tools/`, `_WORKFLOW.md`, `_VAULT-INDEX.md`, `Juggl_StyleGuide/` 등 workspace 파일은 **이 볼트에서만 편집**합니다.
 - 다른 볼트의 동일 파일은 Hub-Sync로 자동 전파됩니다. 직접 수정하지 마세요.
-- Hub 식별 마커: `_forge/` 디렉토리 (이 볼트에만 존재)
+- Hub 식별 마커: `.sync/.hub_marker` 파일 (이 볼트에만 존재)
 
 ### Hub-Sync (자동 동기화)
 
@@ -113,7 +113,6 @@ AIMindVault/
 │   ├── Core/              # 공통 운영 표준 (Hub-Sync으로 모든 볼트에 배포)
 │   └── Contents/          # 이 볼트 전용 규칙 (동기화 안 됨)
 ├── _tools/                # 자동화 스크립트 (PowerShell CLI)
-├── _forge/                # 볼트 복제·초기화 허브 (AIHubVault 전용)
 ├── Juggl_StyleGuide/      # Juggl 그래프 스타일 가이드
 ├── Tags/                  # 태그 정의 노트
 ├── _VaultReview/          # 에이전트 검토 보고서

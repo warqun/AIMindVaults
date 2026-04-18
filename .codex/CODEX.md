@@ -37,7 +37,7 @@ Do not start editing before finishing that order.
 ## Routing Rules
 
 - Explicit vault name wins.
-- If the task mentions AI workflow, agents, `_Standards`, `_forge`, or vault infrastructure, route to `AIHubVault`.
+- If the task mentions AI workflow, agents, `_Standards`, or vault infrastructure, route to `AIHubVault`.
 - If the task mentions content writing, knowledge capture, or general note organization, route to `BasicContentsVault`.
 - If a file path is given, derive the vault from the path.
 - If the task only targets root files (`CLAUDE.md`, `.claude/`, `.codex/`, `docs/`), stay at root.

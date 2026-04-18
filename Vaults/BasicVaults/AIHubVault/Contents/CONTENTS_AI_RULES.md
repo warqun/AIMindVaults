@@ -19,7 +19,6 @@ updated: 2026-03-23
 
 - `_Standards/Core/` 파일 수정은 모든 볼트에 영향. 신중하게 판단.
 - `_Standards/Contents/` 파일은 이 볼트 전용. 자유롭게 수정 가능.
-- `_forge/staging/` 파일은 검토 완료 후 배포 대기 상태. 삭제 전 확인.
 
 ## 노트 생성 시 주의
 
@@ -31,4 +30,3 @@ updated: 2026-03-23
 ## 금지 사항
 
 - `_Standards/Core/` 전체 bulk 수정 금지
-- `_forge/inbox/` 파일 무단 삭제·수정 금지 (외부 에이전트 결과물)

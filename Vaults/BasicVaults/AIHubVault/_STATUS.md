@@ -1,6 +1,6 @@
 ---
 type: status
-updated: 2026-04-13
+updated: 2026-04-17
 ---
 # STATUS — 현재 진행 현황
 
@@ -11,17 +11,19 @@ updated: 2026-04-13
 ## 이 볼트의 역할
 
 > **AI 작업환경 설계·개선·배포 허브**
-> - `_Standards`, `_tools`, `.claude`, `.forge` 등 AI 운영 구조 관리
+> - `_Standards`, `_tools`, `.claude` 등 AI 운영 구조 관리
 > - 게임 개발/기획 작업은 이 볼트에서 수행하지 않음
 
 ## Now (현재 집중)
 
+- **AI 에이전트 협업환경 구축 가이드 추가** — Uzchowall `2026-04-17` 영상 기반으로 `Contents/HowAgentWorks/20260417_AI_에이전트_협업환경_구축법_오픈클로_영상_정리.md`를 생성하고, 역할 분리, 승인/반려 루프, QA 자동화, 위키 갱신 흐름을 정리
 - **cli-node Phase 0~6 전체 완료 + 배포** — 10개 PS1 스크립트 → Node.js ESM 포팅 완료 (2,475→1,840 LOC, 26% 감소). SellingVault 6회 배포 + GitHub push 완료
 - Phase별 commit: `51c5fcc` (0-1), `e874636` (2), `222b6b3` (3), `0cd51cd` (4), `a5abfbc` (5), `06a6a56` (6)
 - _WORKSPACE_VERSION 202604130006~11 기록 완료
 
 ## Next (다음 작업)
 
+- 외부 사례를 2~3건 더 축적해 `Contents/HowAgentWorks/` 패턴을 공통 템플릿으로 일반화할지 판단
 - Shell Commands에서 PS1 → JS 전환 등록 (Obsidian 설정)
 - PS1 fallback 제거 (JS only 전환)
 - Mac/Linux에서 `node cli.js sync`, `node cli.js index build` 실테스트
@@ -32,6 +34,7 @@ updated: 2026-04-13
 
 ## Decisions (결정 사항)
 
+- (2026-04-17) 외부 영상 기반 AI 에이전트 협업환경 사례 정리는 `Contents/HowAgentWorks/` 아래 `guide` 타입 노트로 축적한다
 - (2026-04-09) **배포본 Codex 테스트 통과**: 온보딩 문서 기반으로 Codex가 코어 규칙 15개를 전부 준수함을 확인. 배포본 실사용 가능 상태 확정
 - (2026-04-09) **pre_sync.ps1 자기참조 판정 위치 변경**: Hub 탐색 로직이 현재 볼트를 제외하는 구조이므로, .hub_marker 존재 확인을 탐색 전에 수행
 - (2026-04-08) **노트 작업 완료 조건 강화**: 노트 추가/편집 작업은 `POST_EDIT_REVIEW_BAD=0`만으로 끝내지 않고 `POST_EDIT_INDEX_UPDATED=1`까지 확인해야 완료다. `SKIPPED=1` 또는 `UPDATED=0`이면 수동 인덱싱 후 다시 확인한다

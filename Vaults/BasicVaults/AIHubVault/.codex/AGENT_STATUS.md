@@ -1,13 +1,19 @@
 ---
 type: agent-status
 agent: codex
-updated: 2026-04-08
+updated: 2026-04-17
 ---
 
 # Codex Agent Status
 
 > Codex가 세션마다 갱신하는 상태 파일.
 > Claude 및 다른 에이전트가 읽는 고정 공유 메모.
+
+## 이번 세션 요약 (2026-04-17 — Codex)
+
+- 작업 범위: AI 에이전트 협업환경 구축 영상 분석 및 AIHub 콘텐츠 노트 작성
+- 완료: Uzchowall `2026-04-17` 영상 자막을 바탕으로 `Contents/HowAgentWorks/20260417_AI_에이전트_협업환경_구축법_오픈클로_영상_정리.md`를 생성하고, 역할 분리, 승인/반려 루프, QA, 위키, 작업 분해 패턴을 정리
+- 결정: 외부 사례 기반 협업환경 정리는 `Contents/HowAgentWorks/` 아래 `guide` 타입으로 누적
 
 ## 이번 세션 요약 (2026-04-08 — Codex)
 
@@ -16,6 +22,12 @@ updated: 2026-04-08
 - 결정: 노트 추가/편집 작업은 review 통과만으로 끝내지 않고 인덱싱 완료까지 확인해야 한다
 
 ## 이번 세션에서 한 일 (Done)
+
+### [2026-04-17] Codex 세션
+- `Contents/HowAgentWorks/20260417_AI_에이전트_협업환경_구축법_오픈클로_영상_정리.md` 생성
+  - Uzchowall `2026-04-17` 영상 `그냥 직접 보고 판단하세요 - [잡담] AI 극한까지 활용하면 벌어지는 일` 자막 기반 정리
+  - 오케스트레이터, 역할 분리, 승인/반려 루프, QA 캡처, 위키 갱신, 작업 쪼개기 패턴 요약
+- AIHubVault `_STATUS.md`, `.codex/AGENT_STATUS.md`, `_SESSION_HANDOFF_CODEX.md`, 루트 `_STATUS.md` 갱신
 
 ### [2026-04-08] Codex 세션
 - root `.codex/skills/create-video-note/SKILL.md`를 Codex 전용 절차로 확장
@@ -71,6 +83,7 @@ updated: 2026-04-08
 
 ## 결정 사항 (Decisions)
 
+- (2026-04-17) 외부 영상 기반 AI 에이전트 협업환경 사례 정리는 `Contents/HowAgentWorks/` 아래 `guide` 타입으로 누적한다
 - (2026-03-06) Codex의 자동 진입점은 루트 `AGENTS.md`이며 `.codex/CODEX.md`는 보조 참조 문서로 취급
 - (2026-03-06) `_forge/ideas/LatticeCore/prompt_log/<agent>/` 구조에서는 폴더 노트와 별도 로그 노트를 구분해서 다룸
 - (2026-03-07) **AIMindVault 재정의 확정**: "AI 작업환경 설계·개선·배포 허브"로 목적 전환
@@ -84,6 +97,7 @@ updated: 2026-04-08
 
 ## 다음 작업 (Next)
 
+- `Contents/HowAgentWorks/`에 외부 사례 2~3건을 더 축적해 공통 템플릿으로 일반화
 - 영상, 웹 글, PDF 각각 실제 입력으로 새 스킬 1회씩 검증
 - 노트 생성이 잦은 대상 볼트에 `_WORKSPACE_VERSION.md` 202604080002를 배포하고 `POST_EDIT_INDEX_UPDATED=1` 결과를 표본 점검
 - 실제 사용 중 드러나는 frontmatter, 태그, 라우팅 기본값 보정
