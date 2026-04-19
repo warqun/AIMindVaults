@@ -58,8 +58,8 @@ Exceptions:
 
 For note editing work:
 
-```powershell
-powershell -ExecutionPolicy Bypass -File .\_tools\cli\post_note_edit_review.ps1
+```bash
+node ".sync/_tools/cli-node/bin/cli.js" review -r . -s Contents
 ```
 
 Do not report completion before `POST_EDIT_REVIEW_BAD=0`.

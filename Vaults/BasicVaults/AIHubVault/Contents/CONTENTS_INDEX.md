@@ -1,16 +1,17 @@
 ---
+type: standard
+tags:
+  - Meta
 aliases:
   - "콘텐츠 인덱스"
   - "콘텐츠 지도"
-tags:
-  - AIMindVault
-  - Meta
-type: contents-index
-updated: 2026-03-11
+updated: 2026-03-23
 agent: antigravity
 ---
 
 # CONTENTS_INDEX — AIHubVault 콘텐츠 지도
+
+> 관련: [[CONTENTS_AI_RULES]] | [[CONTENTS_GLOSSARY]]
 
 > 이 볼트의 콘텐츠 하위 구조를 정의합니다.
 > 에이전트가 `[Contents]` 모드 진입 시 참조합니다.

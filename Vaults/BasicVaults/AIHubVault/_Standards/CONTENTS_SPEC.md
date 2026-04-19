@@ -1,7 +1,6 @@
 ---
 type: standard
 tags:
-  - AIMindVault
   - domain
 updated: 2026-03-10
 ---
@@ -24,8 +23,7 @@ AI 에이전트 협업 워크플로우, 도구 설정, 표준 문서, 볼트 생
 
 1. `_Standards/Core/` — 모든 볼트에 배포되는 공통 운영 표준
 2. `_Standards/Contents/` — 이 볼트 전용 커스텀 규칙
-3. `_forge/` — 외부 에이전트 결과물 스테이징 허브
-4. `Contents/` — AI 활용 가이드, 프롬프트, 계획 문서
+3. `Contents/` — AI 활용 가이드, 프롬프트, 계획 문서
 
 ## 범위
 

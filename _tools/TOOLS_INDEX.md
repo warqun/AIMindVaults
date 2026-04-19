@@ -10,8 +10,8 @@
 
 | 파일                                          | 용도                           | 실행 방법                                |
 | ------------------------------------------- | ---------------------------- | ------------------------------------ |
-| `MakeCloneVault.bat`                        | 볼트 복제 런처 (부모경로 + 볼트명 입력)     | 더블클릭                                 |
-| `clone_vault.ps1`                           | Obsidian 볼트 미러 복제 (robocopy) | `.\clone_vault.ps1 -TargetPath <경로>` |
+| `MakeCloneVault.bat`                        | 볼트 복제 런처 (BasicContentsVault/.sync/clone_vault.ps1 호출) | 더블클릭                                 |
+| `setup_new_environment.ps1`                 | 새 환경 초기 설정 (진단, 볼트 등록, 동기화, 인덱스) | `.\setup_new_environment.ps1` 또는 `-DiagnoseOnly` |
 | `cli_launchers/RUN_CLAUDE.bat`              | Claude CLI 실행                | 더블클릭                                 |
 | `cli_launchers/RUN_CODEX.bat`               | Codex CLI 실행                 | 더블클릭                                 |
 | `cli_launchers/RUN_GEMINI.bat`              | Gemini CLI 실행                | 더블클릭                                 |

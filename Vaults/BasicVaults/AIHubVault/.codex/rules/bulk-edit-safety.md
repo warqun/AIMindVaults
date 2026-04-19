@@ -21,7 +21,7 @@ Step 3 — 전체 실행
   샘플 통과 확인 후만 전체 파일에 적용
 
 Step 4 — 사후 검증
-  powershell -ExecutionPolicy Bypass -File .\_tools\cli\post_note_edit_review.ps1
+  node ".sync/_tools/cli-node/bin/cli.js" review -r . -s Contents
   → POST_EDIT_REVIEW_BAD=0 확인
 ```
 

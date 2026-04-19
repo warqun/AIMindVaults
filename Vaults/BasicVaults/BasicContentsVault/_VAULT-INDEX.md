@@ -3,7 +3,6 @@ aliases:
   - "Vault 인덱스"
   - "보관함 지도"
 tags:
-  - AIMindVault
   - Meta
 type: _VAULT-INDEX
 updated: 2026-03-11

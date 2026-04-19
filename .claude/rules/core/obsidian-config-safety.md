@@ -5,7 +5,7 @@
 ## 규칙
 
 - `.obsidian/` 하위 파일(플러그인 설정, `community-plugins.json` 등)은 **workspace 편집**이다.
-- workspace 편집 규칙에 따라 **AIHubVault에서만 수행** → `sync_workspace.ps1`로 전파한다.
+- workspace 편집 규칙에 따라 **AIHubVault에서만 수행** → `node cli.js sync`로 전파한다.
 
 ## .obsidian/ JSON 파일 편집 — 안전 규칙
 

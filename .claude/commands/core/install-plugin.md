@@ -48,7 +48,7 @@ New-Item -ItemType Directory -Path $pluginDir -Force
 
 ### 4. 다른 볼트 전파
 
-- `sync_workspace.ps1` 실행으로 대상 볼트에 플러그인 전파 (Batch 0 병합 방식)
+- `aimv sync` 실행으로 대상 볼트에 플러그인 전파 (Batch 0 병합 방식)
 - 사용자에게 전파 실행 여부 확인 후 진행
 
 ### 5. 활성화 확인

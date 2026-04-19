@@ -14,17 +14,12 @@
 
 | 파일 | 용도 |
 |------|------|
-| clone_vault.ps1 | 볼트 미러 복제 |
-| MakeCloneVault.bat | 볼트 복제 런처 |
+| MakeCloneVault.bat | 볼트 복제 런처 (BasicContentsVault/.sync/clone_vault.ps1 호출) |
+| setup_new_environment.ps1 | 새 환경 초기 설정 (볼트 등록, 동기화, 인덱스) |
 | cli/obsidian_ai_bridge.ps1 | Obsidian CLI 래퍼 |
 | cli/post_note_edit_review.ps1 | 노트 편집 후 품질 검증 |
 | cli/sync_workspace.ps1 | Hub → 볼트 workspace 동기화 |
 | cli/pre_sync.ps1 | 동기화 전 스크립트 최신화 |
-| cli/task_router.ps1 | 작업 기반 에이전트 추천 |
-| cli/open_vault.ps1 | Obsidian 볼트 열기 |
-| cli_launchers/RUN_CLAUDE.bat | Claude CLI 실행 |
-| cli_launchers/RUN_CODEX.bat | Codex CLI 실행 |
-| cli_launchers/RUN_GEMINI.bat | Gemini CLI 실행 |
 | TOOLS_INDEX.md | 도구 목록 문서 |
 | TOOLS_MANIFEST.md | 이 파일 (배포 구분 기준) |
 
@@ -32,6 +27,11 @@
 
 | 파일 | 용도 |
 |------|------|
+| cli/task_router.ps1 | 작업 기반 에이전트 추천 |
+| cli/open_vault.ps1 | Obsidian 볼트 열기 |
+| cli_launchers/RUN_CLAUDE.bat | Claude CLI 실행 |
+| cli_launchers/RUN_CODEX.bat | Codex CLI 실행 |
+| cli_launchers/RUN_GEMINI.bat | Gemini CLI 실행 |
 | antigravity.exe.txt | Antigravity 실행 경로 참조 |
 | open_agents.ps1 | (폐지됨) 멀티볼트 루트 IDE 실행 |
 | check_standards.ps1 | _Standards 구조 확인 (디버그) |

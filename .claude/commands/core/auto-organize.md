@@ -78,7 +78,8 @@
 
 | 주제 | 카테고리 |
 |------|---------|
-| 게임 엔진, 게임 개발 | `Domains_Game` 또는 `Projects_Game` |
+| 게임 엔진, 게임 도메인 지식 | `Domains_Game` |
+| 게임 개발 도구, 툴킷 | `Projects_GameTool` |
 | 영상 편집, 미디어 | `Domains_Video` |
 | 인프라, DevOps, 도구 | `Domains_Infra` |
 | 3D 모델링, 렌더링 | `Domains_3D` |

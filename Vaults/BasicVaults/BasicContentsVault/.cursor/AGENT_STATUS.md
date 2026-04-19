@@ -1,21 +1,18 @@
 ---
 type: agent-status
 agent: cursor
+vault: BasicContentsVault
 updated: 2026-03-15
 ---
 
-# Cursor Agent Status
+## Status
 
-> Cursor가 세션마다 갱신하는 상태 파일.
+- **State**: Pending
+- **Now**: 멀티볼트 환경에서 Cursor 에이전트 설정 구조 초기화.
+- **Next**: BasicContentsVault 내 첫 Cursor 기반 콘텐츠 작업 정의.
+- **Blocked**: 없음
 
-## 이번 세션 요약
+## Notes
 
-(세션 시작 후 기록)
-
-## 다음에 할 일 (Next)
-
--
-
-## 막힌 것 (Blocked)
-
-- 없음
+- 이 볼트는 범용 콘텐츠 저장소 역할을 한다.
+- 다른 에이전트(Claude, Codex, Antigravity)의 `AGENT_STATUS.md`와 이 파일을 함께 참고하여 상태를 병합한다.

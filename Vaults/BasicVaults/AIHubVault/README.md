@@ -29,7 +29,7 @@ AIMindVaults/                    <- 멀티볼트 루트 (AI 에이전트 작업 
 - **이 볼트가 작업환경의 원본(Single Source of Truth)**입니다.
 - `_Standards/Core/`, `_tools/`, `_WORKFLOW.md`, `_VAULT-INDEX.md`, `Juggl_StyleGuide/` 등 workspace 파일은 **이 볼트에서만 편집**합니다.
 - 다른 볼트의 동일 파일은 Hub-Sync로 자동 전파됩니다. 직접 수정하지 마세요.
-- Hub 식별 마커: `_forge/` 디렉토리 (이 볼트에만 존재)
+- Hub 식별 마커: `.sync/.hub_marker` 파일 (이 볼트에만 존재)
 
 ### Hub-Sync (자동 동기화)
 
@@ -62,11 +62,10 @@ ZIP 다운로드 후 원하는 위치에 압축 해제.
 > **Windows 경로 길이 주의**: Windows는 기본적으로 경로 260자 제한이 있습니다. 볼트 내부 경로가 깊으므로, `AIMindVaults/`는 드라이브 루트 가까이에 배치하세요 (예: `C:\AIMindVaults/`, `D:\AIMV/`). `C:\Users\...\Documents\Projects\` 같은 깊은 경로에 넣으면 파일 복사·압축 해제 시 오류가 발생할 수 있습니다.
 >
 > 근본 해결: Windows Long Path 지원을 활성화하면 260자 제한이 해제됩니다.
-
-```
-레지스트리: HKLM\SYSTEM\CurrentControlSet\Control\FileSystem
-값: LongPathsEnabled = 1 (DWORD) → 재부팅 필요
-```
+> ```
+> 레지스트리: HKLM\SYSTEM\CurrentControlSet\Control\FileSystem
+> 값: LongPathsEnabled = 1 (DWORD) → 재부팅 필요
+> ```
 
 ### 2. Obsidian에서 볼트 등록
 
@@ -87,47 +86,15 @@ ZIP 다운로드 후 원하는 위치에 압축 해제.
 
 AI 에이전트(Claude Code, Codex 등)의 **프로젝트 루트를 `AIMindVaults/` 디렉토리**로 설정합니다.
 
-- 루트의 `CLAUDE.md` / `CODEX.md`가 볼트 라우팅 허브 역할을 합니다.
+- Claude Code → 루트 `CLAUDE.md`가 볼트 라우팅 허브 역할
+- Codex → 루트 `AGENTS.md`가 진입점 (구 `CODEX.md`는 `.codex/CODEX.md`로 리다이렉트)
 - 에이전트는 사용자의 작업 대상에 따라 적절한 볼트로 자동 라우팅됩니다.
-
----
-
-## 첫 실행 후 안내
-
-### 비어 있는 디렉토리
-
-| 디렉토리 | 설명 |
-|----------|------|
-| `Contents/Domain/` | 지식 축적 공간 — AI 가이드, 리서치, 프롬프트 등 자유롭게 노트 작성 |
-| `Contents/Project/` | 작업 관리 공간 — 아이디어, 계획, 프로젝트별 하위 폴더 생성 |
-
-이 두 디렉토리는 **사용자의 콘텐츠가 들어가는 곳**입니다. 템플릿 구조만 제공되며, 내용은 직접 채워나가면 됩니다.
-
-### 자동 생성되는 파일
-
-아래 파일은 Obsidian이나 플러그인이 **첫 실행 시 자동으로 생성**합니다. 배포 패키지에는 포함되어 있지 않습니다.
-
-| 파일/디렉토리 | 생성 시점 | 설명 |
-|--------------|----------|------|
-| `.obsidian/workspace.json` | Obsidian 첫 실행 | 창 배치·열린 탭 정보. Obsidian이 자동 관리 |
-| `.smart-env/` | Smart Connections 플러그인 활성화 | 노트 임베딩 캐시. 삭제해도 플러그인이 재생성 |
-| `obsidian-local-rest-api` SSL 인증서 | Local REST API 플러그인 활성화 | API 키·SSL 인증서가 자동 생성됨 |
-| `.claude/settings.local.json` | Claude Code 첫 실행 | Claude Code 로컬 설정. 사용자 환경에 맞게 자동 생성 |
-
-### 상태 파일 (AI 에이전트용)
-
-| 파일 | 역할 |
-|------|------|
-| `_STATUS.md` | 현재 작업 상태 — 에이전트가 세션 시작 시 읽고, 종료 시 갱신 |
-| `.claude/AGENT_STATUS.md` 등 | 에이전트별 세션 기록 — 에이전트가 자동으로 채움 |
-
-이 파일들은 **빈 템플릿 상태**로 제공됩니다. AI 에이전트를 사용하면 세션마다 자동으로 갱신되므로 직접 편집할 필요 없습니다.
 
 ---
 
 ## 새 볼트 추가하기
 
-1. `_forge/clone_vault.ps1`로 AIHubVault를 복제하거나 수동으로 볼트 폴더 생성
+1. `BasicContentsVault/_tools/clone_vault.ps1`로 BasicContentsVault를 클론하여 새 볼트 생성
 2. `Vaults/` 하위 적절한 위치에 배치 (카테고리 폴더 자유롭게 추가 가능)
 3. Obsidian에서 볼트 등록
 4. Shell Commands 플러그인에 `syncworkspace` 등록 (`on-layout-ready` 활성화)
@@ -146,7 +113,6 @@ AIMindVault/
 │   ├── Core/              # 공통 운영 표준 (Hub-Sync으로 모든 볼트에 배포)
 │   └── Contents/          # 이 볼트 전용 규칙 (동기화 안 됨)
 ├── _tools/                # 자동화 스크립트 (PowerShell CLI)
-├── _forge/                # 볼트 복제·초기화 허브 (AIHubVault 전용)
 ├── Juggl_StyleGuide/      # Juggl 그래프 스타일 가이드
 ├── Tags/                  # 태그 정의 노트
 ├── _VaultReview/          # 에이전트 검토 보고서

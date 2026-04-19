@@ -24,3 +24,6 @@
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Windows 예약 장치명 (재귀 복사 사고 잔여물)
+nul

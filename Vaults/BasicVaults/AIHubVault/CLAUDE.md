@@ -14,11 +14,13 @@ agent: claude
 
 ## 이 볼트의 역할
 
-**AI 작업환경 설계·개선·배포 허브** — `_Standards`, `_tools`, `.claude`, `_forge` 등 AI 운영 구조를 설계하고 다른 볼트에 배포하는 원본(Hub).
+**AI 작업환경 설계·개선·배포 허브** — `_Standards`, `_tools`, `.claude` 등 AI 운영 구조를 설계하고 다른 볼트에 배포하는 원본(Hub).
+
+> **콘텐츠 분리 완료 (2026-03-21)**: 기존 Contents/Domain/ → `Vaults/Domains_Infra/AI/`, Contents/Project/ → `Vaults/Projects_Infra/Project_AIMindVaults/`로 이관됨. 이 볼트는 workspace 전용 Hub로 운영.
 
 ## 파생 인스턴스 규칙
 
-이 볼트는 `clone_vault.ps1`로 복제되어 다른 용도의 볼트로 사용될 수 있다.
+이 볼트는 `aimv clone`으로 복제되어 다른 용도의 볼트로 사용될 수 있다.
 
 1. **복제된 볼트도 이 CLAUDE.md의 공통 규칙(§ 아래)을 모두 따른다.**
 2. **workspace 모드 편집은 이 볼트(AIHubVault)에서만 수행한다.** 다른 볼트의 `_Standards/`, `_tools/`, `Juggl_StyleGuide/`는 Hub-Sync로 자동 배포되므로 읽기 전용.
@@ -42,24 +44,15 @@ agent: claude
 
 모든 편집은 아래 모드 중 하나를 **명시적으로 선언**한 후 수행한다. 모드 혼합 금지.
 
-### Contents 모드 (콘텐츠 작업)
+### Contents 모드
 
-- **`[Contents/Domain]`**: `Contents/Domain/**` 지식 축적 (가이드, 리서치, 프롬프트)
-- **`[Contents/Project]`**: `Contents/Project/**` 작업 관리 (아이디어, 계획, 이슈)
-- **금지**: `_Standards/`, `_tools/`, `.claude/`, `.codex/`, `_forge/`, 볼트 루트 파일 수정
-- **예외**: `_VAULT-INDEX.md` 새 문서 등록, `_STATUS.md` 상태 업데이트는 허용
-
-#### Contents 모드 참조 순서
-
-Contents 작업 시작 전 아래 순서로 참조:
-1. `_Standards/CONTENTS_SPEC.md` — 볼트 목적·범위
-2. `Contents/CONTENTS_GLOSSARY.md` — 용어 사전
-3. `Contents/CONTENTS_AI_RULES.md` — AI 작업 규칙
-4. `_Standards/Contents/*` — 볼트 전용 커스텀 규칙
+> **이 볼트는 workspace 전용 Hub.** 콘텐츠 작업은 아래 볼트에서 수행:
+> - AI 도메인 지식 → `Vaults/Domains_Infra/AI/`
+> - AIMindVaults 프로젝트 → `Vaults/Projects_Infra/Project_AIMindVaults/`
 
 ### workspace 모드 (AIHubVault 전용)
 
-- **대상**: `_Standards/`, `_tools/`, `.claude/`, `.codex/`, `_forge/`, `Tags/`, `Juggl_StyleGuide/`, 볼트 루트 파일
+- **대상**: `_Standards/`, `_tools/`, `.claude/`, `.codex/`, `Tags/`, `Juggl_StyleGuide/`, 볼트 루트 파일
 - **금지**: `Contents/**` 본문 콘텐츠 수정
 - **예외**: `Contents/` 내 frontmatter 태그/메타데이터 일괄 갱신은 workspace 작업으로 허용
 - 수정 후 `_WORKSPACE_VERSION.md`에 버전 기록 필수 (형식: `YYYYMMDDNNNN`)
@@ -124,8 +117,8 @@ local: 노트_제목
 ## 편집 완료 게이트
 
 노트 편집 완료 후 반드시 실행:
-```powershell
-powershell -ExecutionPolicy Bypass -File _tools\cli\post_note_edit_review.ps1
+```bash
+node .sync/_tools/cli-node/bin/cli.js review
 ```
 `POST_EDIT_REVIEW_BAD=0` 확인 전 완료 보고 금지.
 

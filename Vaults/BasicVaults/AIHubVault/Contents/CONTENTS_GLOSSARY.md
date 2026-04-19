@@ -1,12 +1,13 @@
 ---
 type: standard
 tags:
-  - AIMindVault
   - domain
-updated: 2026-03-10
+updated: 2026-03-23
 ---
 
 # CONTENTS_GLOSSARY — AIMindVault 용어
+
+> 관련: [[CONTENTS_AI_RULES]] | [[CONTENTS_INDEX]]
 
 | 용어 | 정의 |
 |------|------|
@@ -17,7 +18,6 @@ updated: 2026-03-10
 | **Core Standards** | `_Standards/Core/` — 모든 볼트에 공유되는 운영 표준 |
 | **Contents Standards** | `_Standards/Contents/` — 각 볼트의 주제별 커스텀 규칙 |
 | **에이전트 (Agent)** | 볼트에서 작업하는 AI 도구 (Claude, Codex, Copilot 등) |
-| **포지 (_forge)** | 외부 에이전트 결과물을 검토·배포하는 스테이징 허브 |
 | **clone** | `clone_vault.ps1` — 기존 볼트를 복제하는 스크립트 |
 | **BRAT** | 비공식 Obsidian 플러그인을 설치하는 관리 도구 |
 | **Juggl** | 노트 관계를 시각화하는 인터랙티브 그래프 플러그인 |

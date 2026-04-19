@@ -35,3 +35,5 @@ description: "Obsidian 볼트 열기"
 
 - 볼트명은 Obsidian에 등록된 이름과 정확히 일치해야 함
 - 볼트가 Obsidian에 등록되어 있지 않으면 실패
+- **미등록 볼트를 열어야 하는 경우**: `obsidian://open?path=` URI를 사용하지 않는다. 사용자에게 직접 볼트 매니저에서 등록하도록 안내:
+  > Obsidian 볼트 매니저 → "보관함 폴더 열기" → `{볼트 경로}` 선택

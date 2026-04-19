@@ -1,0 +1,19 @@
+{
+  "id": "conv-1772793725554-91iehqocz",
+  "title": "RESULT_GROK_scripts 작업이 완료됬어 다음 작업을 진행해줘",
+  "titleGenerationStatus": "failed",
+  "createdAt": 1772793725554,
+  "updatedAt": 1772850888852,
+  "lastResponseAt": 1772850888852,
+  "sessionId": "ebdf7efc-9708-4aa6-b563-05b65d83a759",
+  "sdkSessionId": "ebdf7efc-9708-4aa6-b563-05b65d83a759",
+  "usage": {
+    "model": "sonnet",
+    "inputTokens": 3,
+    "cacheCreationInputTokens": 810,
+    "cacheReadInputTokens": 58563,
+    "contextWindow": 200000,
+    "contextTokens": 59376,
+    "percentage": 30
+  }
+}

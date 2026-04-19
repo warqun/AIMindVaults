@@ -26,8 +26,19 @@
 | install-plugin.md | Obsidian 플러그인 설치 |
 | open-vault.md | Obsidian 볼트 열기 |
 | open-note.md | Obsidian 노트 열기 |
+| reindex.md | 볼트 콘텐츠 인덱스 재빌드 |
+| open-notes.md | 복수 Obsidian 노트 새 탭 열기 (local-rest-api) |
+| note-from-video.md | 영상 → 볼트 노트 변환 파이프라인 |
+| note-from-article.md | 웹 글/텍스트 → 볼트 노트 변환 파이프라인 |
+| note-from-pdf.md | PDF → 볼트 노트 변환 파이프라인 |
+| hub-broadcast.md | Hub 파일 전체 볼트 즉시 전파 |
+| sync-all.md | 전체 위성 볼트 워크스페이스 일괄 동기화 |
 
 ## custom/ — 사용자 스킬 (동기화 미대상)
 
 사용자가 자유롭게 추가하는 개인 스킬.
 배포 동기화가 이 폴더를 건드리지 않는다.
+
+| 파일명 | 용도 |
+|--------|------|
+| discord-manage.md | AIMindVaults 디스코드 서버를 봇으로 관리 |

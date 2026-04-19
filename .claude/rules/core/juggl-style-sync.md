@@ -4,8 +4,8 @@
 
 ## 규칙
 
-- Juggl 스타일(모양/색/강조) 변경 시 graph.css와 스타일 가이드(README.md, README_KR.md)를 동시에 갱신한다.
-- 예시 노트는 `Juggl_StyleGuide/Examples/**` 전용으로 유지한다.
+- Juggl 스타일(모양/색/강조) 변경 시 graph.css를 갱신한다.
+- 스타일 가이드(`Contents/Juggl_StyleGuide/`)는 볼트별 개별 관리. 동기화 배포 대상 아님.
 
 ## Juggl 작성 규칙
 

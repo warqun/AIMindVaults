@@ -12,5 +12,5 @@
 
 ## Current Mapping
 
-- `AIHubVault`: AI workflow, agent setup, `_Standards`, `_tools`, `_forge`, vault infrastructure
+- `AIHubVault`: AI workflow, agent setup, `_Standards`, `_tools`, vault infrastructure
 - `BasicContentsVault`: content writing, knowledge notes, general PKM, note organization

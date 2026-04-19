@@ -1,31 +1,16 @@
 ---
 type: status
-updated: 2026-03-15
+updated: 2026-03-19
 ---
-# STATUS — 현재 진행 현황
+# STATUS — BasicContentsVault
 
-> **이 문서가 이 볼트의 유일한 상태 문서다.**
-> 모든 에이전트는 세션 종료 시 이 파일을 직접 갱신한다.
-> AGENT_STATUS는 에이전트 자체 판단으로 선택적 기록.
+> **이 볼트는 `/create-vault`의 복제 소스 템플릿이다.**
+> 직접 콘텐츠 작업 금지. workspace는 AIHubVault에서 동기화.
 
 ## 이 볼트의 역할
 
-> **범용 콘텐츠 저장소**
-> - 일반 지식 노트, 리서치, 가이드 등 콘텐츠 관리
-> - AI 작업환경 설계는 AIHubVault에서 수행
+### 볼트명이 BasicContentsVault인 경우
+> **볼트 복제 소스 템플릿** — 직접 콘텐츠 작업 대상 아님
 
-## Now (현재 집중)
-
-- (에이전트가 세션 종료 시 기록)
-
-## Next (다음 작업)
-
--
-
-## Blocked (막힘/결정 필요)
-
-- 없음
-
-## Decisions (결정 사항)
-
-- (에이전트가 주요 결정 시 `(YYYY-MM-DD) 내용` 형식으로 추가)
+### 볼트명이 BasicContentsVault가 아닌 경우
+> 복제 후 초기 설정 미완료. CLAUDE.md와 이 파일의 역할을 실제 용도에 맞게 수정하고, 루트 `_STATUS.md`에 등록할 것.

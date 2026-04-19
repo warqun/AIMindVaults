@@ -16,7 +16,7 @@
 
 ## 이 볼트의 역할
 
-**AI 작업환경 설계·개선·배포 허브** — `_Standards`, `_tools`, `.claude`, `_forge` 등 AI 운영 구조를 설계하고 다른 볼트에 배포하는 원본(Hub).
+**AI 작업환경 설계·개선·배포 허브** — `_Standards`, `_tools`, `.claude` 등 AI 운영 구조를 설계하고 다른 볼트에 배포하는 원본(Hub).
 
 ## 세션 시작 순서
 
@@ -36,11 +36,11 @@
 
 - **`[Contents/Domain]`**: `Contents/Domain/**` 지식 축적
 - **`[Contents/Project]`**: `Contents/Project/**` 작업 관리
-- 금지: `_Standards/`, `_tools/`, `.claude/`, `.codex/`, `_forge/`, 볼트 루트 파일
+- 금지: `_Standards/`, `_tools/`, `.claude/`, `.codex/`, 볼트 루트 파일
 
 ### workspace 모드 (AIHubVault 전용)
 
-- 대상: `_Standards/`, `_tools/`, `.claude/`, `.codex/`, `_forge/`, `Tags/`, `Juggl_StyleGuide/`, 볼트 루트 파일
+- 대상: `_Standards/`, `_tools/`, `.claude/`, `.codex/`, `Tags/`, `Juggl_StyleGuide/`, 볼트 루트 파일
 - 금지: `Contents/**` 본문 수정
 - 수정 후 `_WORKSPACE_VERSION.md`에 버전 기록 필수
 

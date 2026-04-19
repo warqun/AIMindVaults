@@ -1,21 +1,22 @@
 ---
 type: workflow
 tags:
-  - AIMindVault
   - Meta
   - antigravity
-updated: 2026-03-11
+updated: 2026-03-10
 agent: antigravity
 ---
 
-# Antigravity 세션 규칙
+# Antigravity 세션 규칙 (DEPRECATED)
+
+> **DEPRECATED (2026-03-21)**: Antigravity → Codex 데스크탑 앱으로 전환. 볼트 루트의 `AGENTS.md`를 사용.
 
 > Antigravity 전용 세션 진입점.
 > 세션 시작 시 이 파일을 읽고 규칙을 따른다.
 
 ## 이 볼트의 역할
 
-**AI 작업환경 설계·개선·배포 허브** — `_Standards`, `_tools`, `.claude`, `_forge` 등 AI 운영 구조 관리.
+**AI 작업환경 설계·개선·배포 허브** — `_Standards`, `_tools`, `.claude` 등 AI 운영 구조 관리.
 게임 개발/기획 작업은 이 볼트에서 수행하지 않음.
 
 ## 세션 시작 루틴 (강제)
@@ -23,11 +24,8 @@ agent: antigravity
 1. 루트 `_STATUS.md` 확인 — 전체 볼트 현황 + 다른 볼트 작업 확인
 2. `_STATUS.md` 확인 — 이 볼트의 현재 집중/다음/블로킹
 3. `.antigravity/AGENT_STATUS.md` 확인 — 내 마지막 작업 상태
-3. `_VAULT-INDEX.md`로 작업환경 구조 파악
+3. `_VAULT-INDEX.md`로 문서 위치 파악
 4. 필요 시 `.codex/AGENT_STATUS.md` 확인 — Codex 마지막 작업 (충돌 방지)
-5. **작업환경 동기화** (현재 볼트 ≠ AIHubVault인 경우)
-   - 스크립트 실행: `powershell -ExecutionPolicy Bypass -File "<AIHubVault>\_tools\cli\sync_workspace.ps1"`
-   - `SYNC_RESULT=UP_TO_DATE`이면 다음 단계로, 아니면 동기화 완료 후 진행
 
 ## 편집 모드 분리 (강제)
 
@@ -35,7 +33,7 @@ agent: antigravity
 - `[Contents]` 모드: `Contents/**` 콘텐츠만 수정 가능. `_Standards/`, `_tools/`, `.codex/`, `.claude/`, `.antigravity/`, 볼트 루트 수정 금지.
 - `[workspace]` 모드: `_Standards/`, `_tools/`, `.codex/`, `.claude/`, `.antigravity/`, 볼트 루트만 수정 가능. `Contents/**` 수정 금지.
 - 모드 전환 시 명시적 선언 필수. 한 작업 안에서 두 모드 혼합 금지.
-- **[workspace] 모드는 AIHubVault 전용**: workspace 편집은 AIHubVault에서만 수행하고, 다른 볼트는 `sync_workspace.ps1`로 전파. 수정 후 `_WORKSPACE_VERSION.md`에 새 버전(`YYYYMMDDNNNN`)을 반드시 추가한다.
+- **[workspace] 모드 완료 시 버전 기록 강제**: workspace 파일을 생성·수정·삭제했으면, `_WORKSPACE_VERSION.md`에 새 버전(`YYYYMMDDNNNN`)을 반드시 추가한다. 버전 기록 없이 workspace 작업을 완료 보고하지 않는다.
 - 상세: `_WORKFLOW.md` § 5) 편집 모드 분리
 
 ## 노트 작성 규칙
@@ -64,18 +62,18 @@ agent: antigravity
 
 ## 편집 완료 게이트 (필수)
 
-```powershell
-powershell -ExecutionPolicy Bypass -File .\_tools\cli\post_note_edit_review.ps1
+```bash
+node ".sync/_tools/cli-node/bin/cli.js" review -r . -s Contents
 ```
 
 - `POST_EDIT_REVIEW_BAD=0` 확인 전에는 완료 보고 금지.
 
 ## Obsidian CLI 우선 사용 규칙
 
-- 조회/검색/히스토리 복구는 먼저 `_tools/cli/obsidian_ai_bridge.ps1`을 사용.
+- 조회/검색/히스토리 복구는 먼저 `_tools/cli/aimv bridge`을 사용.
 - 파일 직접 파싱은 CLI 결과로 부족할 때만 사용.
 - 편집 후 `-Action post-review`로 검토 완료.
-- 상세: `_WORKFLOW.md` § 4) AI-First Obsidian CLI 브리지 규칙
+- 상세: [[_Standards/Core/AI_ObsidianCLI_Usage]]
 
 ## 세션 종료 시
 
