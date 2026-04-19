@@ -7,7 +7,7 @@
  */
 
 import { existsSync } from 'node:fs';
-import { readdir, readFile, copyFile, writeFile, mkdir, unlink } from 'node:fs/promises';
+import { readdir, readFile, copyFile, writeFile, mkdir, unlink, rm } from 'node:fs/promises';
 import { join, resolve, dirname, basename, relative, sep } from 'node:path';
 import { mirrorDirectory } from '../lib/fs-mirror.js';
 import { SYNC_EXCLUDE_DIRS, SYNC_EXCLUDE_FILES } from '../lib/config.js';
@@ -97,12 +97,17 @@ function parseLatestVersion(filePath) {
 import { readFileSync } from 'node:fs';
 
 /**
- * Merge Obsidian plugins: Core forced, Custom preserved.
+ * Merge Obsidian plugins: Hub is authoritative.
+ * - Folders present in Hub are mirrored into target.
+ * - Folders present in target but absent in Hub are pruned
+ *   (CORE_PLUGINS are exempt from prune — they must always exist).
+ * - community-plugins.json is reconciled to match Hub (CORE + Hub ids only).
  */
 async function syncPluginBatch(sourceRoot, targetRoot, dryRun) {
   const sourcePlugins = join(sourceRoot, '.obsidian', 'plugins');
   const targetPlugins = join(targetRoot, '.obsidian', 'plugins');
   let syncCount = 0;
+  let pruneCount = 0;
 
   if (!existsSync(sourcePlugins)) {
     log.info('  [SKIP] Source has no .obsidian/plugins/');
@@ -114,6 +119,24 @@ async function syncPluginBatch(sourceRoot, targetRoot, dryRun) {
 
   // 1) Sync plugin folders
   const hubDirs = await readdir(sourcePlugins, { withFileTypes: true });
+  const hubPluginIds = new Set(hubDirs.filter(e => e.isDirectory()).map(e => e.name));
+
+  // 1a) Prune plugin folders present in target but absent in Hub (excluding CORE)
+  if (existsSync(targetPlugins)) {
+    const targetDirs = await readdir(targetPlugins, { withFileTypes: true });
+    for (const d of targetDirs.filter(e => e.isDirectory())) {
+      if (hubPluginIds.has(d.name)) continue;
+      if (CORE_PLUGINS.includes(d.name)) continue; // CORE is always protected
+      const tgtDir = join(targetPlugins, d.name);
+      if (dryRun) {
+        log.info(`  [DRY-PRUNE] .obsidian/plugins/${d.name}`);
+      } else {
+        await rm(tgtDir, { recursive: true, force: true });
+        log.info(`  [PRUNE] .obsidian/plugins/${d.name}`);
+      }
+      pruneCount++;
+    }
+  }
   for (const d of hubDirs.filter(e => e.isDirectory())) {
     const pluginId = d.name;
     const srcDir = join(sourcePlugins, pluginId);
@@ -157,24 +180,28 @@ async function syncPluginBatch(sourceRoot, targetRoot, dryRun) {
     }
   }
 
-  // 2) Merge community-plugins.json
+  // 2) Reconcile community-plugins.json to Hub authoritative set
   const srcCp = join(sourceRoot, '.obsidian', 'community-plugins.json');
   if (existsSync(srcCp)) {
     const cpResult = await mergeCommunityPlugins(srcCp, join(targetRoot, '.obsidian', 'community-plugins.json'), dryRun);
     syncCount += cpResult.newCount;
 
-    // Create reload flag if new plugins added
-    if (cpResult.newCount > 0 && !dryRun) {
+    // Create reload flag if plugin set changed (added or pruned)
+    if ((cpResult.newCount > 0 || pruneCount > 0 || cpResult.removedCount > 0) && !dryRun) {
       const reloadFlag = join(targetRoot, '.obsidian', '.sync-needs-reload');
-      await writeFile(reloadFlag, `new=${cpResult.newCount}`, 'utf8');
+      await writeFile(reloadFlag, `new=${cpResult.newCount} pruned=${pruneCount} removed=${cpResult.removedCount || 0}`, 'utf8');
     }
   }
 
-  return syncCount;
+  if (pruneCount > 0) log.info(`  [PRUNE] total: ${pruneCount} plugin folder(s)`);
+  return syncCount + pruneCount;
 }
 
 /**
- * Merge community-plugins.json: Core forced + Hub custom + target unique preserved.
+ * Reconcile community-plugins.json to Hub authoritative set.
+ * Final list = CORE ∪ Hub ids. Target-unique ids are dropped (Hub is authoritative).
+ * Returns { newCount, removedCount } — newCount: plugins added to target,
+ * removedCount: target-unique plugins dropped.
  */
 async function mergeCommunityPlugins(srcPath, tgtPath, dryRun) {
   const extractIds = (text) => [...text.matchAll(/"([^"]+)"/g)].map(m => m[1]);
@@ -182,18 +209,18 @@ async function mergeCommunityPlugins(srcPath, tgtPath, dryRun) {
   const srcIds = extractIds(readFileSync(srcPath, 'utf8'));
   const tgtIds = existsSync(tgtPath) ? extractIds(readFileSync(tgtPath, 'utf8')) : [];
 
-  // Merge: Core first → Hub custom → Target unique
+  // Authoritative set: CORE ∪ Hub (target-unique dropped)
   const merged = new Set(CORE_PLUGINS);
   for (const id of srcIds) merged.add(id);
-  for (const id of tgtIds) merged.add(id);
   const sorted = [...merged].sort();
 
   const newPlugins = sorted.filter(id => !tgtIds.includes(id));
-  const needsWrite = sorted.length !== tgtIds.length || newPlugins.length > 0;
+  const removedPlugins = tgtIds.filter(id => !merged.has(id));
+  const needsWrite = newPlugins.length > 0 || removedPlugins.length > 0 || sorted.length !== tgtIds.length;
 
   if (needsWrite) {
     if (dryRun) {
-      log.info(`  [DRY] community-plugins.json merge: +${newPlugins.length}`);
+      log.info(`  [DRY] community-plugins.json reconcile: +${newPlugins.length} -${removedPlugins.length}`);
     } else {
       // Write JSON array as text (no JSON.stringify to match PS1 safety rule)
       const lines = ['['];
@@ -209,10 +236,15 @@ async function mergeCommunityPlugins(srcPath, tgtPath, dryRun) {
           log.info(`  [${tag}] ${p}`);
         }
       }
+      if (removedPlugins.length > 0) {
+        for (const p of removedPlugins) {
+          log.info(`  [DROP] ${p}`);
+        }
+      }
     }
   }
 
-  return { newCount: newPlugins.length };
+  return { newCount: newPlugins.length, removedCount: removedPlugins.length };
 }
 
 /**
