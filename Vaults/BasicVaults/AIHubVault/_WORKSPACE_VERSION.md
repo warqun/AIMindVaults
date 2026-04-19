@@ -15,6 +15,7 @@ updated: 2026-04-19
 
 | 버전           | 변경 내용 |
 | ------------ | ----- |
+| 202604190002 | 플러그인 Core/Custom 분리 · 실사용 기반 배포 번들 축소 — Core 6 (local-rest-api, advanced-uri, shellcommands, dataview, templater, linter) + Custom A 11 (juggl, mermaid-tools, make-md, obsidian-git, ytranscript, mcp-tools, quickadd, metadata-menu, global-search-and-replace, obsidian42-brat, tasks-plugin) 유지. 실사용 흔적 0~미미한 10개 제거: obsidian-excalidraw-plugin, advanced-canvas, obsidian-meta-bind-plugin, new-3d-graph, colored-tags, mermaid-themes, obsidian-tagfolder, obsidian-time-machine, share-to-notionnext, table-editor-obsidian. `PLUGIN_META_BIND.md` 동반 삭제. `community-plugins.json` 갱신 |
 | 202604190001 | Claudian 플러그인 제거 — `.obsidian/plugins/claudian/` 디렉토리 삭제, `.obsidian/community-plugins.json`에서 `"claudian"` 항목 제거, `.sync/_Standards/Core/Plugins/PLUGIN_CLAUDIAN.md` 삭제. 사용자 사용 빈도 저조로 배포본 기본 번들에서 제외 |
 | 202604180001 | `.forge/` 디렉토리 전면 제거 (R063). AIHubVault 내부 문서 `.forge`/`_forge` 참조 정리 — CLAUDE.md, AGENTS.md, CODEX.md, .codex/CODEX.md, .codex/rules/never-do.md, .antigravity/SESSION_RULES.md, .github/copilot-instructions.md, CORE_CONCEPTS.md, README.md, _Standards/CONTENTS_SPEC.md, Contents/CONTENTS_GLOSSARY.md, Contents/CONTENTS_AI_RULES.md, _STATUS.md. `.sync/_WORKFLOW.md`에서도 `.forge/` 나열 제거. 루트 `_tools/cli/pre_sync.ps1`, `sync_workspace.ps1`의 Hub 마커를 `_forge/` → `.sync/.hub_marker`로 변경 |
 | 202604150001 | deploy 커맨드 추가 (크로스플랫폼 배포 동기화). config.js에 DEPLOY_TARGETS/PROTECTED_FILES 상수 추가 |
