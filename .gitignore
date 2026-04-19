@@ -27,3 +27,10 @@ desktop.ini
 
 # Windows 예약 장치명 (재귀 복사 사고 잔여물)
 nul
+
+# 제작자 개인 설정 (배포 제외)
+.claude/settings.local.json
+**/.claudian/sessions/
+**/.claudian/claudian-settings.json
+**/.claude/claudian-settings.json
+.serena/
