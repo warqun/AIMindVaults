@@ -32,6 +32,11 @@
       "description": "Relative path (from this Hub's vault root) to the Core Hub. Required when hubType='preset'.",
       "examples": ["../../BasicVaults/AIHubVault"]
     },
+    "coreHubVersion": {
+      "type": "string",
+      "description": "Required Core Hub version range for compatibility (Preset Hubs only). Supports semver-like ranges: '1.2.3' (exact), '^1.2.3' (same major), '~1.2.3' (same minor), '>=1.2.3', '<=1.2.3', '>1.2.3', '<1.2.3'. Checked by 'aimv install-hub' before install and by 'core-sync-all' before push.",
+      "examples": ["^1.0.0", ">=1.2.0"]
+    },
     "description": {
       "type": "string",
       "description": "Short description of the hub's purpose and bundle contents."

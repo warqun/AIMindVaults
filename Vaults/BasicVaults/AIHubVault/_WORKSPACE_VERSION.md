@@ -15,6 +15,7 @@ updated: 2026-04-20
 
 | 버전           | 변경 내용 |
 | ------------ | ----- |
+| 202604200012 | Phase 3 수신 (install-hub, coreHubVersion schema, version-range lib, hub-sharing 가이드) |
 | 202604200011 | Custom 플러그인 잔여 디렉토리 제거 (claudian, obsidian-time-machine). community-plugins.json 에서는 이미 제거됐으나 .obsidian/plugins/ 디렉토리가 잔존해 deploy 시 배포본에 재등장하던 문제 해결 |
 | 202604200010 | Phase 2 Step 2 (aimv rebase) + Step 1 (_CORE_VERSION.md) CoreHub 에서 수신 |
 | 202604200009 | create-hub.js Preset 전용 메타 자동 재작성 수정 수신 |

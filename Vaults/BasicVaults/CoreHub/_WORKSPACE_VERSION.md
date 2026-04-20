@@ -14,6 +14,7 @@ updated: 2026-04-20
 
 | 버전 | 변경 내용 |
 | ---- | -------- |
+| 202604200011 | Phase 3 — Hub 공유 기반 완성. (1) aimv install-hub 명령 신규 — git URL 에서 Hub clone · hub-marker.json 검증 · coreHubVersion 호환성 체크 · per-device config strip. (2) hub-marker.schema.json 에 coreHubVersion 필드 추가 (semver-like: ^ ~ >= <= > < =). (3) lib/version-range.js 공통 모듈 — checkVersionRange() API. (4) core-sync-all 에 호환성 체크 통합 · --force 옵션 (불일치 덮어쓰기). (5) AIHubVault/Minimal 에 coreHubVersion=^1.0.0 예시 기입. (6) docs/hub-sharing.md 공유 가이드 작성. Phase 3 목표 달성: 자체 Preset Hub 를 GitHub 레포로 공유 → 다른 사용자가 install-hub 로 설치 가능 |
 | 202604200010 | Phase 2 Step 3 — Custom 보호 실증 완료 (Minimal 에 test-custom-plugin 추가 후 core-sync-all → 보존 확인). Phase 2 Step 1~3 완료 (_CORE_VERSION.md + rebase + Custom 보호). 남은 것: Step 4 배포 (사용자 승인 영역) |
 | 202604200009 | Phase 2 Step 2 — aimv rebase 명령 구현 (D3 V2). 위성 볼트의 Hub 바인딩 변경: hub-source.json backup → 재작성 → 신 Hub 기준 fresh sync (Add + Prune). --dry-run 필수 선행 · Contents/ 보호 · Hub 볼트는 rebase 거부. REBASE_RESULT=OK/NOOP/DRY_RUN 환경변수 출력 |
 | 202604200008 | Phase 2 Step 1 — _CORE_VERSION.md 신설 + core-sync-all 자동 append 로직 추가. 전파 이력 (버전/대상/결과/아이템수/실패수) 자동 기록. sync 판단에는 사용 안 함 (추적/감사 전용) |

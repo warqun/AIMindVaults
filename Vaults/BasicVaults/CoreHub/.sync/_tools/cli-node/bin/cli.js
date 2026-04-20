@@ -152,12 +152,14 @@ program
   .option('-r, --core-hub-root <path>', 'Core Hub root (auto-detect if omitted)')
   .option('--target <path>', 'Specific Preset Hub to target (default: all)')
   .option('-d, --dry-run', 'Preview without executing')
+  .option('-f, --force', 'Ignore coreHubVersion compatibility mismatches (Phase 3)')
   .action(async (opts) => {
     const { coreSyncAll } = await import('../src/commands/core-sync-all.js');
     await coreSyncAll({
       coreHubRoot: opts.coreHubRoot,
       target: opts.target,
       dryRun: opts.dryRun,
+      force: opts.force,
     });
   });
 
@@ -192,6 +194,25 @@ program
       vaultRoot: opts.vaultRoot,
       hubId: opts.hubId,
       dryRun: opts.dryRun,
+    });
+  });
+
+program
+  .command('install-hub')
+  .description('Clone a Hub (Core or Preset) from a git URL into Vaults/BasicVaults (Phase 3)')
+  .requiredOption('--url <git-url>', 'Git URL of the Hub repo')
+  .option('-t, --target <path>', 'Destination path (default: Vaults/BasicVaults/<repo-name>)')
+  .option('-b, --branch <name>', 'Git branch to check out')
+  .option('-d, --dry-run', 'Preview without git clone')
+  .option('--skip-compat-check', 'Skip coreHubVersion compatibility check')
+  .action(async (opts) => {
+    const { installHub } = await import('../src/commands/install-hub.js');
+    await installHub({
+      url: opts.url,
+      target: opts.target,
+      branch: opts.branch,
+      dryRun: opts.dryRun,
+      skipCompatCheck: opts.skipCompatCheck,
     });
   });
 

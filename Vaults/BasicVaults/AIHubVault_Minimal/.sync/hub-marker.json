@@ -4,6 +4,7 @@
   "hubName": "Minimal Preset Hub",
   "version": "1.0.0",
   "coreHub": "../CoreHub",
+  "coreHubVersion": "^1.0.0",
   "description": "Core 만 포함된 최소 Preset Hub · 개발자/작가/연구자가 Custom 번들 없이 시작하는 베이스. 필요 시 각 사용자가 .obsidian/plugins/, .claude/rules/custom/, .claude/commands/custom/ 에 자체 오버레이 추가",
   "createdAt": "2026-04-20"
 }

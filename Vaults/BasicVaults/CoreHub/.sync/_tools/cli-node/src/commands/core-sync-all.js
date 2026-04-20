@@ -28,6 +28,7 @@ import {
   findHubsByType,
   findAIMindVaultsRoot,
 } from '../lib/hub-resolver.js';
+import { checkVersionRange } from '../lib/version-range.js';
 import * as log from '../lib/logger.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -265,10 +266,27 @@ export async function coreSyncAll(opts = {}) {
   let totalCopied = 0;
   let totalFailed = 0;
 
+  // Local Core Hub version (for coreHubVersion compat check)
+  const coreVersion = marker?.version;
+
   for (const preset of targets) {
     const presetMarker = readHubMarker(preset);
     const presetLabel = presetMarker?.hubId || preset.split(/[/\\]/).pop();
     log.info(`\n--- Preset Hub: ${presetLabel} (${preset}) ---`);
+
+    // Compatibility check: Preset's coreHubVersion vs local Core Hub version
+    if (presetMarker?.coreHubVersion && coreVersion) {
+      const check = checkVersionRange(coreVersion, presetMarker.coreHubVersion);
+      if (!check.ok) {
+        log.warn(`  SKIPPED — coreHubVersion mismatch: ${check.reason}`);
+        log.warn(`  Use --force to override, or update this Preset Hub's coreHubVersion.`);
+        if (!opts.force) {
+          totalFailed++;
+          continue;
+        }
+        log.info('  --force specified, proceeding despite mismatch.');
+      }
+    }
 
     let presetCopied = 0;
     let presetFailed = false;
