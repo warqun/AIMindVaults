@@ -1,0 +1,43 @@
+/* ============================================
+   vis-headings.css
+   헤딩 색상 & 크기 계층 강화
+   Obsidian Default Dark Theme용
+   ============================================ */
+
+/* 헤딩 색상 계층 */
+.markdown-preview-view h1,
+.cm-header-1 {
+    color: #e06c75 !important;
+}
+
+.markdown-preview-view h2,
+.cm-header-2 {
+    color: #e5c07b !important;
+}
+
+.markdown-preview-view h3,
+.cm-header-3 {
+    color: #98c379 !important;
+}
+
+.markdown-preview-view h4,
+.cm-header-4 {
+    color: #56b6c2 !important;
+}
+
+.markdown-preview-view h5,
+.cm-header-5 {
+    color: #c678dd !important;
+}
+
+/* H2 아래 구분선 */
+.markdown-preview-view h2 {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 5px;
+    margin-top: 1.6em;
+}
+
+/* H1 헤딩 상단 여백 */
+.markdown-preview-view h1 {
+    margin-top: 0.5em;
+}

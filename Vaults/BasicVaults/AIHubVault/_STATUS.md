@@ -1,6 +1,7 @@
 ---
 type: status
-updated: 2026-04-17
+updated: 2026-04-19
+agent: claude
 ---
 # STATUS — 현재 진행 현황
 
@@ -16,6 +17,13 @@ updated: 2026-04-17
 
 ## Now (현재 집중)
 
+- **플러그인 번들 정리 + Hub-Sync prune 로직 추가** (2026-04-19)
+  - `.obsidian/plugins/` : Claudian + Custom B 10 제거 → 17 유지 (Core 6 + Custom A 11)
+  - `community-plugins.json` 11개 항목 제거
+  - `.sync/_Standards/Core/Plugins/PLUGIN_CLAUDIAN.md` · `PLUGIN_META_BIND.md` 삭제
+  - `sync-workspace.js` prune 로직 추가 — Hub 정본, satellite 일치 (Add-only 결함 해결)
+  - `_WORKSPACE_VERSION.md` 202604190001~190003 기록
+  - 원본 28 satellite 전수 sync (308 folder pruned · 재실행 시 전부 UP_TO_DATE)
 - **AI 에이전트 협업환경 구축 가이드 추가** — Uzchowall `2026-04-17` 영상 기반으로 `Contents/HowAgentWorks/20260417_AI_에이전트_협업환경_구축법_오픈클로_영상_정리.md`를 생성하고, 역할 분리, 승인/반려 루프, QA 자동화, 위키 갱신 흐름을 정리
 - **cli-node Phase 0~6 전체 완료 + 배포** — 10개 PS1 스크립트 → Node.js ESM 포팅 완료 (2,475→1,840 LOC, 26% 감소). SellingVault 6회 배포 + GitHub push 완료
 - Phase별 commit: `51c5fcc` (0-1), `e874636` (2), `222b6b3` (3), `0cd51cd` (4), `a5abfbc` (5), `06a6a56` (6)
@@ -23,6 +31,7 @@ updated: 2026-04-17
 
 ## Next (다음 작업)
 
+- Multi-Hub 아키텍처 Phase 1 MVP — `hub-source.json` 스키마 + `sync-workspace.js` Hub 탐색 로직 수정 + `aimv create-hub` 명령
 - 외부 사례를 2~3건 더 축적해 `Contents/HowAgentWorks/` 패턴을 공통 템플릿으로 일반화할지 판단
 - Shell Commands에서 PS1 → JS 전환 등록 (Obsidian 설정)
 - PS1 fallback 제거 (JS only 전환)

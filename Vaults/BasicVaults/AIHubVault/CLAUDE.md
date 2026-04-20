@@ -2,19 +2,43 @@
 tags:
   - AIMindVault
   - Meta
+  - PresetHub
+  - Multi-Hub
 type: workflow
-updated: 2026-03-17
+updated: 2026-04-20
 agent: claude
 ---
 
-# AIHubVault — AI 작업환경 설계·개선·배포 허브
+# AIHubVault — Default Preset Hub (Multi-Hub 아키텍처)
 
 > 이 볼트의 모든 AI 에이전트(Claude Code, Claudian, Codex, Cursor)는 이 문서를 진입점으로 사용한다.
 > 에이전트별 추가 진입점: Codex → `CODEX.md` / Antigravity → `.antigravity/SESSION_RULES.md` / Cursor → `.cursor/rules/`
 
 ## 이 볼트의 역할
 
-**AI 작업환경 설계·개선·배포 허브** — `_Standards`, `_tools`, `.claude` 등 AI 운영 구조를 설계하고 다른 볼트에 배포하는 원본(Hub).
+**AIMindVaults Default Preset Hub** — `hubId="default"`, `hubType="preset"`, `coreHub="../CoreHub"` (2026-04-20 Phase 1).
+
+27 위성 볼트가 legacy scan 으로 이 Preset 에 바인딩. Custom 플러그인·규칙·스킬 번들 관리처.
+
+### Multi-Hub 계층
+
+| Hub | 경로 | 역할 |
+|-----|------|------|
+| **CoreHub** (Core Hub) | `../CoreHub/` | Core 계층 정본 (CLI, 표준, 스키마, Core 6 플러그인) |
+| **AIHubVault** (이 볼트, Preset Hub) | `./` | Core 계층 수신 + Custom 계층 관리 |
+| 27 위성 | `Vaults/` 전역 | 이 Preset 과 sync |
+
+### Core 편집은 CoreHub 에서만 (강제)
+
+`.sync/_tools/`, `.sync/_Standards/Core/`, `.sync/schemas/`, Core 6 플러그인 (local-rest-api, advanced-uri, shellcommands, dataview, templater, linter) 편집은 **CoreHub 볼트에서** 수행. 이 볼트에서 직접 편집 금지.
+
+Core 편집 후 CoreHub 에서 `bump-version -m "..." --broadcast` 실행 → 이 볼트로 자동 Push. 이 명령 실행 전 완료 보고 금지.
+
+### 이 볼트에서 편집 가능한 것 (Custom 계층)
+
+- `.obsidian/plugins/` 중 Custom (Juggl, make-md, obsidian-git, mcp-tools, quickadd, metadata-menu, global-search-and-replace, obsidian42-brat, tasks-plugin, mermaid-tools, ytranscript 등)
+- 이 볼트의 CLAUDE.md, _STATUS.md, README.md 등 Preset 개별 파일
+- Custom 계층 편집 후 이 볼트 `_WORKSPACE_VERSION.md` bump (위성 전파 알림)
 
 > **콘텐츠 분리 완료 (2026-03-21)**: 기존 Contents/Domain/ → `Vaults/Domains_Infra/AI/`, Contents/Project/ → `Vaults/Projects_Infra/Project_AIMindVaults/`로 이관됨. 이 볼트는 workspace 전용 Hub로 운영.
 

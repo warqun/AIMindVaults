@@ -1,0 +1,52 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://aimindvaults.local/schemas/hub-marker.json",
+  "title": "Hub Marker",
+  "description": "Hub identity metadata placed at {hub-vault}/.sync/hub-marker.json. Declares the vault as a Hub and specifies its role (core vs preset) in the Multi-Hub topology.",
+  "type": "object",
+  "required": ["hubId", "hubType", "version"],
+  "properties": {
+    "hubId": {
+      "type": "string",
+      "description": "Unique hub identifier used by satellites to verify a Hub binding.",
+      "pattern": "^[a-z0-9][a-z0-9-]*$",
+      "examples": ["core", "game-dev", "writing", "minimal"]
+    },
+    "hubType": {
+      "type": "string",
+      "enum": ["core", "preset"],
+      "description": "Role of this Hub. 'core' = single authoritative Core layer source. 'preset' = derived hub with Core inherited and custom overlay."
+    },
+    "hubName": {
+      "type": "string",
+      "description": "Human-readable display name.",
+      "examples": ["Game Development Hub"]
+    },
+    "version": {
+      "type": "string",
+      "description": "Hub bundle version (semver recommended).",
+      "examples": ["1.0.0"]
+    },
+    "coreHub": {
+      "type": "string",
+      "description": "Relative path (from this Hub's vault root) to the Core Hub. Required when hubType='preset'.",
+      "examples": ["../../BasicVaults/AIHubVault"]
+    },
+    "description": {
+      "type": "string",
+      "description": "Short description of the hub's purpose and bundle contents."
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date",
+      "description": "Date the hub was created."
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "hubType": { "const": "preset" } } },
+      "then": { "required": ["coreHub"] }
+    }
+  ],
+  "additionalProperties": false
+}
