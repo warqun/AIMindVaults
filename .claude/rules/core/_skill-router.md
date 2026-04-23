@@ -21,8 +21,9 @@
 | Discord 운영 | Discord, 디스코드, 디코, 봇, AIMindVaults Admin Bot, 채널, Forum, Community, allowed_mentions | `/discord-admin` Skill (실제 조작 시 `/discord-manage` 추가) |
 | Notion 기록 | Notion, 노션, 작업 관리 DB, 개발 현황 공유, Notion 기록 | `/notion-record` Skill |
 | 배포·Git push, sync 기능 수정 | 배포, SellingVault, git push, 동기화 배포, 영문 배포, distribute, deploy, cli.js sync, pre-sync, _WORKSPACE_VERSION, sync-version, pre-sync 트램펄린 | `/distribute` Skill |
-| Multi-Hub | Core Hub, Preset Hub, CoreHub, core-sync, core-sync-all, hub-source.json, hub-marker.json, create-hub, multi-hub, 프리셋 허브, 코어 허브, bump-version --broadcast, hubId, hubType, hub-resolver | `Vaults/Projects_Infra/Project_AIMindVaults/Contents/Project/plan/architecture/20260419_Multi_Hub_아키텍처_설계.md` + `20260420_Multi_Hub_Phase1_구현_결과.md` Read |
-| 새 볼트 생성 | 볼트 생성, create-vault, 새 볼트, 볼트 분리 | `/create-vault` Skill + `.claude/rules-archive/vault-individualization.md` Read |
+| Multi-Hub | Core Hub, Preset Hub, CoreHub, core-sync, core-sync-all, hub-source.json, hub-marker.json, multi-hub, 코어 허브, bump-version --broadcast, hubId, hubType, hub-resolver | `Vaults/Projects_Infra/Project_AIMindVaults/Contents/Project/plan/architecture/20260419_Multi_Hub_아키텍처_설계.md` + `20260420_Multi_Hub_Phase1_구현_결과.md` Read |
+| 새 볼트 생성 (위성) | 볼트 생성, create-vault, 새 볼트, 볼트 분리 | `/create-vault` Skill + `.claude/rules-archive/vault-individualization.md` Read |
+| 새 Preset Hub 생성 | Preset Hub 생성, 프리셋 허브 만들기, create-preset-hub, create-hub, 신규 Hub, AIHubVault_ 생성, Hub 파생 | `/create-preset-hub` Skill |
 | 대량 편집 · 인코딩 | 대량 수정, 일괄 변경, 인코딩, mojibake, 한글 깨짐, bulk rewrite | `.claude/rules/core/encoding-safety.md` + `.claude/rules/core/temp-file-management.md` (core 주입됨) |
 | 스크립트 생성 | 스크립트 생성, .ps1, .py 신규, 자동화 스크립트 | `.claude/rules/core/script-creation-approval.md` + `.claude/rules/core/script-management.md` (core 주입됨) |
 | Juggl 편집 | Juggl, graph.css, Juggl 임베드 | `.claude/rules/core/juggl-style-sync.md` (core 주입됨) |
