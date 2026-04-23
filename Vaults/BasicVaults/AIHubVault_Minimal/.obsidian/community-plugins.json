@@ -4,5 +4,6 @@
   "obsidian-shellcommands",
   "dataview",
   "templater-obsidian",
-  "obsidian-linter"
+  "obsidian-linter",
+  "make-md"
 ]

@@ -22,6 +22,7 @@ import {
   SYNC_EXCLUDE_DIRS,
   SYNC_EXCLUDE_FILES,
 } from '../lib/config.js';
+import { seedPluginDataBatch } from '../lib/plugin-seed.js';
 import {
   isHub,
   readHubMarker,
@@ -108,6 +109,51 @@ async function syncCorePlugins(sourceHub, targetHub, opts) {
     copied += result.copied;
   }
   return { copied };
+}
+
+/**
+ * Merge CORE_PLUGINS into Preset Hub's community-plugins.json.
+ * Ensures Core plugins are always enabled (array-style list).
+ * Preserves existing Custom plugins in their original order.
+ *
+ * Result shape: [...CORE_PLUGINS (in config order), ...existing Custom (preserved)]
+ */
+async function mergeCommunityPlugins(targetHub, opts) {
+  const path = join(targetHub, '.obsidian', 'community-plugins.json');
+  const writeIfNeeded = async (arr) => {
+    if (!opts.dryRun) {
+      await mkdir(dirname(path), { recursive: true });
+      await writeFile(path, JSON.stringify(arr, null, 2) + '\n', 'utf8');
+    }
+  };
+
+  if (!existsSync(path)) {
+    await writeIfNeeded([...CORE_PLUGINS]);
+    log.info(`    [${opts.dryRun ? 'DRY' : 'WRITE'}] community-plugins.json (new, ${CORE_PLUGINS.length} core)`);
+    return { added: CORE_PLUGINS.length, created: true };
+  }
+
+  try {
+    const raw = readFileSync(path, 'utf8');
+    const current = JSON.parse(raw);
+    if (!Array.isArray(current)) {
+      log.warn(`    community-plugins.json not an array — skipped`);
+      return { added: 0, skipped: 'not-array' };
+    }
+    const existingCustom = current.filter(p => !CORE_PLUGINS.includes(p));
+    const merged = [...CORE_PLUGINS, ...existingCustom];
+    // No-op if identical
+    if (JSON.stringify(merged) === JSON.stringify(current)) {
+      return { added: 0 };
+    }
+    const missing = CORE_PLUGINS.filter(p => !current.includes(p));
+    await writeIfNeeded(merged);
+    log.info(`    [${opts.dryRun ? 'DRY' : 'MERGE'}] community-plugins.json (+${missing.length} core${missing.length ? ': ' + missing.join(', ') : ''})`);
+    return { added: missing.length };
+  } catch (e) {
+    log.warn(`    community-plugins.json parse error — skipped: ${e.message}`);
+    return { added: 0, error: e.message };
+  }
 }
 
 /**
@@ -305,6 +351,19 @@ export async function coreSyncAll(opts = {}) {
       log.info(`  [Core Plugins] ${CORE_PLUGINS.join(', ')}`);
       const pluginResult = await syncCorePlugins(coreHubRoot, preset, { dryRun: opts.dryRun });
       presetCopied += pluginResult.copied;
+
+      // Merge CORE_PLUGINS into community-plugins.json (activation list)
+      log.info(`  [Community-Plugins Merge]`);
+      const mergeResult = await mergeCommunityPlugins(preset, { dryRun: opts.dryRun });
+      if (mergeResult.added > 0 || mergeResult.created) presetCopied += 1;
+
+      // Seed data.json for Core plugins that target lacks (bootstrap once)
+      log.info(`  [Plugin Data Seed]`);
+      const seedResult = await seedPluginDataBatch(coreHubRoot, preset, CORE_PLUGINS, { dryRun: opts.dryRun });
+      for (const p of seedResult.seeded) {
+        log.info(`    [${opts.dryRun ? 'DRY' : 'SEED'}] ${p}/data.json`);
+      }
+      presetCopied += seedResult.seeded.length;
 
       log.info(`  → ${presetCopied} item(s) ${opts.dryRun ? 'would be synced' : 'synced'}`);
     } catch (err) {
