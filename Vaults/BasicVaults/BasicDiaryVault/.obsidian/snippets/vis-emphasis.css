@@ -1,0 +1,31 @@
+/* ============================================
+   vis-emphasis.css
+   볼드 / 이탤릭 / 형광펜 시각 강조
+   Obsidian Default Dark Theme용
+   ============================================ */
+
+/* 볼드 — 노란색으로 눈에 띄게 */
+.markdown-reading-view strong,
+.cm-strong {
+    color: #e5c07b;
+}
+
+/* 이탤릭 — 연한 청록색 */
+.markdown-reading-view em,
+.cm-em {
+    color: #56b6c2;
+    font-style: italic;
+}
+
+/* 취소선 — 흐리게 */
+.markdown-reading-view del {
+    opacity: 0.5;
+}
+
+/* 형광펜 (==텍스트==) */
+.markdown-reading-view mark {
+    background-color: rgba(229, 192, 123, 0.28);
+    color: inherit;
+    border-radius: 3px;
+    padding: 0 3px;
+}

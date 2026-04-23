@@ -1,0 +1,17 @@
+/* ============================================
+   vis-mermaid-fix.css
+   Mermaid 다이어그램 잘림 방지 & 여백 개선
+   Obsidian Default Dark Theme용
+   ============================================ */
+
+/* 다이어그램 잘림 방지 */
+.mermaid svg {
+    max-width: 100%;
+    height: auto;
+}
+
+/* 다이어그램 컨테이너 여백 */
+.mermaid {
+    margin: 16px 0;
+    overflow-x: auto;
+}

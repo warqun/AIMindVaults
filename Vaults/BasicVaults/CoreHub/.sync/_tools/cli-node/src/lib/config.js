@@ -98,12 +98,17 @@ export const HASH_PREFIX_LENGTH = 8;
 
 /**
  * Core-layer paths — propagated by `core-sync-all` from Core Hub to Preset Hubs.
- * Paths are relative to vault root. Trailing slash marks directory.
+ * Paths are relative to vault root. Trailing slash marks directory;
+ * absence of trailing slash marks a single file.
  *
  * NOTE: `.claude/rules/core/` and `.claude/commands/core/` live at the
  * AIMindVaults ROOT (not in any vault) and are inherited by all vaults via
  * Claude Code's CWD ancestry. They are deployed separately via `deploy`
  * (DEPLOY_TARGETS) and are NOT part of Hub-to-Hub propagation.
+ *
+ * MakeCloneVault.{bat,sh} live at `Vaults/BasicVaults/` root (single copy,
+ * operates on sibling Hubs/Templates) — not part of Hub-to-Hub propagation.
+ * Deployed via DEPLOY_TARGETS (Vaults/BasicVaults dir mirror).
  */
 export const CORE_PATHS = [
   '.sync/_tools/',
@@ -126,7 +131,9 @@ export const CUSTOM_PATHS = [
 /**
  * Core plugins — forced sync, cannot be removed per vault.
  * Previously defined in sync-workspace.js; moved here for shared use.
- * Expanded to the Core 6 set (per handoff 202604190002).
+ * Expanded to the Core 7 set (per handoff 202604210001): make-md added
+ * because vault visibility (sidebar navigation, folder tree, tag spaces)
+ * relies on make-md and is missing Custom-less Presets is unacceptable.
  */
 export const CORE_PLUGINS = [
   'obsidian-local-rest-api',
@@ -135,6 +142,7 @@ export const CORE_PLUGINS = [
   'dataview',
   'templater-obsidian',
   'obsidian-linter',
+  'make-md',
 ];
 
 /** Plugins whose data.json is force-synced from Hub (centralized data). */
