@@ -15,7 +15,8 @@
 | 파일명 | 용도 |
 |--------|------|
 | auto-organize.md | 노트/볼트 생성 시 폴더 자동 분류 |
-| create-vault.md | 새 볼트 생성 |
+| create-vault.md | 새 볼트 생성 (위성) |
+| create-preset-hub.md | 새 Preset Hub 생성 (Multi-Hub 아키텍처) |
 | grok-route.md | Grok 분기 라우터 |
 | juggl-note.md | Juggl 포함 표준 노트 생성 |
 | note-link.md | 노트 간 의미적 연결 |
