@@ -8,9 +8,10 @@
 
 import { existsSync, readFileSync } from 'node:fs';
 import { readdir, unlink, writeFile } from 'node:fs/promises';
-import { join, resolve, basename, dirname } from 'node:path';
+import { join, resolve, relative, basename, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { mirrorDirectory } from '../lib/fs-mirror.js';
+import { isHub, readHubMarker } from '../lib/hub-resolver.js';
 import * as log from '../lib/logger.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -36,6 +37,9 @@ const PER_DEVICE_CONFIGS = [
  * @param {string} opts.targetPath - Destination path for new vault
  * @param {string} [opts.projectName] - Display name (defaults to folder name)
  * @param {string} [opts.sourcePath] - Source vault (auto-detect: parent of .sync/)
+ * @param {string} [opts.hub] - Hub vault root for the new satellite to bind to.
+ *                              Auto-writes .sync/hub-source.json after clone.
+ *                              If omitted, no hub-source.json is written (legacy scan).
  */
 export async function cloneVault(opts) {
   if (!opts.targetPath) {
@@ -51,6 +55,19 @@ export async function cloneVault(opts) {
 
   const targetPath = resolve(opts.targetPath);
   const projectName = opts.projectName || basename(targetPath);
+
+  // Resolve hub binding target (if specified)
+  let hubBindPath = null;
+  let hubBindMarker = null;
+  if (opts.hub) {
+    hubBindPath = resolve(opts.hub);
+    if (!isHub(hubBindPath)) {
+      log.error(`--hub path is not a Hub (no .hub_marker / hub-marker.json): ${hubBindPath}`);
+      process.exitCode = 1;
+      return;
+    }
+    hubBindMarker = readHubMarker(hubBindPath);
+  }
 
   log.info('====================================================');
   log.info(' Obsidian Vault Clone');
@@ -100,7 +117,7 @@ export async function cloneVault(opts) {
   }
 
   // Step 3: Update make-md systemName
-  log.info('\n[3/3] Updating plugin settings...');
+  log.info('\n[3/4] Updating plugin settings...');
   const makeMdPath = join(targetPath, '.obsidian', 'plugins', 'make-md', 'data.json');
   if (existsSync(makeMdPath)) {
     try {
@@ -117,6 +134,29 @@ export async function cloneVault(opts) {
     }
   } else {
     log.info('  - make-md plugin not found, skipping');
+  }
+
+  // Step 4: Write hub-source.json if --hub specified
+  log.info('\n[4/4] Writing hub-source.json...');
+  if (hubBindPath) {
+    const relHub = relative(targetPath, hubBindPath).split(/[/\\]/).join('/');
+    const hubSource = {
+      hubPath: relHub || '.',
+      hubId: hubBindMarker?.hubId || opts.hubId || 'core',
+      bindAt: new Date().toISOString().slice(0, 10),
+    };
+    const hubSourcePath = join(targetPath, '.sync', 'hub-source.json');
+    await writeFile(hubSourcePath, JSON.stringify(hubSource, null, 2) + '\n', 'utf8');
+    log.info(`  - Wrote: .sync/hub-source.json (hubId="${hubSource.hubId}", hubPath="${hubSource.hubPath}")`);
+
+    // Also clean stale .hub_marker if the clone source was a Hub but target is satellite
+    const staleMarker = join(targetPath, '.sync', '.hub_marker');
+    if (existsSync(staleMarker)) {
+      await unlink(staleMarker);
+      log.info(`  - Removed stale .hub_marker (cloned satellite is not a Hub)`);
+    }
+  } else {
+    log.info('  - No --hub specified, skipping hub-source.json (legacy scan fallback will be used)');
   }
 
   log.info('\n====================================================');

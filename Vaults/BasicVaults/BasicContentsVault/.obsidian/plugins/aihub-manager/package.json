@@ -1,0 +1,21 @@
+{
+  "name": "aihub-manager",
+  "version": "0.1.0",
+  "description": "AIHub Manager — AIMindVaults Obsidian plugin",
+  "main": "main.js",
+  "scripts": {
+    "dev": "node esbuild.config.mjs",
+    "build": "node esbuild.config.mjs production",
+    "clean": "rm -f main.js styles.css"
+  },
+  "devDependencies": {
+    "@types/node": "^18.0.0",
+    "builtin-modules": "^3.3.0",
+    "esbuild": "^0.20.0",
+    "obsidian": "latest",
+    "typescript": "^5.3.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

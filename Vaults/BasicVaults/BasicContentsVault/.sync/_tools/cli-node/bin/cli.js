@@ -84,9 +84,9 @@ program
 // Phase 4: sync commands
 program
   .command('sync')
-  .description('Workspace sync between vault and Hub')
+  .description('Workspace sync between vault and Hub (Multi-Hub aware)')
   .option('-r, --vault-root <path>', 'Vault root path (auto-detect from CWD)')
-  .option('--hub-path <path>', 'Hub vault path (auto-detect via .hub_marker)')
+  .option('--hub-path <path>', 'Hub vault path (priority: --hub-path > hub-source.json > .hub_marker scan)')
   .option('-d, --dry-run', 'Preview changes without executing')
   .option('--no-prune', 'Skip deleting target-only files')
   .option('--verify-content', 'Force file hash verification even if versions match')
@@ -107,13 +107,113 @@ program
 // Phase 5: clone/broadcast commands
 program
   .command('clone')
-  .description('Clone vault to a new location')
+  .description('Clone vault to a new location (optionally bind to a specific Hub)')
   .requiredOption('-t, --target-path <path>', 'Destination path for the new vault')
   .option('-n, --project-name <name>', 'Display name (defaults to folder name)')
   .option('-s, --source-path <path>', 'Source vault (auto-detect if omitted)')
+  .option('--hub <path>', 'Hub vault to bind (writes .sync/hub-source.json)')
+  .option('--hub-id <id>', 'Hub identifier (used when --hub Hub has no hub-marker.json)')
   .action(async (opts) => {
     const { cloneVault } = await import('../src/commands/clone-vault.js');
-    await cloneVault({ targetPath: opts.targetPath, projectName: opts.projectName, sourcePath: opts.sourcePath });
+    await cloneVault({
+      targetPath: opts.targetPath,
+      projectName: opts.projectName,
+      sourcePath: opts.sourcePath,
+      hub: opts.hub,
+      hubId: opts.hubId,
+    });
+  });
+
+// Multi-Hub commands (Phase 1)
+program
+  .command('create-hub')
+  .description('Create a Preset Hub derived from a Core Hub')
+  .requiredOption('-t, --target-path <path>', 'Destination path for the new Preset Hub')
+  .requiredOption('--hub-id <id>', 'Preset Hub identifier (e.g. "game-dev")')
+  .option('-f, --from <path>', 'Source Core Hub (auto-detect if omitted)')
+  .option('-n, --hub-name <name>', 'Display name')
+  .option('--description <text>', 'Short description')
+  .option('-d, --dry-run', 'Preview without executing')
+  .action(async (opts) => {
+    const { createHub } = await import('../src/commands/create-hub.js');
+    await createHub({
+      targetPath: opts.targetPath,
+      hubId: opts.hubId,
+      from: opts.from,
+      hubName: opts.hubName,
+      description: opts.description,
+      dryRun: opts.dryRun,
+    });
+  });
+
+program
+  .command('core-sync-all')
+  .description('Push Core layer from Core Hub to all Preset Hubs (D1 propagation)')
+  .option('-r, --core-hub-root <path>', 'Core Hub root (auto-detect if omitted)')
+  .option('--target <path>', 'Specific Preset Hub to target (default: all)')
+  .option('-d, --dry-run', 'Preview without executing')
+  .option('-f, --force', 'Ignore coreHubVersion compatibility mismatches (Phase 3)')
+  .action(async (opts) => {
+    const { coreSyncAll } = await import('../src/commands/core-sync-all.js');
+    await coreSyncAll({
+      coreHubRoot: opts.coreHubRoot,
+      target: opts.target,
+      dryRun: opts.dryRun,
+      force: opts.force,
+    });
+  });
+
+program
+  .command('bump-version')
+  .description('Bump _WORKSPACE_VERSION.md on Hub; --broadcast triggers core-sync-all')
+  .requiredOption('-m, --message <text>', 'Change description for the new version row')
+  .option('-r, --hub-root <path>', 'Hub root (auto-detect if omitted)')
+  .option('-b, --broadcast', 'After bump, trigger core-sync-all (Core Hub only)')
+  .option('-d, --dry-run', 'Preview without executing')
+  .action(async (opts) => {
+    const { bumpVersion } = await import('../src/commands/bump-version.js');
+    await bumpVersion({
+      hubRoot: opts.hubRoot,
+      message: opts.message,
+      broadcast: opts.broadcast,
+      dryRun: opts.dryRun,
+    });
+  });
+
+program
+  .command('rebase')
+  .description('Change a satellite vault\'s bound Hub (D3 · Phase 2)')
+  .requiredOption('--hub <path>', 'Path to new target Hub')
+  .option('-r, --vault-root <path>', 'Satellite vault root (auto-detect from CWD)')
+  .option('--hub-id <id>', 'Override hub-id check')
+  .option('-d, --dry-run', 'Preview without executing (REQUIRED before first rebase)')
+  .action(async (opts) => {
+    const { rebase } = await import('../src/commands/rebase.js');
+    await rebase({
+      hub: opts.hub,
+      vaultRoot: opts.vaultRoot,
+      hubId: opts.hubId,
+      dryRun: opts.dryRun,
+    });
+  });
+
+program
+  .command('install-hub')
+  .description('Clone a Hub (Core or Preset) from a git URL into Vaults/BasicVaults (Phase 3)')
+  .requiredOption('--url <git-url>', 'Git URL of the Hub repo')
+  .option('-t, --target <path>', 'Destination path (default: Vaults/BasicVaults/<repo-name>)')
+  .option('-b, --branch <name>', 'Git branch to check out')
+  .option('-d, --dry-run', 'Preview without git clone')
+  .option('--skip-compat-check', 'Skip coreHubVersion compatibility check')
+  .action(async (opts) => {
+    const { installHub } = await import('../src/commands/install-hub.js');
+    await installHub({
+      url: opts.url,
+      target: opts.target,
+      branch: opts.branch,
+      dryRun: opts.dryRun,
+      skipCompatCheck: opts.skipCompatCheck,
+    });
   });
 
 program

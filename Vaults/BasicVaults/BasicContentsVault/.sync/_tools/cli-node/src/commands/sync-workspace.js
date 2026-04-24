@@ -10,19 +10,14 @@ import { existsSync } from 'node:fs';
 import { readdir, readFile, copyFile, writeFile, mkdir, unlink, rm } from 'node:fs/promises';
 import { join, resolve, dirname, basename, relative, sep } from 'node:path';
 import { mirrorDirectory } from '../lib/fs-mirror.js';
-import { SYNC_EXCLUDE_DIRS, SYNC_EXCLUDE_FILES } from '../lib/config.js';
+import {
+  SYNC_EXCLUDE_DIRS,
+  SYNC_EXCLUDE_FILES,
+  CORE_PLUGINS,
+  CORE_FORCE_DATA_JSON,
+} from '../lib/config.js';
+import { isHub, resolveHub } from '../lib/hub-resolver.js';
 import * as log from '../lib/logger.js';
-
-// Core plugins — forced sync, cannot be removed per vault
-const CORE_PLUGINS = [
-  'obsidian-local-rest-api',
-  'dataview',
-  'templater-obsidian',
-  'obsidian-linter',
-];
-
-// Plugins whose data.json is force-synced from Hub
-const CORE_FORCE_DATA_JSON = ['obsidian-linter', 'obsidian-shellcommands'];
 
 /**
  * Detect vault root from CWD by walking up looking for _VAULT-INDEX.md or CLAUDE.md.
@@ -41,44 +36,8 @@ function detectVaultRootCwd() {
   return null;
 }
 
-/**
- * Find AIMindVaults root (parent that contains Vaults/).
- */
-function findAIMindVaultsRoot(startPath) {
-  let dir = startPath;
-  for (let i = 0; i < 10; i++) {
-    const parent = dirname(dir);
-    if (parent === dir) break;
-    if (existsSync(join(parent, 'Vaults'))) return parent;
-    dir = parent;
-  }
-  return null;
-}
-
-/**
- * Find Hub vault by searching for .hub_marker under Vaults/.
- */
-async function findHub(aimRoot, excludeVault) {
-  const vaultsDir = join(aimRoot, 'Vaults');
-  if (!existsSync(vaultsDir)) return null;
-
-  async function searchDir(dir, depth) {
-    if (depth > 3) return null;
-    const entries = await readdir(dir, { withFileTypes: true });
-    for (const entry of entries) {
-      if (!entry.isDirectory()) continue;
-      const full = join(dir, entry.name);
-      const normalized = resolve(full);
-      if (normalized === excludeVault) continue;
-      if (existsSync(join(full, '.sync', '.hub_marker'))) return normalized;
-      const found = await searchDir(full, depth + 1);
-      if (found) return found;
-    }
-    return null;
-  }
-
-  return searchDir(vaultsDir, 0);
-}
+// Hub detection/resolution moved to ../lib/hub-resolver.js (Multi-Hub support).
+// Use `resolveHub(vaultRoot, { hubPath })` and `isHub(vaultRoot)` from there.
 
 /**
  * Parse latest version number from _WORKSPACE_VERSION.md.
@@ -312,23 +271,26 @@ export async function syncWorkspace(opts = {}) {
   }
 
   // 2. Self-check: is this Hub?
-  if (existsSync(join(vaultRoot, '.sync', '.hub_marker'))) {
+  if (isHub(vaultRoot)) {
     log.envVar('SYNC_RESULT', 'SELF');
     log.info('Current vault is Hub. No sync needed.');
     return;
   }
 
-  // 3. Find Hub
-  let hubPath = opts.hubPath ? resolve(opts.hubPath) : null;
-  if (!hubPath) {
-    const aimRoot = findAIMindVaultsRoot(vaultRoot);
-    if (aimRoot) hubPath = await findHub(aimRoot, resolve(vaultRoot));
-  }
-  if (!hubPath || !existsSync(hubPath)) {
+  // 3. Resolve Hub (Multi-Hub aware).
+  //    Priority: opts.hubPath > hub-source.json > .hub_marker scan (legacy)
+  const resolution = resolveHub(vaultRoot, { hubPath: opts.hubPath });
+  if (!resolution.hubPath) {
     log.envVar('SYNC_RESULT', 'ERROR');
-    log.error('Hub vault not found. Use --hub-path to specify.');
+    if (resolution.warning) log.error(resolution.warning);
+    log.error('Hub vault not found. Use --hub-path to specify or add .sync/hub-source.json.');
     process.exitCode = 1;
     return;
+  }
+  const hubPath = resolution.hubPath;
+  if (resolution.warning) log.warn(resolution.warning);
+  if (resolution.source === 'hub-source.json') {
+    log.info(`Hub resolved via hub-source.json (hubId="${resolution.hubSource?.hubId ?? '?'}").`);
   }
 
   // 4. Parse versions

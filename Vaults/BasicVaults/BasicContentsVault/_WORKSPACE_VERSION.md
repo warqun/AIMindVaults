@@ -4,7 +4,7 @@ tags:
   - AIMindVault
   - TileMapToolKit
   - Meta
-updated: 2026-04-19
+updated: 2026-04-20
 ---
 
 # Workspace Version
@@ -15,6 +15,18 @@ updated: 2026-04-19
 
 | 버전           | 변경 내용 |
 | ------------ | ----- |
+| 202604200012 | Phase 3 수신 (install-hub, coreHubVersion schema, version-range lib, hub-sharing 가이드) |
+| 202604200011 | Custom 플러그인 잔여 디렉토리 제거 (claudian, obsidian-time-machine). community-plugins.json 에서는 이미 제거됐으나 .obsidian/plugins/ 디렉토리가 잔존해 deploy 시 배포본에 재등장하던 문제 해결 |
+| 202604200010 | Phase 2 Step 2 (aimv rebase) + Step 1 (_CORE_VERSION.md) CoreHub 에서 수신 |
+| 202604200009 | create-hub.js Preset 전용 메타 자동 재작성 수정 수신 |
+| 202604200008 | node_modules sync 포함 수정 수신. 27 위성에 다음 sync 시 node_modules 전파 → 각 위성에서 자체 pre-sync 실행 가능 (Obsidian Shell Commands) |
+| 202604200007 | hub-resolver.js Vaults/BasicVaults 앵커 강화 수정 수신. 27 위성은 다음 sync 에서 새 config/resolver 받음 |
+| 202604200006 | CLAUDE.md 에 Preset Hub 역할 명시 (hubId=default, hubType=preset, coreHub=../CoreHub). Multi-Hub 계층 표 + Core 편집 금지 섹션 + Custom 계층 편집 가능 범위 추가. 타이틀 '── AI 작업환경 설계·개선·배포 허브' → '── Default Preset Hub (Multi-Hub 아키텍처)' 변경 |
+| 202604200005 | pre-sync.js 개선 (_WORKSPACE_VERSION 비교 추가) 를 CoreHub 에서 수신. 다음 위성 sync 부터 config/lib 변경도 감지 → Hub cli.js re-exec 로 최신 exclude 규칙 적용 |
+| 202604200004 | config.js (SYNC_EXCLUDE_FILES 확장) 를 CoreHub 에서 수신. hub-marker.json 등 Hub 정체성 파일이 위성으로 잘못 복제되는 버그 수정 반영. 27 위성은 다음 sync 에서 새 config.js 받음 (일회적 cleanup 필요) |
+| 202604200003 | AIHubVault → Preset Hub 승격 (hubId=default, coreHub=../CoreHub). hub-marker.json 작성 (hubType=preset). .hub_marker 빈 파일 유지 (하위호환). 27개 위성 볼트는 legacy scan 으로 계속 이 Preset 에 바인딩. Core 계층은 이제 CoreHub 에서 core-sync-all 로 수신. Custom 계층 (Juggl, make-md, obsidian-git, mcp-tools, quickadd, metadata-menu, global-search-and-replace, obsidian42-brat, tasks-plugin, mermaid-tools, ytranscript 등) 은 이 Preset 에서 관리 |
+| 202604200002 | Multi-Hub Phase 1 Step 2-8 — lib/config.js(CORE_PATHS,CUSTOM_PATHS,CORE_PLUGINS) + schemas/hub-marker,hub-source JSON Schema + create-hub.js(Preset Hub 생성) + core-sync-all.js(Core→Preset Push) + bump-version.js(버전+--broadcast) + clone-vault.js(--hub 옵션 · hub-source.json 자동작성) + bin/cli.js 신규 3개 명령 등록(create-hub, core-sync-all, bump-version). CORE_PLUGINS/CORE_FORCE_DATA_JSON sync-workspace.js에서 config.js로 이동. 회귀 테스트 통과(Hub self, satellite sync, core-sync-all NO_TARGETS, bump-version, create-hub dry-run 856 files). |
+| 202604200001 | Multi-Hub Phase 1 Step 1 — `lib/hub-resolver.js` 신설. Hub 탐색 로직을 sync-workspace.js + pre-sync.js에서 중앙화. `hub-source.json` 지원 추가 (위성 → Hub 명시적 지명). `.hub_marker` 스캔은 레거시 폴백으로 유지 (하위호환 보증). `isHub()`, `resolveHub()`, `scanHubs()`, `findHubsByType()`, `readHubMarker()`, `readHubSource()`, `getHubCliNode()` API 제공. 기존 28 satellite 동작 영향 없음 (회귀 테스트 통과: Hub self-check, satellite sync dry-run, `hub-source.json` 지명) |
 | 202604190003 | sync-workspace.js 플러그인 prune 로직 추가 — Hub를 정본으로 간주. satellite의 `.obsidian/plugins/` 중 Hub에 없는 것은 제거 (CORE_PLUGINS 예외). `community-plugins.json`도 CORE ∪ Hub ids 로 재조정하고 target-unique 항목 drop. `removedCount`, `[PRUNE]`/`[DROP]` 로그 추가. Hub-Sync가 사실상 Add-only로 동작하던 결함 해결 |
 | 202604190002 | 플러그인 Core/Custom 분리 · 실사용 기반 배포 번들 축소 — Core 6 (local-rest-api, advanced-uri, shellcommands, dataview, templater, linter) + Custom A 11 (juggl, mermaid-tools, make-md, obsidian-git, ytranscript, mcp-tools, quickadd, metadata-menu, global-search-and-replace, obsidian42-brat, tasks-plugin) 유지. 실사용 흔적 0~미미한 10개 제거: obsidian-excalidraw-plugin, advanced-canvas, obsidian-meta-bind-plugin, new-3d-graph, colored-tags, mermaid-themes, obsidian-tagfolder, obsidian-time-machine, share-to-notionnext, table-editor-obsidian. `PLUGIN_META_BIND.md` 동반 삭제. `community-plugins.json` 갱신 |
 | 202604190001 | Claudian 플러그인 제거 — `.obsidian/plugins/claudian/` 디렉토리 삭제, `.obsidian/community-plugins.json`에서 `"claudian"` 항목 제거, `.sync/_Standards/Core/Plugins/PLUGIN_CLAUDIAN.md` 삭제. 사용자 사용 빈도 저조로 배포본 기본 번들에서 제외 |
