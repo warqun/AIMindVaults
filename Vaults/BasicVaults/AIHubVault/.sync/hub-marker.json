@@ -1,0 +1,11 @@
+{
+  "hubId": "default",
+  "hubType": "preset",
+  "hubName": "AIMindVaults Default Preset Hub",
+  "version": "1.0.0",
+  "coreHub": "../CoreHub",
+  "coreHubVersion": "^1.0.0",
+  "description": "AIMindVaults 기본 Preset Hub — Core 계층은 CoreHub에서 core-sync-all로 수신. Custom 계층(Juggl, make-md, obsidian-git, mcp-tools, quickadd, metadata-menu, global-search-and-replace, obsidian42-brat, tasks-plugin, mermaid-tools, ytranscript 등)은 이 Preset 에서 관리. 27개 위성 볼트가 이 Preset 에 바인딩.",
+  "defaultTemplate": "BasicContentsVault",
+  "createdAt": "2026-04-20"
+}

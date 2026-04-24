@@ -25,6 +25,7 @@
 | `obsidian-config-safety.md` | Obsidian 설정 파일 안전 편집 |
 | `script-creation-approval.md` | 스크립트 생성 사전 승인 |
 | `script-management.md` | 스크립트 관리 |
+| `shell-redirect-safety.md` | 셸별 NUL 리다이렉트 구문 안전 (Bash `2>/dev/null` · PowerShell `2>$null` · CMD `2>nul` 구분) |
 | `temp-file-management.md` | 임시 파일 관리 |
 | `user-guidance.md` | 유저 가이드 (D안 슬림판: 고위험 6섹션 인라인 유지, 저위험은 Skill Router 위임) |
 

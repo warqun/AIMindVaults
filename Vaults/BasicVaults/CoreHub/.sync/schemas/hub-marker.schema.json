@@ -1,0 +1,62 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://aimindvaults.local/schemas/hub-marker.json",
+  "title": "Hub Marker",
+  "description": "Hub identity metadata placed at {hub-vault}/.sync/hub-marker.json. Declares the vault as a Hub and specifies its role (core vs preset) in the Multi-Hub topology.",
+  "type": "object",
+  "required": ["hubId", "hubType", "version"],
+  "properties": {
+    "hubId": {
+      "type": "string",
+      "description": "Unique hub identifier used by satellites to verify a Hub binding.",
+      "pattern": "^[a-z0-9][a-z0-9-]*$",
+      "examples": ["core", "game-dev", "writing", "minimal"]
+    },
+    "hubType": {
+      "type": "string",
+      "enum": ["core", "preset"],
+      "description": "Role of this Hub. 'core' = single authoritative Core layer source. 'preset' = derived hub with Core inherited and custom overlay."
+    },
+    "hubName": {
+      "type": "string",
+      "description": "Human-readable display name.",
+      "examples": ["Game Development Hub"]
+    },
+    "version": {
+      "type": "string",
+      "description": "Hub bundle version (semver recommended).",
+      "examples": ["1.0.0"]
+    },
+    "coreHub": {
+      "type": "string",
+      "description": "Relative path (from this Hub's vault root) to the Core Hub. Required when hubType='preset'.",
+      "examples": ["../../BasicVaults/AIHubVault"]
+    },
+    "coreHubVersion": {
+      "type": "string",
+      "description": "Required Core Hub version range for compatibility (Preset Hubs only). Supports semver-like ranges: '1.2.3' (exact), '^1.2.3' (same major), '~1.2.3' (same minor), '>=1.2.3', '<=1.2.3', '>1.2.3', '<1.2.3'. Checked by 'aimv install-hub' before install and by 'core-sync-all' before push.",
+      "examples": ["^1.0.0", ">=1.2.0"]
+    },
+    "description": {
+      "type": "string",
+      "description": "Short description of the hub's purpose and bundle contents."
+    },
+    "defaultTemplate": {
+      "type": "string",
+      "description": "Default clone source for satellites bound to this Hub. Used by `aimv clone --hub <thisHub>` when --source-path is not given. Resolution: (a) bare name like 'BasicDomainVault' → sibling of this Hub in BasicVaults/; (b) relative path starting with '../' or '.' → relative to this Hub root; (c) absolute path → used as-is. If unset or unresolvable, clone falls back to BasicContentsVault sibling.",
+      "examples": ["BasicContentsVault", "BasicDomainVault", "../BasicDiaryVault"]
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date",
+      "description": "Date the hub was created."
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "hubType": { "const": "preset" } } },
+      "then": { "required": ["coreHub"] }
+    }
+  ],
+  "additionalProperties": false
+}

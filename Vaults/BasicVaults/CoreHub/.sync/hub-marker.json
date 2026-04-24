@@ -1,0 +1,8 @@
+{
+  "hubId": "core",
+  "hubType": "core",
+  "hubName": "AIMindVaults Core Hub",
+  "version": "1.0.0",
+  "description": "Core 계층 정본 (CLI, _Standards/Core, schemas, Core 6 플러그인). core-sync-all 로 모든 Preset Hub에 Push 전파. .claude/rules/core 와 .claude/commands/core 는 AIMindVaults 루트에 상주 (전송 대상 아님).",
+  "createdAt": "2026-04-20"
+}

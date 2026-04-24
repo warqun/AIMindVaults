@@ -1,0 +1,21 @@
+# Install to: .github/workflows/deny-reserved-names.yml
+#
+# Fails CI on any push or pull request that contains Windows reserved file
+# names (NUL/CON/PRN/AUX/COM1-9/LPT1-9). Complements the pre-commit hook —
+# pre-commit guards local pushes, CI guards force-pushes and external PRs.
+#
+# Source: deep research 2026-04-21 (`20260421_nul_파일_누적_생성_이슈_리서치.md`)
+name: deny-reserved-names
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fail on Windows reserved names
+        shell: bash
+        run: ./.ci/check-reserved-names.sh

@@ -15,26 +15,41 @@
 
 | 작업 유형 | 트리거 키워드 | 호출 대상 |
 |---------|-------------|---------------|
-| 새 볼트 생성 | 볼트 생성, create-vault, 새 볼트, 볼트 분리 | `/create-vault` Skill + `.claude/rules-archive/vault-individualization.md` Read |
+| Unity 스크립팅 | Unity, C#, 유니티, 스크립트, 스킬 시스템, mcp-unity, unity-cli, Serena, find_symbol, replace_symbol_body, 심볼 기반 편집 | `/unity-dev` Skill |
+| Blender 작업 | Blender, 블렌더, 3D 모델링, bpy, Hyper3D, Polyhaven, Sketchfab | `/blender-workflow` Skill |
+| Meshy API | Meshy, AI 텍스처, 3D 생성, Meshy 크레딧, text-to-3d, image-to-3d | `/meshy-workflow` Skill |
+| Discord 운영 | Discord, 디스코드, 디코, 봇, AIMindVaults Admin Bot, 채널, Forum, Community, allowed_mentions | `/discord-admin` Skill (실제 조작 시 `/discord-manage` 추가) |
+| Notion 기록 | Notion, 노션, 작업 관리 DB, 개발 현황 공유, Notion 기록 | `/notion-record` Skill |
+| 배포·Git push, sync 기능 수정 | 배포, SellingVault, git push, 동기화 배포, 영문 배포, distribute, deploy, cli.js sync, pre-sync, _WORKSPACE_VERSION, sync-version, pre-sync 트램펄린 | `/distribute` Skill |
+| Multi-Hub | Core Hub, Preset Hub, CoreHub, core-sync, core-sync-all, hub-source.json, hub-marker.json, multi-hub, 코어 허브, bump-version --broadcast, hubId, hubType, hub-resolver | `Vaults/Projects_Infra/Project_AIMindVaults/Contents/Project/plan/architecture/20260419_Multi_Hub_아키텍처_설계.md` + `20260420_Multi_Hub_Phase1_구현_결과.md` Read |
+| 새 볼트 생성 (위성) | 볼트 생성, create-vault, 새 볼트, 볼트 분리 | `/create-vault` Skill + `.claude/rules-archive/vault-individualization.md` Read |
+| 새 Preset Hub 생성 | Preset Hub 생성, 프리셋 허브 만들기, create-preset-hub, create-hub, 신규 Hub, AIHubVault_ 생성, Hub 파생 | `/create-preset-hub` Skill |
 | 대량 편집 · 인코딩 | 대량 수정, 일괄 변경, 인코딩, mojibake, 한글 깨짐, bulk rewrite | `.claude/rules/core/encoding-safety.md` + `.claude/rules/core/temp-file-management.md` (core 주입됨) |
 | 스크립트 생성 | 스크립트 생성, .ps1, .py 신규, 자동화 스크립트 | `.claude/rules/core/script-creation-approval.md` + `.claude/rules/core/script-management.md` (core 주입됨) |
 | Juggl 편집 | Juggl, graph.css, Juggl 임베드 | `.claude/rules/core/juggl-style-sync.md` (core 주입됨) |
 | .obsidian/ 편집 | .obsidian, 플러그인 설정, community-plugins.json | `.claude/rules/core/obsidian-config-safety.md` (core 주입됨) |
-| 유저 가이드 저위험 (§1, §3, §6, §7, §9, §12) | Obsidian 열기, 노트 어디에, 어느 볼트, 플러그인 설치, 세션 종료, 끝났어, 정리해, 마무리, 노트 어디 있어, 어떻게, 뭘 해야, 모르겠, 까먹, 방법, 절차, 다음에 뭐, how to, what should I | `.claude/rules-archive/user-guidance-detail.md` Read |
+| 유저 가이드 저위험 (§1, §3, §6, §7, §9, §12) | Obsidian 열기, 노트 어디에, 어느 볼트, 플러그인 설치, 세션 종료, 끝났어, 정리해, 마무리, 노트 어디 있어, 배포 어떻게, SellingVault, 어떻게, 뭘 해야, 모르겠, 까먹, 방법, 절차, 다음에 뭐, how to, what should I | `.claude/rules-archive/user-guidance-detail.md` Read |
+| 에이전트 협업 | Codex와 동시, 충돌, 에이전트 분담 | `.claude/rules/custom/agent-ownership.md` (custom 주입됨) |
 | 임시 파일 · 재귀 삭제 | 임시 파일, MAX_PATH, 무한 재귀, flatten-and-delete, robocopy | `.claude/rules/core/temp-file-management.md` (core 주입됨) |
 
 ## 매칭 실패 시
 
 - 키워드 없음 → `_essentials.md`만으로 작업.
 - 필요한 규칙이 있을 것 같은데 테이블에 없음 → 사용자에게 "이 작업에 적용할 규칙이 있는지" 확인 후 진행.
-- 새로운 작업 유형이 자주 발생 → `core/_skill-router.md` 또는 사용자 개인 `custom/` 규칙에 추가.
+- 새로운 작업 유형이 자주 발생 → 사용자 승인 후 이 테이블에 추가.
 
-## 사용자 확장 가능
+## Phase 2-A 완료 (2026-04-18)
 
-사용자는 자신의 도메인에 맞춰 이 테이블을 확장할 수 있다:
+도메인 규칙 6개 Skill 전환 완료. custom/ 규칙 7개 → rules-archive/ 이관.
 
-1. `.claude/commands/custom/` 에 개인 Skill을 추가
-2. `.claude/rules-archive/` 에 관련 규칙 파일 배치
-3. 이 테이블에 트리거 키워드 → Skill/파일 경로 행 추가
+| Skill | 통합된 archive 규칙 |
+|-------|-------------------|
+| `/distribute` | distribution-deploy + sync-version-priority |
+| `/unity-dev` | unity-tools + unity-scripting-style + serena-mcp |
+| `/blender-workflow` | blender-mcp |
+| `/meshy-workflow` | meshy-api |
+| `/discord-admin` | discord-bot |
+| `/notion-record` | notion-sync |
 
-예시: Unity 작업, Blender 3D 모델링, Notion 기록 등 — 각자의 워크플로우에 맞게 Skill 생성 후 이 라우터에 등록.
+custom/에 유지된 규칙 (상시 주입): `agent-ownership.md`, `multivault-personalization.md`
+보류 대상: `bulk-edit-safe` Skill (core 안전 규칙이라 별도 검토 필요)
