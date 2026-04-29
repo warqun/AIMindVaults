@@ -1,18 +1,20 @@
 /**
  * pre_sync — Trampoline: ensure cli-node is up-to-date before sync.
- * Port of pre_sync.ps1 (101 LOC → ~70 LOC).
  *
- * 1. Detect Hub's cli-node
- * 2. Compare cli.js hash
- * 3. If different → re-exec from Hub's cli.js
- * 4. Otherwise → run sync-workspace directly
+ * Detection signals (any one triggers re-exec from Hub's cli.js):
+ *   1. Hub `_WORKSPACE_VERSION.md` > local version  (primary — catches config/lib changes)
+ *   2. `bin/cli.js` hash differs                    (fallback — dev/manual edits without version bump)
+ *
+ * Using only cli.js hash misses changes in `src/lib/*.js` and `src/commands/*.js`
+ * (config.js, hub-resolver.js, etc.), so version comparison is the main gate.
  */
 
-import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { join, resolve, dirname } from 'node:path';
 import { createHash } from 'node:crypto';
 import { execSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { isHub, resolveHub, getHubCliNode } from '../lib/hub-resolver.js';
 import * as log from '../lib/logger.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -22,6 +24,20 @@ const cliNodeRoot = resolve(__dirname, '..', '..');
 function hashFile(filePath) {
   if (!existsSync(filePath)) return null;
   return createHash('sha256').update(readFileSync(filePath)).digest('hex');
+}
+
+/**
+ * Parse latest `YYYYMMDDNNNN` version from `_WORKSPACE_VERSION.md`.
+ * Returns null if file missing or unparseable.
+ */
+function parseLatestVersion(filePath) {
+  if (!existsSync(filePath)) return null;
+  try {
+    const m = readFileSync(filePath, 'utf8').match(/^\|\s*(\d{12})\s*\|/m);
+    return m ? m[1] : null;
+  } catch {
+    return null;
+  }
 }
 
 /**
@@ -41,43 +57,6 @@ function detectVaultRootCwd(startDir) {
 }
 
 /**
- * Find Hub's cli-node directory by searching for .hub_marker.
- */
-function findHubCliNode(vaultRoot) {
-  // Walk up to find AIMindVaults root (has Vaults/)
-  let dir = vaultRoot;
-  let aimRoot = null;
-  for (let i = 0; i < 10; i++) {
-    const parent = dirname(dir);
-    if (parent === dir) break;
-    if (existsSync(join(parent, 'Vaults'))) { aimRoot = parent; break; }
-    dir = parent;
-  }
-  if (!aimRoot) return null;
-
-  const normalizedVault = resolve(vaultRoot);
-
-  function search(searchDir, depth) {
-    if (depth > 3 || !existsSync(searchDir)) return null;
-    try {
-      for (const e of readdirSync(searchDir, { withFileTypes: true })) {
-        if (!e.isDirectory()) continue;
-        const full = join(searchDir, e.name);
-        if (resolve(full) === normalizedVault) continue;
-        if (existsSync(join(full, '.sync', '.hub_marker'))) {
-          return join(full, '.sync', '_tools', 'cli-node');
-        }
-        const found = search(full, depth + 1);
-        if (found) return found;
-      }
-    } catch {}
-    return null;
-  }
-
-  return search(join(aimRoot, 'Vaults'), 0);
-}
-
-/**
  * @param {object} opts
  * @param {string} [opts.vaultRoot]
  */
@@ -90,26 +69,37 @@ export async function preSync(opts = {}) {
   }
 
   // Self is Hub → no sync needed
-  if (existsSync(join(vaultRoot, '.sync', '.hub_marker'))) {
+  if (isHub(vaultRoot)) {
     log.info('[PRE_SYNC] Current vault is Hub. No sync needed.');
     return;
   }
 
-  // Find Hub's cli-node
-  const hubCliNode = findHubCliNode(vaultRoot);
-  if (!hubCliNode || !existsSync(hubCliNode)) {
-    log.warn('[PRE_SYNC] Hub cli-node not found. Running sync directly.');
+  // Resolve the Hub this satellite binds to (Multi-Hub aware).
+  const resolution = resolveHub(vaultRoot);
+  if (!resolution.hubPath) {
+    log.warn('[PRE_SYNC] Hub not found. Running local sync directly.');
     const { syncWorkspace } = await import('./sync-workspace.js');
     await syncWorkspace({ vaultRoot });
     return;
   }
+  const hubPath = resolution.hubPath;
+  const hubCliNode = getHubCliNode(hubPath);
 
-  // Compare cli.js hash
+  // Signal 1 — workspace version comparison (primary).
+  const hubVer = parseLatestVersion(join(hubPath, '_WORKSPACE_VERSION.md'));
+  const localVer = parseLatestVersion(join(vaultRoot, '_WORKSPACE_VERSION.md'));
+  const versionStale = !!hubVer && (!localVer || localVer < hubVer);
+
+  // Signal 2 — cli.js hash (fallback).
   const localHash = hashFile(join(cliNodeRoot, 'bin', 'cli.js'));
   const hubHash = hashFile(join(hubCliNode, 'bin', 'cli.js'));
+  const hashDiffers = hubHash && localHash !== hubHash;
 
-  if (localHash !== hubHash && hubHash) {
-    log.info('[PRE_SYNC] cli-node outdated. Re-executing from Hub...');
+  if (versionStale || hashDiffers) {
+    const reasons = [];
+    if (versionStale) reasons.push(`version ${localVer || '(none)'} < Hub ${hubVer}`);
+    if (hashDiffers) reasons.push('cli.js hash differs');
+    log.info(`[PRE_SYNC] Re-executing from Hub (${reasons.join(', ')})`);
     try {
       execSync(`"${process.execPath}" "${join(hubCliNode, 'bin', 'cli.js')}" sync --vault-root "${vaultRoot}"`, {
         stdio: 'inherit',

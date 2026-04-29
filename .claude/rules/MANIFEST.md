@@ -19,6 +19,7 @@
 |--------|------|
 | `_essentials.md` | 필수 코어 — 보고 언어, 토큰 절약, 볼트 라우팅, 편집 모드, Post-Edit Review, 노트 작성 frontmatter/H1/파일명, 세션 종료 통합 |
 | `_skill-router.md` | 작업 키워드 → 로드할 규칙 파일 경로 매핑 테이블 |
+| `distribution-content-safety.md` | 배포 대상 문서에 사용자 개인 볼트명·카테고리·자산 인용 금지 (2026-04-25 incident 기반) |
 | `distribution-sync.md` | 배포 동기화 규칙 |
 | `encoding-safety.md` | 인코딩 안전 |
 | `juggl-style-sync.md` | Juggl 스타일 동기화 |

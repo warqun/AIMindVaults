@@ -1,0 +1,43 @@
+/* ============================================
+   vis-callouts.css
+   콜아웃 가시성 강화
+   Obsidian Default Dark Theme용
+   ============================================ */
+
+/* 콜아웃 공통 — 왼쪽 테두리 두껍게, 둥근 모서리 */
+.callout {
+    border-left-width: 4px !important;
+    border-radius: 6px;
+}
+
+/* 콜아웃 타이틀 폰트 */
+.callout-title {
+    font-size: 0.95em;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+/* 타입별 배경색 (다크 테마에 맞춘 낮은 채도) */
+.callout[data-callout="note"] {
+    background-color: rgba(70, 130, 200, 0.08);
+}
+
+.callout[data-callout="tip"] {
+    background-color: rgba(80, 200, 120, 0.08);
+}
+
+.callout[data-callout="important"] {
+    background-color: rgba(200, 150, 50, 0.08);
+}
+
+.callout[data-callout="warning"] {
+    background-color: rgba(230, 160, 0, 0.10);
+}
+
+.callout[data-callout="caution"] {
+    background-color: rgba(200, 60, 60, 0.10);
+}
+
+.callout[data-callout="info"] {
+    background-color: rgba(60, 160, 210, 0.08);
+}

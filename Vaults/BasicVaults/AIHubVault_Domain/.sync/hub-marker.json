@@ -1,0 +1,11 @@
+{
+  "hubId": "domain",
+  "hubType": "preset",
+  "hubName": "Domain Preset Hub",
+  "version": "1.0.0",
+  "coreHub": "../CoreHub",
+  "coreHubVersion": "^1.0.0",
+  "description": "Zettelkasten 중심 지식 축적 Preset — Core 6 + Custom 5 (quickadd, metadata-menu, Juggl, global-search-and-replace, obsidian42-brat). fleeting/literature/permanent/moc/synthesis 타입. 20 Domain 볼트 대상.",
+  "defaultTemplate": "BasicDomainVault",
+  "createdAt": "2026-04-20"
+}

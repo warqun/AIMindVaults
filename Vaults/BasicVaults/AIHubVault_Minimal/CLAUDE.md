@@ -52,6 +52,16 @@ Core 6 플러그인 (`obsidian-local-rest-api`, `obsidian-advanced-uri`, `obsidi
 
 또는 `aimv clone --hub <Minimal 경로>` 로 생성 시 자동 작성.
 
+## 의도별 진입 가이드 (이 볼트 작업 시)
+
+| 의도 | 진입점 |
+|------|-------|
+| **현재 상태** | `_STATUS.md` |
+| **Custom 추가** (개인화) | `.obsidian/plugins/` · 루트 `.claude/rules/custom/` → `bump-version -m "..."` |
+| **위성 신규 바인딩** | `aimv clone -t <path> --hub <이 볼트 경로>` |
+| **기존 위성을 이 Preset 으로** | 대상 위성에서 `aimv rebase --hub <이 볼트 경로> --dry-run` |
+| **Core 편집 필요** | → **CoreHub 로 이동** (이 볼트에서 금지) |
+
 ## 참조
 
 - 설계 문서: `Vaults/Projects_Infra/Project_AIMindVaults/Contents/Project/plan/architecture/20260419_Multi_Hub_아키텍처_설계.md`

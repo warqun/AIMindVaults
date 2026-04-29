@@ -1,13 +1,19 @@
 ---
 type: agent-status
 agent: codex
-updated: 2026-04-17
+updated: 2026-04-21
 ---
 
 # Codex Agent Status
 
 > Codex가 세션마다 갱신하는 상태 파일.
 > Claude 및 다른 에이전트가 읽는 고정 공유 메모.
+
+## 이번 세션 요약 (2026-04-21 — Codex)
+
+- 작업 범위: `괴발자`의 `2026-04-19` YouTube 영상 `클로드 코드의 토큰 낭비를 60% 줄여주는 오픈소스 RTK-AI 소개` 노트화
+- 완료: `Contents/HowAgentWorks/20260419_Claude_Code_RTK_AI_토큰_절약_구조와_한계_영상_정리.md`를 생성하고, RTK의 Hook 구조, 적용 조건, 한계와 trade-off를 정리
+- 결정: `Claude Code` 토큰 절약·CLI 출력 최적화 사례도 `Contents/HowAgentWorks/` 아래 `guide` 타입으로 축적
 
 ## 이번 세션 요약 (2026-04-17 — Codex)
 
@@ -22,6 +28,12 @@ updated: 2026-04-17
 - 결정: 노트 추가/편집 작업은 review 통과만으로 끝내지 않고 인덱싱 완료까지 확인해야 한다
 
 ## 이번 세션에서 한 일 (Done)
+
+### [2026-04-21] Codex 세션
+- `Contents/HowAgentWorks/20260419_Claude_Code_RTK_AI_토큰_절약_구조와_한계_영상_정리.md` 생성
+  - `괴발자` `2026-04-19` 영상 `클로드 코드의 토큰 낭비를 60% 줄여주는 오픈소스 RTK-AI 소개` 자막 기반 정리
+  - `Claude Code`의 `PreToolUse` Hook, `rtk-cli`, `rtk-rewrite.sh`, CLI 출력 압축 포인트, 정확성 trade-off를 요약
+- AIHubVault `_STATUS.md`, `.codex/AGENT_STATUS.md`, `_SESSION_HANDOFF_CODEX.md`, 루트 `_STATUS.md`, 루트 `_SESSION_HANDOFF_CODEX.md` 갱신
 
 ### [2026-04-17] Codex 세션
 - `Contents/HowAgentWorks/20260417_AI_에이전트_협업환경_구축법_오픈클로_영상_정리.md` 생성
@@ -83,6 +95,7 @@ updated: 2026-04-17
 
 ## 결정 사항 (Decisions)
 
+- (2026-04-21) `Claude Code` 토큰 절약·CLI 출력 최적화 사례도 `Contents/HowAgentWorks/` 아래 `guide` 타입으로 축적한다
 - (2026-04-17) 외부 영상 기반 AI 에이전트 협업환경 사례 정리는 `Contents/HowAgentWorks/` 아래 `guide` 타입으로 누적한다
 - (2026-03-06) Codex의 자동 진입점은 루트 `AGENTS.md`이며 `.codex/CODEX.md`는 보조 참조 문서로 취급
 - (2026-03-06) `_forge/ideas/LatticeCore/prompt_log/<agent>/` 구조에서는 폴더 노트와 별도 로그 노트를 구분해서 다룸
@@ -98,6 +111,7 @@ updated: 2026-04-17
 ## 다음 작업 (Next)
 
 - `Contents/HowAgentWorks/`에 외부 사례 2~3건을 더 축적해 공통 템플릿으로 일반화
+- RTK처럼 `Claude Code`의 CLI 비용·로그 압축을 다루는 보조 도구 사례를 1~2건 더 추가해 공통 패턴을 비교
 - 영상, 웹 글, PDF 각각 실제 입력으로 새 스킬 1회씩 검증
 - 노트 생성이 잦은 대상 볼트에 `_WORKSPACE_VERSION.md` 202604080002를 배포하고 `POST_EDIT_INDEX_UPDATED=1` 결과를 표본 점검
 - 실제 사용 중 드러나는 frontmatter, 태그, 라우팅 기본값 보정

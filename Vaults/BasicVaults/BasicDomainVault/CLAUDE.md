@@ -47,7 +47,10 @@ agent: claude
 ### 태그 규칙 (도메인 볼트 공통)
 
 - 도메인 식별은 인덱서 `vault` 필드가 담당 — `domain` frontmatter 필드 사용 금지
-- `tags` 는 **상태·운영용만** (`zk`, `literature`, `synthesis`, `moc`, `pattern`)
+- `tags` 는 **상태·운영용만**
+  - **ZK 정식 5 타입**: `zk`, `literature`, `synthesis`, `moc`, `pattern`
+  - **Draft·운영 단계**: `ai-draft` (AI 가 작성한 미승격 초안 — `Contents/_AI_Drafts/` 폴더 노트 권장), `temp` (사람 임시 메모)
+  - 정식 ZK 타입과 운영 단계 태그는 **병기 가능** (`tags: [zk, ai-draft]` 등)
 - **개념 분류 태그 금지** — 개념은 링크로 연결하라
 - 고유명사는 원표기 유지 (`Unity`, `Python`, `AI`)
 
@@ -55,6 +58,7 @@ agent: claude
 
 - 공통 7 필드: `id` (permanent/literature/synthesis 한정), `type`, `status`, `created`, `updated`, `tags: [zk]`, `agent`
 - literature 3 추가 필드: `source_type`, `author`, `year`
+- **AI Draft 단계** (`Contents/_AI_Drafts/`): `tags: [ai-draft]` 또는 `[zk, ai-draft]`. 정식 ZK 타입 (zk/literature/synthesis/moc/pattern) 으로 승격 시 `ai-draft` 제거
 - **wikilink 관계 필드 (`see_also`, `source`, `related`) 는 frontmatter 에 넣지 말 것.** 본문 Dataview inline field 로 (`- source:: [[...]]`)
 
 ### 파일명 · H1

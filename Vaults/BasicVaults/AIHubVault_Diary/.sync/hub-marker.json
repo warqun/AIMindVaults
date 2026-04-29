@@ -1,0 +1,11 @@
+{
+  "hubId": "diary",
+  "hubType": "preset",
+  "hubName": "Diary Preset Hub",
+  "version": "1.0.0",
+  "coreHub": "../CoreHub",
+  "coreHubVersion": "^1.0.0",
+  "description": "Core 6 + 일기 전용 Custom 4 (Calendar, Periodic Notes, Heatmap Calendar, Journal Review). 최소 UI · 프라이버시 우선 · AI scope 기본 none. 대상: Vaults/Personal/Diary.",
+  "defaultTemplate": "BasicDiaryVault",
+  "createdAt": "2026-04-20"
+}

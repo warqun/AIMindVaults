@@ -1,0 +1,16 @@
+{
+  "name": "aimindvaults-cli",
+  "version": "0.1.0",
+  "description": "AIMindVaults cross-platform CLI tools",
+  "type": "module",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "bin": {
+    "aimv": "./bin/cli.js"
+  },
+  "dependencies": {
+    "commander": "^13.0.0",
+    "gray-matter": "^4.0.3"
+  }
+}

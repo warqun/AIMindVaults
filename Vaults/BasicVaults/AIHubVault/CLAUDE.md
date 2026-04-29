@@ -40,6 +40,20 @@ Core 편집 후 CoreHub 에서 `bump-version -m "..." --broadcast` 실행 → �
 - 이 볼트의 CLAUDE.md, _STATUS.md, README.md 등 Preset 개별 파일
 - Custom 계층 편집 후 이 볼트 `_WORKSPACE_VERSION.md` bump (위성 전파 알림)
 
+## 의도별 진입 가이드 (이 볼트 작업 시)
+
+| 의도 | 진입점 |
+|------|-------|
+| **현재 상태·진행 확인** | `_STATUS.md` |
+| **세션 맥락 복원** | `_SESSION_HANDOFF_CLAUDE.md` (루트) + 이 볼트 핸드오프 (있는 경우) |
+| **Custom 플러그인 추가·제거** | `.obsidian/plugins/` + `community-plugins.json` → 편집 후 `bump-version -m "..."` |
+| **Custom 규칙·스킬 수정** | 루트 `.claude/rules/custom/` · `.claude/commands/custom/` (볼트 레벨 아님 · 루트 ancestry) |
+| **Preset 버전 기록** | `bump-version -m "변경 내용"` → `_WORKSPACE_VERSION.md` |
+| **위성 전파 확인** | 대상 위성에서 `aimv sync --dry-run` |
+| **Core 편집 필요** | → **CoreHub 로 이동** (이 볼트에서 금지) · CoreHub 에서 `bump-version --broadcast` |
+| **신규 위성 바인딩** | `aimv clone -t <path> --hub <이 볼트 경로>` |
+| **기존 위성 Hub 변경** | 대상 위성에서 `aimv rebase --hub <다른 Hub> --dry-run` 먼저 |
+
 > **콘텐츠 분리 완료 (2026-03-21)**: 기존 Contents/Domain/ → `Vaults/Domains_Infra/AI/`, Contents/Project/ → `Vaults/Projects_Infra/Project_AIMindVaults/`로 이관됨. 이 볼트는 workspace 전용 Hub로 운영.
 
 ## 파생 인스턴스 규칙

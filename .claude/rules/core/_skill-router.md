@@ -31,6 +31,7 @@
 | 유저 가이드 저위험 (§1, §3, §6, §7, §9, §12) | Obsidian 열기, 노트 어디에, 어느 볼트, 플러그인 설치, 세션 종료, 끝났어, 정리해, 마무리, 노트 어디 있어, 배포 어떻게, SellingVault, 어떻게, 뭘 해야, 모르겠, 까먹, 방법, 절차, 다음에 뭐, how to, what should I | `.claude/rules-archive/user-guidance-detail.md` Read |
 | 에이전트 협업 | Codex와 동시, 충돌, 에이전트 분담 | `.claude/rules/custom/agent-ownership.md` (custom 주입됨) |
 | 임시 파일 · 재귀 삭제 | 임시 파일, MAX_PATH, 무한 재귀, flatten-and-delete, robocopy | `.claude/rules/core/temp-file-management.md` (core 주입됨) |
+| Obsidian 인스턴스 제어 | Obsidian 창, 옵시디언 창, ob 창, 인스턴스, instance, N개로 맞춰, N개로 줄여, N개로 늘려, Obsidian 정리, 옵시디언 닫아, Obsidian 몇 개 | `/obsidian-windows` Skill + `.claude/rules/custom/obsidian-instance-control.md` (custom 주입됨) |
 
 ## 매칭 실패 시
 

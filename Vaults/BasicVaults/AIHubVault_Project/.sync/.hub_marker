@@ -1,0 +1,4 @@
+# Hub Marker
+# This file identifies AIHubVault as the workspace sync source (Hub).
+# Do not create this file in other vaults.
+# Used by sync_workspace.ps1 for automatic Hub detection.

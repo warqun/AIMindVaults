@@ -3,10 +3,22 @@
 > 이 파일은 Codex 데스크탑 앱 / Codex CLI 전용 진입점이다.
 > Claude Code → `CLAUDE.md` 참조.
 
-## 공통 규칙 (정본 참조 — Mandatory)
+## 공통 규칙 (Phase 1 구조 — Mandatory)
 
-세션 시작 시 `.claude/rules/` 디렉토리의 **모든 규칙 파일**을 읽고 따른다.
+세션 시작 시 다음 순서로 규칙을 로드한다:
+
+1. **상시 필수** (Codex 는 명시적 Read, Claude 는 자동 주입):
+   - `.claude/rules/core/*.md` — 배포 규칙 (모든 에이전트 공통)
+   - `.claude/rules/custom/*.md` — 사용자 개인 규칙
+2. **트리거 시 Read** (작업 유형별):
+   - `.claude/rules-archive/*.md` — 도메인·상세 규칙
+   - 트리거 매핑은 `.codex/rules/skill-router.md` 참조 (신설 예정)
+   - 매핑 없으면 core/custom 만으로 진행
+
 이 규칙들은 모든 AI 에이전트에 동일 적용되는 강제(Mandatory) 규칙이다.
+Claude 는 자동 주입 메커니즘이 있고, Codex 는 없으므로 세션 진입 시 core/custom 파일을 명시적으로 Read 해야 한다.
+
+여기 명시되지 않은 에이전트(Cursor, Windsurf, GitHub Copilot, Antigravity 등)도 자유롭게 부착 가능하며, 사용하지 않는 에이전트의 진입점·규칙 파일은 각 사용자가 정리한다.
 
 ## 에이전트 식별자
 
@@ -23,62 +35,24 @@
 ## 세션 시작 순서
 
 1. 이 파일 (`AGENTS.md`)
-2. `.claude/rules/` 전체 — 공통 강제 규칙 (정본)
-3. `_STATUS.md` (루트) — 전체 볼트 현황 + 다른 볼트 작업 확인
-4. `.codex/rules/` — Codex 고유 규칙
-5. `.codex/AGENT_STATUS.md`
-6. 대상 볼트의 `AGENTS.md`
-7. 대상 볼트의 `_STATUS.md`
+2. `.claude/rules/core/*.md` — 상시 필수 (모든 파일 Read)
+3. `.claude/rules/custom/*.md` — 상시 필수 (모든 파일 Read)
+4. `_STATUS.md` (루트) — 전체 볼트 현황 + 다른 볼트 작업 확인
+5. `_AGENT_COMMS/to_codex/` — Claude 가 남긴 메시지 스캔 (`status: open` 확인)
+6. `.codex/rules/` — Codex 고유 규칙 (skill-router · edit-scope · status-sync · encoding-safety · vault-routing)
+7. 작업 유형 트리거 매칭 시 `.claude/rules-archive/` 해당 파일 Read (매핑은 `.codex/rules/skill-router.md`)
+8. (볼트 진입 시) 대상 볼트 `_STATUS.md`
 
 편집 전에 위 순서를 완료한다.
+`.codex/AGENT_STATUS.md` · 볼트별 `AGENTS.md` 는 레거시 항목 — 필요 시에만 Read (대부분 stub).
 
 ## 볼트 레지스트리
 
-### BasicVaults (작업환경 허브)
+**볼트 전체 목록·경로·상태는 루트 `_STATUS.md` 볼트 레지스트리 참조.**
 
-| 볼트 ID | 경로 | 역할 | 상태 |
-|---------|------|------|------|
-| AIHubVault | `Vaults/BasicVaults/AIHubVault/` | AI 작업환경 설계·개선·배포 허브 | active |
-| BasicContentsVault | `Vaults/BasicVaults/BasicContentsVault/` | 범용 콘텐츠 저장소 (배포용 — 직접 편집 금지) | active |
+레지스트리는 카테고리별(BasicVaults, Domains, Labs, Projects 등) 테이블로 볼트명 · 타입 · 경로 · 콘텐츠 · 작업 에이전트를 관리한다.
 
-### Domains (도메인 지식 볼트)
-
-| 볼트 ID | 경로 | 역할 | 상태 |
-|---------|------|------|------|
-| Unity | `Vaults/Domains_Game/Unity/` | Unity 엔진 도메인 지식 | active |
-| GameDesign | `Vaults/Domains_Game/GameDesign/` | 게임 기획·디자인 | active |
-| CapCut | `Vaults/Domains_Video/CapCut/` | CapCut 영상편집 도메인 지식 | active |
-| Notion | `Vaults/Domains_Infra/Notion/` | Notion 워크스페이스 운영 | active |
-| Git | `Vaults/Domains_VCS/Git/` | Git 버전관리 지식 | active |
-| Blender | `Vaults/Domains_3D/Blender/` | Blender 3D 도메인 지식 | active |
-| AI_Gen4Game | `Vaults/Domains_AI_Asset/AI_Gen4Game/` | AI 생성 게임 에셋 | active |
-
-### Labs (도메인+프로젝트 복합 볼트)
-
-| 볼트 ID | 경로 | 역할 | 상태 |
-|---------|------|------|------|
-| ObsidianDev | `Vaults/Lab_Infra/ObsidianDev/` | Obsidian 플러그인 개발 | active |
-
-### Domain_Art (아트 도메인)
-
-| 볼트 ID | 경로 | 역할 | 상태 |
-|---------|------|------|------|
-| LightAndColor | `Vaults/Domain_Art/LightAndColor/` | 빛과 색 이론, 색채학, 명암/색보정, 영화 색 스토리텔링 | active |
-| ArtInsight | `Vaults/Domain_Art/ArtInsight/` | 미적 안목, 시각적 분별, 레퍼런스 해석, 취향과 스타일 판단 | active |
-
-### Projects (프로젝트 볼트)
-
-| 볼트 ID | 경로 | 역할 | 상태 |
-|---------|------|------|------|
-| CombatToolKit | `Vaults/Lab_Game/CombatToolKit/` | 게임 전투 시스템 개발 툴킷 | active |
-| TileMapToolKit | `Vaults/Lab_Game/TileMapToolKit/` | 게임 타일맵 시스템 개발 툴킷 | active |
-| JissouGame | `Vaults/Projects_Game/JissouGame/` | Unity 기반 게임 개발 프로젝트 | active |
-
-### References (참조 전용)
-
-| 볼트 ID | 경로 | 역할 | 상태 |
-|---------|------|------|------|
-| Unity_Documentation | `References/Unity_Documentation/` | Unity 6.3 공식 문서 (조회 전용) | readonly |
+볼트 ID → 실제 경로 해석은 루트 `_STATUS.md` 볼트 레지스트리의 "경로" 컬럼에서 lookup.
 
 ## 볼트 라우팅 규칙
 
@@ -96,6 +70,7 @@
    - "Git", "버전관리" → Git
    - "Blender", "3D" → Blender
    - "AI 에셋", "생성형 AI" → AI_Gen4Game
+   - "공장 자동화", "자동화 기계 조립", "기계 조립", "공작현장", "렌치볼트", "육각렌치볼트", "체결부품", "공구", "토크", "공차" → MachineAssembly
    - "빛과 색", "색채학", "명암", "색온도", "필름룩", "RAW", "LOG" → LightAndColor
    - "아트 인사이트", "미적 감각", "안목", "취향", "유행과 트렌드", "올드와 클래식", "상황과 감정" → ArtInsight
 3. 파일 경로 포함 시 → 경로에서 볼트 추출
@@ -108,6 +83,7 @@
 - `AGENTS.md`, `CLAUDE.md`, `CODEX.md`
 - `.claude/`, `.codex/`
 - `_STATUS.md`, `_ROOT_VERSION.md`
+- `_AGENT_COMMS/` (에이전트 간 소통 공간 — 볼트 아님)
 - `docs/`
 
 볼트 내부 파일은 대상 볼트 진입 후에만 수정한다.

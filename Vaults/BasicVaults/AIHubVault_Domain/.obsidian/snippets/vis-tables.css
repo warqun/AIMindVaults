@@ -1,0 +1,38 @@
+/* ============================================
+   vis-tables.css
+   테이블 가독성 & 줄무늬 강화
+   Obsidian Default Dark Theme용
+   ============================================ */
+
+/* 테이블 테두리 */
+.markdown-reading-view table {
+    border-collapse: collapse;
+    width: 100%;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+/* 헤더 행 강조 */
+.markdown-reading-view thead th {
+    background-color: rgba(100, 150, 220, 0.18);
+    color: #e5c07b;
+    font-weight: 700;
+    padding: 9px 14px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.12);
+}
+
+/* 셀 여백 & 구분선 */
+.markdown-reading-view td {
+    padding: 7px 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* 홀짝 줄무늬 (zebra stripe) */
+.markdown-reading-view tbody tr:nth-child(even) {
+    background-color: rgba(255, 255, 255, 0.03);
+}
+
+/* 호버 하이라이트 */
+.markdown-reading-view tbody tr:hover {
+    background-color: rgba(100, 150, 220, 0.08);
+}

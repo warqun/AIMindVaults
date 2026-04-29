@@ -3,7 +3,7 @@ type: workspace-version
 tags:
   - CoreHub
   - Multi-Hub
-updated: 2026-04-20
+updated: 2026-04-24
 ---
 
 # CoreHub Workspace Version
@@ -14,6 +14,19 @@ updated: 2026-04-20
 
 | 버전 | 변경 내용 |
 | ---- | -------- |
+| 202604240005 | sync 런처 설치 시 Hub 템플릿 사용 보강 |
+| 202604240004 | Sync This Vault bat 경로 계산 안정화 |
+| 202604240003 | sync 런처를 볼트 .sync 내부로 이동하고 루트 설치물 cleanup 추가 |
+| 202604240002 | sync-all npm 실행 경고 제거 (npm.cmd 직접 호출) |
+| 202604240001 | 수동 sync 런처 도입 (sync-all/install-launchers CLI + Sync All/This Vault 템플릿) |
+| 202604220003 | BasicVaults 런처 재배치 (단일 copy / defaultTemplate 메커니즘 / CLONE_EXCLUDE_FILES 편입 / CORE_PATHS 에서 런처 제거) |
+| 202604220002 | MakeCloneVault.bat/sh 복구 (Node CLI 호출) + CORE_PATHS 편입 (자동 전파) |
+| 202604220001 | create-hub.js 주석 보강 (경로 해석·5단계·자동/수동 구분·동기화 흐름) |
+| 202604210001 | sync-workspace mergeCommunityPlugins: Hub plugin 폴더 존재만으로 위성 community-plugins.json 자동 활성화 (folder-set union 추가). 기존엔 Hub community-plugins.json 기반이라 Hub에서 플러그인 설치했지만 Enable 토글 전이면 위성에 꺼진 상태로 전파되던 엣지케이스 근본 해결 |
+| 202604200015 | plugin-seed: 첫 보드캐스트 시 data.json 자동 부트스트랩 (make-md systemName 포함) |
+| 202604200014 | core-sync-all: community-plugins.json 자동 병합 로직 추가 |
+| 202604200013 | Core 7: make-md 편입 (가시성 개선) |
+| 202604200012 | CoreHub CLAUDE.md 에 의도별 진입 가이드 추가 (10개 항목: Core 상태/CLI/표준/스키마/Core 플러그인/Preset 생성/전파/호환성/외부 Hub 설치/Custom 금지). PLLC 템플릿 네비게이션 패턴 차용. AIHubVault 및 Minimal CLAUDE.md 에도 각 Hub 성격에 맞춘 의도 가이드 추가 |
 | 202604200011 | Phase 3 — Hub 공유 기반 완성. (1) aimv install-hub 명령 신규 — git URL 에서 Hub clone · hub-marker.json 검증 · coreHubVersion 호환성 체크 · per-device config strip. (2) hub-marker.schema.json 에 coreHubVersion 필드 추가 (semver-like: ^ ~ >= <= > < =). (3) lib/version-range.js 공통 모듈 — checkVersionRange() API. (4) core-sync-all 에 호환성 체크 통합 · --force 옵션 (불일치 덮어쓰기). (5) AIHubVault/Minimal 에 coreHubVersion=^1.0.0 예시 기입. (6) docs/hub-sharing.md 공유 가이드 작성. Phase 3 목표 달성: 자체 Preset Hub 를 GitHub 레포로 공유 → 다른 사용자가 install-hub 로 설치 가능 |
 | 202604200010 | Phase 2 Step 3 — Custom 보호 실증 완료 (Minimal 에 test-custom-plugin 추가 후 core-sync-all → 보존 확인). Phase 2 Step 1~3 완료 (_CORE_VERSION.md + rebase + Custom 보호). 남은 것: Step 4 배포 (사용자 승인 영역) |
 | 202604200009 | Phase 2 Step 2 — aimv rebase 명령 구현 (D3 V2). 위성 볼트의 Hub 바인딩 변경: hub-source.json backup → 재작성 → 신 Hub 기준 fresh sync (Add + Prune). --dry-run 필수 선행 · Contents/ 보호 · Hub 볼트는 rebase 거부. REBASE_RESULT=OK/NOOP/DRY_RUN 환경변수 출력 |

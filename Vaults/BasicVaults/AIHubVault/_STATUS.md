@@ -1,7 +1,7 @@
 ---
 type: status
-updated: 2026-04-19
-agent: claude
+updated: 2026-04-21
+agent: codex
 ---
 # STATUS — 현재 진행 현황
 
@@ -17,6 +17,10 @@ agent: claude
 
 ## Now (현재 집중)
 
+- **RTK-AI 토큰 절약 영상 노트 추가** (2026-04-21)
+  - `Contents/HowAgentWorks/20260419_Claude_Code_RTK_AI_토큰_절약_구조와_한계_영상_정리.md` 생성
+  - `Claude Code`의 CLI 출력 압축 구조, `PreToolUse` Hook 경유 흐름, 효과가 큰 조건, 정확성 trade-off를 정리
+  - `POST_EDIT_REVIEW_BAD=0`, `POST_EDIT_INDEX_UPDATED=1` 확인
 - **플러그인 번들 정리 + Hub-Sync prune 로직 추가** (2026-04-19)
   - `.obsidian/plugins/` : Claudian + Custom B 10 제거 → 17 유지 (Core 6 + Custom A 11)
   - `community-plugins.json` 11개 항목 제거
@@ -43,6 +47,7 @@ agent: claude
 
 ## Decisions (결정 사항)
 
+- (2026-04-21) `Claude Code` 토큰 절약·CLI 출력 최적화 사례도 `Contents/HowAgentWorks/` 아래 `guide` 타입 노트로 함께 축적한다
 - (2026-04-17) 외부 영상 기반 AI 에이전트 협업환경 사례 정리는 `Contents/HowAgentWorks/` 아래 `guide` 타입 노트로 축적한다
 - (2026-04-09) **배포본 Codex 테스트 통과**: 온보딩 문서 기반으로 Codex가 코어 규칙 15개를 전부 준수함을 확인. 배포본 실사용 가능 상태 확정
 - (2026-04-09) **pre_sync.ps1 자기참조 판정 위치 변경**: Hub 탐색 로직이 현재 볼트를 제외하는 구조이므로, .hub_marker 존재 확인을 탐색 전에 수행

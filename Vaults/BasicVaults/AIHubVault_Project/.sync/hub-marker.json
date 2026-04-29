@@ -1,0 +1,11 @@
+{
+  "hubId": "project",
+  "hubType": "preset",
+  "hubName": "Project Preset Hub",
+  "version": "1.0.0",
+  "coreHub": "../CoreHub",
+  "coreHubVersion": "^1.0.0",
+  "description": "PARA 기반 프로젝트 실행 Preset — Core 6 + Custom 5 (tasks-plugin, metadata-menu, mermaid-tools, obsidian-git, mcp-tools). 9 타입 (idea/plan/spec/design/task/decision/issue/report/retro). 대상: Projects_Game, Projects_Infra.",
+  "defaultTemplate": "BasicProjectVault",
+  "createdAt": "2026-04-20"
+}

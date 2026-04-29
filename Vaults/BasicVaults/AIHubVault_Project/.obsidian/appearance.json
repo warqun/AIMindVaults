@@ -1,0 +1,13 @@
+{
+  "theme": "obsidian",
+  "enabledCssSnippets": [
+    "vis-callouts",
+    "vis-codeblocks",
+    "vis-emphasis",
+    "vis-headings",
+    "vis-mermaid-fix",
+    "vis-tables",
+    "vis-tags-links",
+    "vis-typography"
+  ]
+}

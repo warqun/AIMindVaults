@@ -2,9 +2,8 @@
 type: workspace-version
 tags:
   - AIMindVault
-  - TileMapToolKit
   - Meta
-updated: 2026-04-20
+updated: 2026-04-24
 ---
 
 # Workspace Version
@@ -15,6 +14,11 @@ updated: 2026-04-20
 
 | 버전           | 변경 내용 |
 | ------------ | ----- |
+| 202604240003 | CoreHub sync 런처 .sync 이동 수신 |
+| 202604240002 | CoreHub sync-all npm 경고 수정 수신 |
+| 202604240001 | CoreHub 수동 sync 런처 전파 수신 |
+| 202604210001 | sync-workspace mergeCommunityPlugins: Hub 플러그인 폴더 존재만으로 자동 활성화 (folder-set union) — CoreHub 배포본 수신 |
+| 202604200013 | AIHubVault CLAUDE.md 에 의도별 진입 가이드 추가 (9개 항목). Preset 에서 할 수 있는 것 / CoreHub 로 가야 하는 것 명시 |
 | 202604200012 | Phase 3 수신 (install-hub, coreHubVersion schema, version-range lib, hub-sharing 가이드) |
 | 202604200011 | Custom 플러그인 잔여 디렉토리 제거 (claudian, obsidian-time-machine). community-plugins.json 에서는 이미 제거됐으나 .obsidian/plugins/ 디렉토리가 잔존해 deploy 시 배포본에 재등장하던 문제 해결 |
 | 202604200010 | Phase 2 Step 2 (aimv rebase) + Step 1 (_CORE_VERSION.md) CoreHub 에서 수신 |

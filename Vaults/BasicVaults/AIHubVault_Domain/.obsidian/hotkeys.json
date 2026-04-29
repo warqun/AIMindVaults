@@ -1,0 +1,17 @@
+{
+  "new-3d-graph:open-3d-graph-view": [
+    {
+      "modifiers": [],
+      "key": "F12"
+    }
+  ],
+  "obsidian-shellcommands:shell-command-wsgbrzrjrs": [
+    {
+      "modifiers": [
+        "Mod",
+        "Shift"
+      ],
+      "key": "Y"
+    }
+  ]
+}

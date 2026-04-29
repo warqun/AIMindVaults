@@ -46,3 +46,14 @@ node "{AIHubVault}/.sync/_tools/cli-node/bin/cli.js" broadcast -p "<.sync 기준
 - `-Force`: 파일이 없는 볼트에도 신규 생성
 - AIHubVault 자신은 항상 제외
 - 소스 파일이 Hub에 없으면 에러 종료
+
+## 정본·전파본·생성물 분리 (R081)
+
+broadcast 호출 전에 대상 파일이 **정본** 인지 확인:
+- ✅ **정본**: Hub `.sync/_tools/`, `_Standards/Core/`, `schemas/`, Core 플러그인 등 → broadcast 정상
+- ❌ **전파본**: 다른 sync 로 이미 받은 파일을 다시 broadcast → 순환 위험, 정본 위치에서 수정 후 broadcast
+- ❌ **생성물**: installer/CLI 가 만든 결과물 (`Sync This Vault.*` 같은) → broadcast 대신 **생성 로직 (template + installer) 수정 후 sync 로 재생성**
+
+생성물을 broadcast 하면 위성에 stale 사본이 남아 다음 sync 에서 prune 안 되는 문제 발생. 정본·생성 로직 우선 수정 원칙 준수.
+
+상세: `.claude/rules/core/_essentials.md § 4` · `.claude/rules-archive/edit-mode-separation.md`.

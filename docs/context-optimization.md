@@ -173,40 +173,42 @@ bkit은 PDCA 기반 개발 워크플로우용입니다. Obsidian 지식 관리�
 
 변경 후 Claude Code 재시작 → `/context` 명령으로 베이스라인 확인.
 
-### 참고 수치 (기본 세팅 기준)
+### 실측 결과 (2026-04-19, Opus 4.7 [1M])
 
-AIMindVaults 배포본만 clone 한 뒤 추가 MCP 서버·플러그인을 등록하지 않은 상태에서 루트 세션을 측정한 예시:
+AIMindVaults 루트 세션 기준:
 
 ```
-Tokens: ~46k / 1m (~5%)
+Tokens: 46.4k / 1m (5%)
 
 Estimated usage by category:
-  System prompt ............ ~8k
-  System tools ............. ~11k
-  Memory files ............. ~23k
-  MCP tools (deferred) ..... 가변 (실제 주입되지 않음)
-  Skills ................... ~2k
-  Free space ............... ~920k
+  System prompt ............ 8.4k  (0.8%)
+  System tools .............. 11.4k (1.1%)
+  MCP tools ................. 1.3k  (0.1%)
+  MCP tools (deferred) ...... 52.1k (5.2%)   ← 실제 주입되지 않음
+  System tools (deferred) ... 19.6k (2.0%)   ← 실제 주입되지 않음
+  Memory files .............. 23.0k (2.3%)
+  Skills .................... 2.3k  (0.2%)
+  Messages .................. ~0    (0.0%)
+  Autocompact buffer ........ 33.0k (3.3%)
+  Free space ................ 920.6k (92.1%)
 ```
-
-> 사용자가 MCP 서버·플러그인을 추가할수록 베이스라인이 증가합니다. 위 수치는 출발점입니다.
 
 ### 해석
 
-- **Memory files ~23k**: core 상시 주입 + archive 조건부 로드 구조의 기본 효과.
-- **Deferred tools는 토큰 실소비 없음**: 최신 Claude Code는 MCP/시스템 도구 스키마를 `ToolSearch` 호출 시에만 로드하는 Deferred 아키텍처를 사용합니다. `/context`에 표시되어도 실제 컨텍스트를 소비하지 않으므로, Deferred로 분류된 MCP 도구는 더 이상 베이스라인 압박 요인이 아닙니다.
-- **실효 베이스라인 ~46k**: 대화 시작 시 실제 사용 토큰. 1M 컨텍스트 중 ~920k가 자유 공간.
+- **Memory files 23k 달성**: 규칙 주입 구조 개편(Phase 1~3) 효과 확인.
+- **Deferred tools (72k)는 실제 토큰 소비 없음**: ToolSearch로 질의할 때만 스키마가 로드되는 구조. 베이스라인에 계산되지만 실 사용 컨텍스트는 소비하지 않음.
+- **실효 베이스라인 46.4k**: 대화 시작 시점의 실제 사용 토큰. 1M 중 920k가 자유 공간.
 
-### 목표치
+### 목표치 vs 실측
 
-| 지표 | 최적화 전 | 최적화 후 |
-|------|----------|----------|
-| Memory files | ~45k | ~23k (기본 제공) |
-| MCP tools (active) | ~67k | Deferred 아키텍처로 실소비 없음 |
-| Skills | ~6k | ~2k 이하 |
-| **실효 베이스라인** | ~170k | **~50k 이하** |
+| 지표 | 최적화 전 | 목표 | 실측 (2026-04-19) |
+|------|----------|------|------------------|
+| Memory files | ~45k | ~23k | **23.0k** ✅ |
+| MCP tools (deferred) | ~67k | ~15k 이하 | 52.1k (deferred — 미주입) |
+| Skills | ~6k | ~0k | 2.3k ✅ |
+| **실효 베이스라인** | ~170k | ~80k | **46.4k** ✅ |
 
-> MCP 서버를 프로젝트별로 분리 등록하거나 불필요한 플러그인을 비활성화하면 위 수준을 유지할 수 있습니다.
+> Deferred tools는 ToolSearch 호출 시에만 스키마를 로드하므로 실제 컨텍스트 소비량으로 환산하면 실측 베이스라인은 목표치를 크게 상회.
 
 ---
 

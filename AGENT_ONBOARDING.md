@@ -32,22 +32,28 @@ AIMindVaults는 Obsidian 기반 멀티볼트 지식 관리 시스템이다.
 
 ## 2. 볼트 구성
 
-전체 레지스트리는 `CLAUDE.md` 또는 `AGENTS.md`에 있다. 주요 카테고리:
+본 시스템의 볼트는 **Multi-Hub 아키텍처** (2026-04-20 Phase 1) 의 3 계층으로 구성된다.
 
-| 카테고리 | 경로 패턴 | 예시 |
-|----------|----------|------|
-| BasicVaults | `Vaults/BasicVaults/` | AIHubVault (Hub), BasicContentsVault (템플릿) |
-| Domains_Game | `Vaults/Domains_Game/` | Unity, GameDesign, GameArt |
-| Domains_Video | `Vaults/Domains_Video/` | CapCut |
-| Domains_Infra | `Vaults/Domains_Infra/` | Notion, CICD, Search, AI, AppFlowy |
-| Domain_Art | `Vaults/Domain_Art/` | LightAndColor |
-| Domains_Business | `Vaults/Domains_Business/` | Funding |
-| Lab_Infra | `Vaults/Lab_Infra/` | ObsidianDev |
-| Lab_Game | `Vaults/Lab_Game/` | CombatToolKit, TileMapToolKit |
-| Projects_Game | `Vaults/Projects_Game/` | JissouGame |
-| Projects_Infra | `Vaults/Projects_Infra/` | Project_AIMindVaults |
-| Personal | `Vaults/Personal/` | Diary |
-| References | `References/` | Unity_Documentation (readonly) |
+| 계층 | 경로 | 역할 |
+|------|------|------|
+| **Core Hub** | `Vaults/BasicVaults/CoreHub/` | Core 계층 정본 — CLI, `_Standards/Core/`, schemas, Core 플러그인. 모든 Preset Hub 에 broadcast |
+| **Preset Hub** | `Vaults/BasicVaults/AIHubVault*` | Core 수신 + Custom 번들 (Custom 플러그인, 도메인 스킬·규칙). Preset 별로 분리 (default, minimal, diary, domain, lab, project 등) |
+| **위성 볼트** | `Vaults/<카테고리>/<볼트명>/` | 실제 콘텐츠 작업 공간. Preset Hub 에 바인딩되어 sync 수신. 사용자가 카테고리·볼트를 자유롭게 추가 |
+
+### 동작 흐름
+
+1. **Core 변경** → CoreHub `bump-version --broadcast` → 모든 Preset Hub 일괄 갱신
+2. **Preset Hub 변경** (Custom 계층) → 위성으로 sync (위성 `aimv sync` 또는 Hub `broadcast`)
+3. **위성 콘텐츠** (`Contents/**`) 는 위성 자체에서만 관리, Hub 로 역전파 X
+
+### 볼트 추가
+
+- 새 위성 볼트: `/create-vault` 스킬 또는 `Vaults/BasicVaults/MakeCloneVault.bat`
+- 새 Preset Hub: `/create-preset-hub` 스킬
+
+실제 등록된 위성 볼트는 사용자 환경에 따라 다르므로 루트 `_STATUS.md` 의 **볼트 레지스트리** 섹션 참조.
+
+> **주의**: 본 문서·`CLAUDE.md`·`AGENTS.md` 등 **배포 대상 문서에는 위 3 계층 구조만 기록한다**. 사용자가 추가한 카테고리·볼트명은 본인 `_STATUS.md` 에서만 관리하며 배포 문서에 인용 금지 (`.claude/rules/core/distribution-content-safety.md` 참조).
 
 ---
 
@@ -110,20 +116,9 @@ AIMindVaults/                    ← 멀티볼트 루트
 
 ---
 
-## 6. 환경 점검 (온보딩 직후 필수 실행)
+## 6. 환경 점검 (온보딩 완료 후)
 
-> **이 점검은 사용자 작업 요청을 기다리기 전에 반드시 1회 자동 실행한다.**
-> 온보딩 문서를 읽고 요약하는 것만으로 "온보딩 완료"가 아니다. 점검 결과까지 사용자에게 함께 보고해야 온보딩이 끝난다.
-
-### 실행 트리거
-
-다음 중 하나를 만족하면 **에이전트가 사용자 지시 없이 먼저 수행**한다:
-
-- `_SESSION_HANDOFF_CLAUDE.md` · `_SESSION_HANDOFF_CODEX.md` 가 비어 있거나 없음 (= 첫 세션)
-- 사용자 첫 메시지에 "install", "setup", "처음", "신규", "시작" 등 신규 환경 키워드 포함
-- 루트 `_STATUS.md` 의 작업 에이전트 컬럼이 비어 있음
-
-발견한 문제는 **수정하지 말고 사용자에게 보고**한다.
+이 문서와 에이전트별 온보딩을 읽은 직후, 실제 작업에 들어가기 전에 아래를 점검한다. 문제를 발견하면 **수정하지 말고 사용자에게 보고**한다.
 
 ### 필수 점검
 
@@ -300,16 +295,6 @@ node "{볼트경로}/.sync/_tools/cli-node/bin/cli.js" index build -r "{볼트�
 ---
 
 ## 15. 토큰 절약
-
-### 규칙 동적 로드 구조
-
-- 모든 세션에 상시 주입되는 것은 `.claude/rules/core/`의 `_essentials.md`(통합 코어)와 `_skill-router.md`(키워드 → 규칙/Skill 매핑 테이블)다.
-- 도메인 규칙과 참조 가이드는 `.claude/rules-archive/`에 있으며 **자동 주입되지 않는다**.
-- 매 사용자 메시지 수신 시 `_skill-router.md`를 검토 → 트리거 키워드 감지 시 해당 Skill을 호출하거나 archive 규칙 파일을 Read한다.
-- 이미 세션 내에서 로드된 Skill·규칙은 재실행 금지 (중복 토큰 소비 방지).
-- 매칭이 없으면 `_essentials.md`만으로 작업한다.
-
-### 일반 토큰 절약
 
 - **핀포인트 접근**: 필요한 파일만 정확히 지정. 광범위 검색 금지.
 - 경로를 모르면 사용자에게 먼저 확인.

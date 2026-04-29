@@ -1,0 +1,43 @@
+/* ============================================
+   vis-tags-links.css
+   태그 & 링크 스타일 강화
+   Obsidian Default Dark Theme용
+   ============================================ */
+
+/* 태그 배지 스타일 */
+.tag {
+    background-color: rgba(86, 182, 194, 0.18);
+    color: #56b6c2 !important;
+    border: 1px solid rgba(86, 182, 194, 0.35);
+    border-radius: 10px;
+    padding: 1px 9px;
+    font-size: 0.82em;
+    text-decoration: none !important;
+}
+
+.tag:hover {
+    background-color: rgba(86, 182, 194, 0.30);
+}
+
+/* 내부 링크 */
+.internal-link {
+    color: #61afef !important;
+    text-decoration: none;
+    border-bottom: 1px dotted rgba(97, 175, 239, 0.4);
+}
+
+.internal-link:hover {
+    border-bottom: 1px solid #61afef;
+}
+
+/* 미작성 링크 (broken / unresolved) */
+.internal-link.is-unresolved {
+    color: #e06c75 !important;
+    opacity: 0.65;
+    border-bottom-color: rgba(224, 108, 117, 0.4);
+}
+
+/* 외부 링크 */
+.external-link {
+    color: #98c379 !important;
+}

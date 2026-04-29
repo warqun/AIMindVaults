@@ -66,6 +66,9 @@ export const DEPLOY_TARGETS = [
   { type: 'file', path: 'AGENT_ONBOARDING_CODEX.md' },
   { type: 'file', path: 'README.md' },
   { type: 'file', path: 'SETUP_GUIDE.md' },
+  { type: 'file', path: 'Sync All Vaults.bat' },
+  { type: 'file', path: 'Sync All Vaults.command' },
+  { type: 'file', path: 'Sync All Vaults.sh' },
   { type: 'file', path: '_ROOT_VERSION.md' },
 ];
 

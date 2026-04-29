@@ -10,19 +10,15 @@ import { existsSync } from 'node:fs';
 import { readdir, readFile, copyFile, writeFile, mkdir, unlink, rm } from 'node:fs/promises';
 import { join, resolve, dirname, basename, relative, sep } from 'node:path';
 import { mirrorDirectory } from '../lib/fs-mirror.js';
-import { SYNC_EXCLUDE_DIRS, SYNC_EXCLUDE_FILES } from '../lib/config.js';
+import {
+  SYNC_EXCLUDE_DIRS,
+  SYNC_EXCLUDE_FILES,
+  CORE_PLUGINS,
+  CORE_FORCE_DATA_JSON,
+} from '../lib/config.js';
+import { isHub, resolveHub } from '../lib/hub-resolver.js';
+import { installVaultLaunchers } from '../lib/launchers.js';
 import * as log from '../lib/logger.js';
-
-// Core plugins — forced sync, cannot be removed per vault
-const CORE_PLUGINS = [
-  'obsidian-local-rest-api',
-  'dataview',
-  'templater-obsidian',
-  'obsidian-linter',
-];
-
-// Plugins whose data.json is force-synced from Hub
-const CORE_FORCE_DATA_JSON = ['obsidian-linter', 'obsidian-shellcommands'];
 
 /**
  * Detect vault root from CWD by walking up looking for _VAULT-INDEX.md or CLAUDE.md.
@@ -41,44 +37,8 @@ function detectVaultRootCwd() {
   return null;
 }
 
-/**
- * Find AIMindVaults root (parent that contains Vaults/).
- */
-function findAIMindVaultsRoot(startPath) {
-  let dir = startPath;
-  for (let i = 0; i < 10; i++) {
-    const parent = dirname(dir);
-    if (parent === dir) break;
-    if (existsSync(join(parent, 'Vaults'))) return parent;
-    dir = parent;
-  }
-  return null;
-}
-
-/**
- * Find Hub vault by searching for .hub_marker under Vaults/.
- */
-async function findHub(aimRoot, excludeVault) {
-  const vaultsDir = join(aimRoot, 'Vaults');
-  if (!existsSync(vaultsDir)) return null;
-
-  async function searchDir(dir, depth) {
-    if (depth > 3) return null;
-    const entries = await readdir(dir, { withFileTypes: true });
-    for (const entry of entries) {
-      if (!entry.isDirectory()) continue;
-      const full = join(dir, entry.name);
-      const normalized = resolve(full);
-      if (normalized === excludeVault) continue;
-      if (existsSync(join(full, '.sync', '.hub_marker'))) return normalized;
-      const found = await searchDir(full, depth + 1);
-      if (found) return found;
-    }
-    return null;
-  }
-
-  return searchDir(vaultsDir, 0);
-}
+// Hub detection/resolution moved to ../lib/hub-resolver.js (Multi-Hub support).
+// Use `resolveHub(vaultRoot, { hubPath })` and `isHub(vaultRoot)` from there.
 
 /**
  * Parse latest version number from _WORKSPACE_VERSION.md.
@@ -101,7 +61,8 @@ import { readFileSync } from 'node:fs';
  * - Folders present in Hub are mirrored into target.
  * - Folders present in target but absent in Hub are pruned
  *   (CORE_PLUGINS are exempt from prune — they must always exist).
- * - community-plugins.json is reconciled to match Hub (CORE + Hub ids only).
+ * - community-plugins.json is reconciled to Hub authoritative set
+ *   (CORE ∪ Hub community-plugins.json ids ∪ Hub plugin folder ids).
  */
 async function syncPluginBatch(sourceRoot, targetRoot, dryRun) {
   const sourcePlugins = join(sourceRoot, '.obsidian', 'plugins');
@@ -183,7 +144,7 @@ async function syncPluginBatch(sourceRoot, targetRoot, dryRun) {
   // 2) Reconcile community-plugins.json to Hub authoritative set
   const srcCp = join(sourceRoot, '.obsidian', 'community-plugins.json');
   if (existsSync(srcCp)) {
-    const cpResult = await mergeCommunityPlugins(srcCp, join(targetRoot, '.obsidian', 'community-plugins.json'), dryRun);
+    const cpResult = await mergeCommunityPlugins(srcCp, join(targetRoot, '.obsidian', 'community-plugins.json'), dryRun, hubPluginIds);
     syncCount += cpResult.newCount;
 
     // Create reload flag if plugin set changed (added or pruned)
@@ -199,19 +160,25 @@ async function syncPluginBatch(sourceRoot, targetRoot, dryRun) {
 
 /**
  * Reconcile community-plugins.json to Hub authoritative set.
- * Final list = CORE ∪ Hub ids. Target-unique ids are dropped (Hub is authoritative).
+ * Final list = CORE ∪ Hub community-plugins.json ids ∪ Hub plugin folder ids.
+ * Folder presence implies activation — Hub installing a plugin folder auto-enables it
+ * in satellites even if Hub's community-plugins.json hasn't been updated yet.
+ * Target-unique ids are dropped (Hub is authoritative).
  * Returns { newCount, removedCount } — newCount: plugins added to target,
  * removedCount: target-unique plugins dropped.
  */
-async function mergeCommunityPlugins(srcPath, tgtPath, dryRun) {
+async function mergeCommunityPlugins(srcPath, tgtPath, dryRun, hubPluginIds = new Set()) {
   const extractIds = (text) => [...text.matchAll(/"([^"]+)"/g)].map(m => m[1]);
 
   const srcIds = extractIds(readFileSync(srcPath, 'utf8'));
   const tgtIds = existsSync(tgtPath) ? extractIds(readFileSync(tgtPath, 'utf8')) : [];
 
-  // Authoritative set: CORE ∪ Hub (target-unique dropped)
+  // Authoritative set: CORE ∪ Hub community-plugins.json ∪ Hub folder set
+  // (target-unique dropped). Folder-set union ensures plugins installed on Hub
+  // but not yet toggled-on still activate in satellite.
   const merged = new Set(CORE_PLUGINS);
   for (const id of srcIds) merged.add(id);
+  for (const id of hubPluginIds) merged.add(id);
   const sorted = [...merged].sort();
 
   const newPlugins = sorted.filter(id => !tgtIds.includes(id));
@@ -312,23 +279,26 @@ export async function syncWorkspace(opts = {}) {
   }
 
   // 2. Self-check: is this Hub?
-  if (existsSync(join(vaultRoot, '.sync', '.hub_marker'))) {
+  if (isHub(vaultRoot)) {
     log.envVar('SYNC_RESULT', 'SELF');
     log.info('Current vault is Hub. No sync needed.');
     return;
   }
 
-  // 3. Find Hub
-  let hubPath = opts.hubPath ? resolve(opts.hubPath) : null;
-  if (!hubPath) {
-    const aimRoot = findAIMindVaultsRoot(vaultRoot);
-    if (aimRoot) hubPath = await findHub(aimRoot, resolve(vaultRoot));
-  }
-  if (!hubPath || !existsSync(hubPath)) {
+  // 3. Resolve Hub (Multi-Hub aware).
+  //    Priority: opts.hubPath > hub-source.json > .hub_marker scan (legacy)
+  const resolution = resolveHub(vaultRoot, { hubPath: opts.hubPath });
+  if (!resolution.hubPath) {
     log.envVar('SYNC_RESULT', 'ERROR');
-    log.error('Hub vault not found. Use --hub-path to specify.');
+    if (resolution.warning) log.error(resolution.warning);
+    log.error('Hub vault not found. Use --hub-path to specify or add .sync/hub-source.json.');
     process.exitCode = 1;
     return;
+  }
+  const hubPath = resolution.hubPath;
+  if (resolution.warning) log.warn(resolution.warning);
+  if (resolution.source === 'hub-source.json') {
+    log.info(`Hub resolved via hub-source.json (hubId="${resolution.hubSource?.hubId ?? '?'}").`);
   }
 
   // 4. Parse versions
@@ -379,6 +349,11 @@ export async function syncWorkspace(opts = {}) {
 
   // PLUGIN_ONLY: only Batch 0, then exit
   if (direction === 'PLUGIN_ONLY') {
+    await installVaultLaunchers(target, {
+      templateDir: join(source, '.sync', '_tools', 'launchers', 'vault'),
+      dryRun: opts.dryRun,
+      log: (msg) => log.info(`  ${msg}`),
+    });
     await triggerObsidianReload(target);
     if (totalSync > 0) {
       log.info(`\nPLUGIN_ONLY: ${totalSync} items merged.`);
@@ -422,10 +397,23 @@ export async function syncWorkspace(opts = {}) {
     }
   }
 
-  // 9. Obsidian reload
+  // 9. Manual sync launchers (PULL/VERIFY only)
+  if (direction !== 'PUSH') {
+    log.info('\n--- Launcher install ---');
+    const launcherResult = await installVaultLaunchers(vaultRoot, {
+      templateDir: join(source, '.sync', '_tools', 'launchers', 'vault'),
+      dryRun: opts.dryRun,
+      log: (msg) => log.info(`  ${msg}`),
+    });
+    if (launcherResult.copied === 0) {
+      log.info('  Launchers up to date.');
+    }
+  }
+
+  // 10. Obsidian reload
   await triggerObsidianReload(target);
 
-  // 10. Result
+  // 11. Result
   log.info('\n=== Sync Complete ===');
   if (totalSync === 0 && totalPrune === 0) {
     const result = direction === 'VERIFY' ? 'VERIFIED' : 'VERSION_SYNCED';

@@ -104,6 +104,61 @@ program
     await preSync({ vaultRoot: opts.vaultRoot });
   });
 
+program
+  .command('sync-all')
+  .description('Run pre-sync across all vaults under an AIMindVaults root')
+  .option('-r, --root <path>', 'AIMindVaults root path (auto-detect if omitted)')
+  .option('-d, --dry-run', 'Preview without running npm install or pre-sync')
+  .option('--skip-npm', 'Do not run npm install when node_modules is missing')
+  .option('--no-install-launchers', 'Do not refresh Sync This Vault launchers')
+  .action(async (opts) => {
+    const { syncAll } = await import('../src/commands/sync-all.js');
+    await syncAll({
+      root: opts.root,
+      dryRun: opts.dryRun,
+      skipNpm: opts.skipNpm,
+      installLaunchers: opts.installLaunchers,
+    });
+  });
+
+program
+  .command('install-launchers')
+  .description('Install double-click sync launchers at root and vault .sync folders')
+  .option('-r, --root <path>', 'AIMindVaults root path (auto-detect if omitted)')
+  .option('--vault-root <path>', 'Install only for a single vault root')
+  .option('--root-only', 'Install only Sync All Vaults launchers')
+  .option('--vault-only', 'Install only Sync This Vault launchers')
+  .option('-d, --dry-run', 'Preview without copying files')
+  .action(async (opts) => {
+    const { installLaunchers } = await import('../src/commands/install-launchers.js');
+    await installLaunchers({
+      root: opts.root,
+      vaultRoot: opts.vaultRoot,
+      rootOnly: opts.rootOnly,
+      vaultOnly: opts.vaultOnly,
+      dryRun: opts.dryRun,
+    });
+  });
+
+program
+  .command('register-vaults')
+  .description('Bulk-register AIMindVaults satellites into Obsidian obsidian.json registry')
+  .option('-r, --root <path>', 'AIMindVaults root path (auto-detect if omitted)')
+  .option('--config-path <path>', 'Override obsidian.json path (testing)')
+  .option('--apply', 'Actually modify obsidian.json (default: dry-run)')
+  .option('--force', 'Proceed even if Obsidian is running (NOT recommended)')
+  .option('--skip-process-check', 'Skip Obsidian running check entirely')
+  .action(async (opts) => {
+    const { registerVaults } = await import('../src/commands/register-vaults.js');
+    await registerVaults({
+      root: opts.root,
+      configPath: opts.configPath,
+      apply: opts.apply,
+      force: opts.force,
+      skipProcessCheck: opts.skipProcessCheck,
+    });
+  });
+
 // Phase 5: clone/broadcast commands
 program
   .command('clone')

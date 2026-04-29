@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://aimindvaults.local/schemas/hub-source.json",
+  "title": "Hub Source Binding",
+  "description": "Declares which Hub a satellite vault should sync with. Placed at {satellite-vault}/.sync/hub-source.json. Highest priority over legacy .hub_marker scan.",
+  "type": "object",
+  "required": ["hubPath", "hubId"],
+  "properties": {
+    "hubPath": {
+      "type": "string",
+      "description": "Relative path from this satellite vault's root to the Hub vault's root.",
+      "examples": ["../../BasicVaults/AIHubVault", "../../BasicVaults/AIHubVault_GameDev"]
+    },
+    "hubId": {
+      "type": "string",
+      "description": "Expected Hub identifier. Cross-checked against {hub}/.sync/hub-marker.json's hubId.",
+      "pattern": "^[a-z0-9][a-z0-9-]*$",
+      "examples": ["core", "game-dev"]
+    },
+    "bindAt": {
+      "type": "string",
+      "format": "date",
+      "description": "Date this binding was established.",
+      "examples": ["2026-04-20"]
+    },
+    "notes": {
+      "type": "string",
+      "description": "Optional human notes on why this binding was chosen."
+    }
+  },
+  "additionalProperties": false
+}

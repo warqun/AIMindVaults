@@ -1,0 +1,11 @@
+{
+  "hubId": "lab",
+  "hubType": "preset",
+  "hubName": "Lab Preset Hub",
+  "version": "1.0.0",
+  "coreHub": "../CoreHub",
+  "coreHubVersion": "^1.0.0",
+  "description": "실험·반복 R&D Preset — 3축 (Iteration·Knowledge·Phase). Core 6 + Custom 6 (git, mcp-tools, tasks, mermaid, metadata-menu, quickadd). 9 타입 (idea/literature/permanent/moc/experiment/failure-log/plan/report/decision). 대상: ObsidianDev, CombatToolKit, TileMapToolKit, CookingLab.",
+  "defaultTemplate": "BasicLabVault",
+  "createdAt": "2026-04-20"
+}

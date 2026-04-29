@@ -84,6 +84,12 @@ AIHubVault가 유일한 원본입니다. 규칙, 도구, 표준 문서는 **여�
 
 다른 볼트를 Obsidian에서 열면 `aimv pre-sync`가 자동 실행되어 Hub와 버전을 비교하고, 차이가 있으면 알아서 동기화합니다.
 
+### 수동 sync 실행
+
+Obsidian 자동 sync가 실패했거나 새 디바이스에서 먼저 작업환경을 맞추고 싶을 때는 루트의 `Sync All Vaults.bat`을 더블클릭합니다. macOS는 `Sync All Vaults.command`, Linux는 `Sync All Vaults.sh`를 사용합니다.
+
+각 볼트 루트에는 sync 후 `Sync This Vault.bat` / `.command` / `.sh`가 설치됩니다. 해당 볼트 하나만 수동으로 동기화할 때 사용하세요. 실행 결과는 루트 또는 볼트의 `sync.log`에 누적됩니다.
+
 ### 편집 모드 분리
 
 볼트 안에서의 편집은 두 종류로 나뉩니다:
@@ -111,27 +117,6 @@ AI 에이전트가 따르는 규칙은 3단계입니다:
 
 공통 규칙 11개의 상세 내용은 볼트 안에서 확인:
 → `Vaults/BasicVaults/AIHubVault/_Standards/Core/AI_Rules_Index.md`
-
----
-
-## 과도한 컨텍스트를 어떻게 다루나요?
-
-AI 에이전트는 세션 시작 시 규칙 파일, MCP 서버 스키마, 플러그인 메타데이터를 자동으로 주입합니다. 멀티볼트·다중 도구 환경에서는 이 베이스라인이 150k를 쉽게 넘기며, 정작 작업에 쓸 컨텍스트 여유가 줄어듭니다.
-
-AIMindVaults는 이 문제를 두 축으로 조정합니다:
-
-1. **규칙을 세션 라이프사이클에 맞춰 분리**
-   - 모든 세션에 필요한 코어(`_essentials.md` + `_skill-router.md`)만 상시 주입
-   - 도메인 규칙은 `rules-archive/`로 분리해 자동 주입에서 제외
-   - 에이전트가 사용자 메시지의 트리거 키워드를 감지하면 해당 규칙만 동적으로 Read
-2. **MCP 서버·플러그인 범위 분리 가이드**
-   - 전역 설정에는 상시 필요한 서버만 유지
-   - 도메인 전용(Unity MCP, Blender MCP 등)은 해당 프로젝트 `.claude/settings.json`으로 이동
-
-결과: 기본 세팅 기준 Memory files ~23k(일반 구성 ~45k), 실효 베이스라인 ~46k(일반 구성 ~170k) 수준. 최신 Claude Code가 MCP/시스템 도구를 Deferred로 분류해 실제 호출 시에만 스키마를 로드하므로, Deferred 카테고리는 베이스라인을 더 이상 압박하지 않습니다.
-
-- 튜닝 방법: `SETUP_GUIDE.md § 컨텍스트 창 튜닝`
-- 상세 수치·해석: `docs/context-optimization.md`
 
 ---
 

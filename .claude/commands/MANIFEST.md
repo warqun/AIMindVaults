@@ -43,3 +43,4 @@
 | 파일명 | 용도 |
 |--------|------|
 | discord-manage.md | AIMindVaults 디스코드 서버를 봇으로 관리 |
+| spawn-claude.md | AIMindVaults 루트에서 새 Claude CLI 터미널 인스턴스 실행 |

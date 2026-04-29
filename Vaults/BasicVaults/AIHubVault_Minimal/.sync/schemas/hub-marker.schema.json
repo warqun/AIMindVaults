@@ -41,6 +41,11 @@
       "type": "string",
       "description": "Short description of the hub's purpose and bundle contents."
     },
+    "defaultTemplate": {
+      "type": "string",
+      "description": "Default clone source for satellites bound to this Hub. Used by `aimv clone --hub <thisHub>` when --source-path is not given. Resolution: (a) bare name like 'BasicDomainVault' → sibling of this Hub in BasicVaults/; (b) relative path starting with '../' or '.' → relative to this Hub root; (c) absolute path → used as-is. If unset or unresolvable, clone falls back to BasicContentsVault sibling.",
+      "examples": ["BasicContentsVault", "BasicDomainVault", "../BasicDiaryVault"]
+    },
     "createdAt": {
       "type": "string",
       "format": "date",

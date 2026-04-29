@@ -75,6 +75,21 @@ Contents 모드 내부: `[Contents/Domain]`(지식) 또는 `[Contents/Project]`(
 
 **2026-04-20 Multi-Hub Phase 1 이후**: Hub 가 Core Hub (`CoreHub/`) + Preset Hub (`AIHubVault/`, hubId=default) 로 분리됨.
 
+### [workspace] 정본·전파본·생성물 분리 (강제)
+
+workspace 작업은 편집 전에 파일의 역할을 먼저 분류한다.
+
+| 역할 | 의미 | 처리 |
+|------|------|------|
+| 정본 (source of truth) | 사람이 직접 편집해야 하는 원본 | 해당 Hub/루트의 정본만 편집 |
+| 전파본 (synced copy) | sync/broadcast 로 내려온 사본 | 직접 편집 금지, 정본 수정 후 전파 |
+| 생성물 (generated/install artifact) | installer/CLI/sync 후처리가 만드는 결과물 | 직접 편집 금지, 생성 로직 수정 후 재생성 |
+
+- 기본 원칙: **동기화 구조에서 편집·검증·재생성이 가장 쉬운 위치를 먼저 선택**한다.
+- 설치물·런처·템플릿·플러그인 사본처럼 여러 볼트에 퍼지는 파일은 "최종 위치"가 아니라 "정본 + 설치/전파 로직"을 우선 수정한다.
+- 정본 수정 후에는 버전 신호(`_WORKSPACE_VERSION.md`, `bump-version`, `--broadcast`)가 실제 하위 계층을 갱신하는지 확인한다.
+- 이 원칙을 어기는 편이 더 이득이라고 판단되는 경우, 진행 전에 사용자에게 이유·영향 범위·대안을 짧게 보고하고 확인을 받는다.
+
 | 편집 대상 | 편집 위치 | 전파 경로 |
 |----------|---------|---------|
 | Core 계층 (`.sync/_tools/`, `.sync/_Standards/Core/`, `.sync/schemas/`, Core 6 플러그인) | **CoreHub** 에서만 | CoreHub → Preset Hub (`core-sync-all`) → 위성 (`sync`) |
@@ -97,6 +112,7 @@ Contents 모드 내부: `[Contents/Domain]`(지식) 또는 `[Contents/Project]`(
 **절대 금지:**
 - Core 계층 (CORE_PATHS) 을 Preset Hub 또는 위성에서 직접 편집. 반드시 CoreHub 에서.
 - 위성에서 `.sync/hub-marker.json` 또는 `.hub_marker` 수동 작성 (자기를 Hub 로 오판).
+- 생성물/전파본을 빠르게 고쳐서 완료한 것처럼 보고하는 행위. 정본·전파·재생성 경로를 먼저 고친다.
 
 ### 루트 레벨 편집 — 버전 기록 (강제)
 
@@ -150,6 +166,16 @@ Obsidian CLI 우선: 조회/검색/히스토리 복구는 `node cli.js bridge` �
 - **단수형**: `systems` X → `system`.
 - 볼트 식별 태그 비권장 (인덱서 `vault` 필드로 식별).
 - 볼트 `CLAUDE.md`에 "태그 규칙" 선언 시 그것이 우선.
+
+### ZK 시스템 (Domain Preset 계열) 태그 규칙
+
+Domain Preset (`AIHubVault_Domain` 위성, `BasicDomainVault` 클론) 은 Zettelkasten 원칙으로 운영하며 일반 태그 규칙 대신 다음을 따른다:
+
+- **운영·상태 태그만** — `zk`, `literature`, `synthesis`, `moc`, `pattern` (정식 ZK 5 타입) + `ai-draft` (AI 미승격 초안 — `Contents/_AI_Drafts/` 권장), `temp` (사람 임시)
+- **개념 분류 태그 금지** — 개념은 `[[wikilink]]` + MOC 노트로 표현
+- 도메인 식별은 인덱서 `vault` 필드 자동 처리 (도메인명 태그 X)
+- 정식 타입과 운영 단계 병기 가능 (`tags: [zk, ai-draft]`)
+- 정본: 해당 볼트 `CLAUDE.md § 태그 규칙` 또는 `Vaults/BasicVaults/BasicDomainVault/CLAUDE.md`
 
 ### H1 제목 · 파일명 (강제)
 

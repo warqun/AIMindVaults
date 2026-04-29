@@ -5,8 +5,8 @@ tags:
   - Standards
   - AIMindVault
   - script-management
-updated: 2026-04-13
-agent: claude
+updated: 2026-04-24
+agent: codex
 ---
 
 # Script Registry — 스크립트 레지스트리
@@ -29,6 +29,8 @@ agent: claude
 | `aimv review` | `src/commands/post-edit-review.js` | 노트 편집 후 UTF-8·frontmatter 검증 + 자동 인덱싱 | claude |
 | `aimv sync` | `src/commands/sync-workspace.js` | 볼트 간 작업환경 동기화 (Hub-Sync) | claude |
 | `aimv pre-sync` | `src/commands/pre-sync.js` | 트램펄린: cli-node 자동 최신화 + sync 실행 | claude |
+| `aimv sync-all` | `src/commands/sync-all.js` | AIMindVaults 루트 하위 전체 볼트 수동 sync 순회 + 로그 요약 | codex |
+| `aimv install-launchers` | `src/commands/install-launchers.js` | 루트/볼트 더블클릭 sync 런처 설치 | codex |
 | `aimv clone` | `src/commands/clone-vault.js` | 볼트 클론 (BasicContentsVault 기반) | claude |
 | `aimv broadcast` | `src/commands/hub-broadcast.js` | Hub .sync/ 파일을 전체 위성 볼트에 전파 | claude |
 | `aimv trash-clean` | `src/commands/trash-clean.js` | 볼트 .trash/ 일괄 정리 | claude |
@@ -46,6 +48,18 @@ agent: claude
 | `src/lib/fs-mirror.js` | 디렉토리 미러링 (sync 엔진) |
 | `src/lib/config.js` | 설정 상수 |
 | `src/lib/logger.js` | 로그 출력 |
+| `src/lib/launchers.js` | 수동 sync 런처 템플릿 설치 및 cli-node 보유 볼트 탐색 |
+
+### 더블클릭 런처 템플릿
+
+| 파일 | 용도 |
+|------|------|
+| `.sync/_tools/launchers/root/Sync All Vaults.bat` | Windows 루트 전체 sync 런처 |
+| `.sync/_tools/launchers/root/Sync All Vaults.command` | macOS 루트 전체 sync 런처 |
+| `.sync/_tools/launchers/root/Sync All Vaults.sh` | Linux 루트 전체 sync 런처 |
+| `.sync/_tools/launchers/vault/Sync This Vault.bat` | Windows 단일 볼트 sync 런처 |
+| `.sync/_tools/launchers/vault/Sync This Vault.command` | macOS 단일 볼트 sync 런처 |
+| `.sync/_tools/launchers/vault/Sync This Vault.sh` | Linux 단일 볼트 sync 런처 |
 
 ---
 
