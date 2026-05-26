@@ -10,7 +10,8 @@ import subprocess
 import tempfile
 from datetime import datetime
 
-VAULT_PATH = "C:/Dev_Game/Obsidian/GameDesign/Projects_VamSurLike"
+# 볼트 경로는 환경 변수 `AIMV_VAULT_PATH` 로 지정 (없으면 cwd)
+VAULT_PATH = os.environ.get("AIMV_VAULT_PATH", os.getcwd())
 OUTPUT_DIR = os.path.join(VAULT_PATH, "References/YouTube")
 
 def get_video_info(url):

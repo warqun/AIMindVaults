@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "snapshots": [
+    {
+      "timestamp": "2026-05-26T13:09:20",
+      "date": "2026-05-26",
+      "vault_count": 6,
+      "note_count": 25,
+      "concept_count": 2,
+      "connection_count": 0,
+      "tag_count": 14
+    },
+    {
+      "timestamp": "2026-05-26T13:10:17",
+      "date": "2026-05-26",
+      "vault_count": 6,
+      "note_count": 25,
+      "concept_count": 2,
+      "connection_count": 0,
+      "tag_count": 14
+    },
+    {
+      "timestamp": "2026-05-26T13:39:47",
+      "date": "2026-05-26",
+      "vault_count": 6,
+      "note_count": 23,
+      "concept_count": 2,
+      "connection_count": 0,
+      "tag_count": 14
+    },
+    {
+      "timestamp": "2026-05-26T13:39:48",
+      "date": "2026-05-26",
+      "vault_count": 6,
+      "note_count": 23,
+      "concept_count": 2,
+      "connection_count": 0,
+      "tag_count": 4
+    }
+  ],
+  "max_snapshots": 200
+}

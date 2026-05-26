@@ -37,7 +37,7 @@ updated: 2026-04-22
 | 철학 | PARA (Projects·Areas·Resources·Archive) + ADR (Architecture Decision Record) |
 | 축 | 시간·실행 (Domain 은 개념축, Diary 는 일자축) |
 | 타입 수 | 9 (idea · plan · spec · design · task · decision · issue · report · retro) |
-| 대상 위성 | Projects_Game (JissouGame) · Projects_Infra (Project_AIMindVaults) · 향후 VamSurLike 등 |
+| 대상 위성 | `Projects_*` 카테고리의 사용자 추가 프로젝트 볼트 (`/create-vault` 로 추가) |
 
 ## 폴더 구조
 
@@ -130,10 +130,8 @@ agent: claude
 
 ## 태그 규칙
 
-- **공통**: 모든 노트 `project` 태그 필수
 - **타입 태그**: type 과 동일 (`task`, `decision`, `issue` 등) — Dataview `FROM` 절과 이중 보장
 - **decision 은 `adr` 추가 태그**
-- **볼트 고유 태그**: 위성 볼트 복제 후 각 볼트가 자신의 프로젝트명 태그 추가 (예: `JissouGame`, `AIMindVaults`)
 - Flat 전용. `/` 계층 금지. kebab-case. 단수형.
 
 ## 플러그인

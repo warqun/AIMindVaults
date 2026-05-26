@@ -1,0 +1,145 @@
+# tag-aliases.yaml — 태그 정규화 예외 사전 (Core 정본)
+#
+# 정본 위치: Vaults/BasicVaults/CoreHub/.sync/_tools/cli-node/data/tag-aliases.yaml
+# 전파: bump-version --broadcast 로 모든 Preset Hub 에 전파
+# 로드: master-index-build.js + tag-migrate.js 가 CLI 자기 위치 기반 상대경로로 read
+#
+# 정책 (owned_tags 계획서 § 3 A1 5-12 확정):
+#   - 전 태그 PascalCase + 약어 대문자 유지 + 다국어 자유 (어느 언어든 상관없음)
+#   - 약어 결합 = JSONParser (전통 PascalCase, 약어 보존)
+#   - 다국어 (한국어/일본어 등) = 그대로 유지, 강제 변환 X
+#   - 메타 태그 (domain, Meta, meta, (볼트 태그)) = 제거 (변환이 아니라 삭제)
+#   - 숫자 포함 = 그대로
+#
+# 본 사전 등록 케이스:
+#   - 자동 변환 룰 (kebab/snake → PascalCase) 로 처리 안 되는 예외만
+#   - 사용자가 명시적으로 매핑 원하는 다국어 (선택)
+#   - 약어 보존 표기 (`json-parser` → `JSONParser` 같은 약어 결합)
+#
+# 형식:
+#   aliases:
+#     <기존 표기>: <정규 표기>
+
+aliases:
+  # ===== 대소문자 충돌 통합 (61 케이스) =====
+
+  # 도구·시스템 (PascalCase 통합)
+  ai: AI
+  unity: Unity
+  blender: Blender
+  claude: Claude
+  codex: Codex
+  juggl: Juggl
+  notion: Notion
+  python: Python
+  git: Git
+  # 약어 (전체 대문자 통합)
+  mcp: MCP
+  api: API
+  llm: LLM
+  url: URL
+  ui: UI
+  vfx: VFX
+  sfx: SFX
+  bgm: BGM
+  cli: CLI
+  ecs: ECS
+  dots: DOTS
+  qa: QA
+  3d: 3D
+  2d: 2D
+  zk: ZK                 # Zettelkasten 약어 (5-12 W1 dry-run 보고서 결과)
+  usa: USA               # 국가 약어 (USA_2026 등)
+  nodejs: NodeJS         # Node.js
+  agentforge: AgentForge # 합성어
+  ci-cd: CICD            # CI/CD 약어 (kebab 결합 → 전체 대문자)
+  cicd: CICD             # 단일 표기 케이스
+  urp: URP               # Universal Render Pipeline (5-12 apply 후 잔존 dedup)
+  Urp: URP               # PascalCase 자동 변환 결과 (Urp) → URP 통합
+  kpi: KPI               # Key Performance Indicator
+  Kpi: KPI               # PascalCase 자동 변환 결과 → KPI 통합
+  dayloop: DayLoop       # 일자 루프 (Day + Loop 합성)
+  Dayloop: DayLoop       # PascalCase 자동 변환 결과 → DayLoop 통합
+  ppe: PPE               # Personal Protective Equipment (약어 단독)
+  Ppe: PPE               # PascalCase 자동 변환 결과 → PPE 통합
+  iac: IaC               # Infrastructure as Code (약어 결합)
+  Iac: IaC               # PascalCase 자동 변환 결과 → IaC 통합
+
+  # 활동·개념 (PascalCase 통합)
+  automation: Automation
+  architecture: Architecture
+  pipeline: Pipeline
+  refactoring: Refactoring
+  roadmap: Roadmap
+  research: Research
+  workflow: Workflow
+  prompt: Prompt
+  agent: Agent
+
+  # ===== kebab-case → PascalCase (480 자동 변환되지만, 약어 보존 예외만 등록) =====
+
+  # 약어 + 단어 결합 (약어 보존 = JSONParser 패턴)
+  json-parser: JSONParser
+  xml-schema: XMLSchema
+  api-gateway: APIGateway
+  url-encoder: URLEncoder
+  api-key: APIKey
+  api-design: APIDesign
+  cli-tool: CLITool
+  ui-design: UIDesign
+  ui-pattern: UIPattern
+  llm-prompt: LLMPrompt
+  llm-api: LLMAPI
+  mcp-server: MCPServer
+  mcp-protocol: MCPProtocol
+  dots-ecs: DOTSECS
+  3d-modeling: 3DModeling
+  3d-asset: 3DAsset
+  2d-art: 2DArt
+
+  # 복합 약어 (대문자 보존)
+  ai-coding: AICoding
+  ai-asset: AIAsset
+  ai-agent: AIAgent
+  ai-tool: AITool
+  ai-workflow: AIWorkflow
+
+  # ===== 하이픈 → PascalCase 자동 변환 (대표 예시) =====
+  # 자동 룰이 kebab-case → PascalCase 변환하므로 본 사전에 명시 안 해도 됨
+  # 단 사용자가 의외 케이스 발견 시 본 사전에 명시적 등록
+
+  # 예시 (자동 변환됨, 사전 등록 불필요):
+  # skill-system: SkillSystem  ← 자동 룰이 처리
+  # plugin-dev: PluginDev      ← 자동 룰이 처리
+  # game-dev: GameDev          ← 자동 룰이 처리
+
+  # ===== 메타 태그 제거 (alias 가 아니라 삭제 대상) =====
+  # 본 사전이 아니라 tag-migrate.js 의 `remove` 리스트로 처리
+
+  # ===== 다국어 매핑 (사용자가 영어 정규화 원할 때만 등록, 기본은 다국어 유지) =====
+  # 빈 상태로 시작. 사용자가 명시할 때만 추가.
+  # 예시 (현재 미적용):
+  # 유니티: Unity
+  # 블렌더: Blender
+  # 깃: Git
+
+# remove (메타 태그 제거 — tag-migrate.js 가 frontmatter `tags` 에서 일괄 삭제)
+remove:
+  - domain
+  - Domain
+  - Meta
+  - meta
+  - "(볼트 태그)"
+
+# 정규화 룰 (코드 내장, 자동 처리 — 본 파일 의 룰 영역은 참조용)
+rules:
+  description: |
+    자동 변환은 master-index-build.js / tag-migrate.js 코드 내장 함수가 처리:
+      1. 한국어·일본어·중국어 등 비라틴 문자 포함 → 변환 0 (그대로 유지)
+      2. 첫 글자 소문자 + 단일 단어 → 첫 글자 대문자화 (research → Research)
+      3. kebab-case (`-` 포함) → PascalCase (단어 경계마다 대문자, skill-system → SkillSystem)
+      4. snake_case (`_` 포함) → PascalCase (단, vault_id 정합 케이스 예외: AI_Coding 그대로)
+      5. 전체 대문자 약어 (MCP, API, JSON 등) → 그대로
+      6. 이미 PascalCase → 변경 없음
+      7. 본 사전의 `aliases` 매핑 우선 적용 (룰보다 우선)
+      8. 본 사전의 `remove` 리스트는 frontmatter `tags` 에서 일괄 삭제

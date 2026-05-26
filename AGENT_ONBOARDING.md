@@ -320,7 +320,7 @@ node "{볼트경로}/.sync/_tools/cli-node/bin/cli.js" index build -r "{볼트�
 Start-Process 'obsidian://open?vault=볼트명&file=볼트루트기준_상대경로'
 ```
 
-- `vault`: Obsidian에 등록된 볼트 폴더명 (예: `AIHubVault`, `Unity`, `JissouGame`)
+- `vault`: Obsidian에 등록된 볼트 폴더명 (예: `AIHubVault`, `BasicContentsVault` 등 — 사용자 환경별)
 - `file`: 볼트 루트 기준 상대 경로, `.md` 확장자 생략 (예: `Contents/Domain/Example_Note`)
 - 경로 구분자: `/` 사용. 한글 파일명 그대로 사용 가능.
 - `Start-Process <파일경로.md>`, `code`, `Invoke-Item` 등은 VS Code로 열리므로 금지.

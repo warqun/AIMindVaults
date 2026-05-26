@@ -2,7 +2,7 @@
 type: folder-index
 status: active
 updated: 2026-04-22
-tags: [zk, index]
+tags: [ZK, Index]
 agent: claude
 ---
 

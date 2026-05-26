@@ -1,0 +1,336 @@
+{
+  "built": "2026-05-26T13:39:48",
+  "vault_count": 6,
+  "note_count": 23,
+  "vaults": {
+    "AIHubVault": {
+      "path": "Vaults/BasicVaults/AIHubVault",
+      "note_count": 5,
+      "domain_tags": [],
+      "built": "2026-05-26T13:39:47"
+    },
+    "BasicContentsVault": {
+      "path": "Vaults/BasicVaults/BasicContentsVault",
+      "note_count": 6,
+      "domain_tags": [],
+      "built": "2026-05-26T13:39:47"
+    },
+    "BasicDiaryVault": {
+      "path": "Vaults/BasicVaults/BasicDiaryVault",
+      "note_count": 2,
+      "domain_tags": [],
+      "built": "2026-05-26T13:39:47"
+    },
+    "BasicDomainVault": {
+      "path": "Vaults/BasicVaults/BasicDomainVault",
+      "note_count": 4,
+      "domain_tags": [
+        "ZK",
+        "Index",
+        "Log"
+      ],
+      "built": "2026-05-26T13:39:47"
+    },
+    "BasicLabVault": {
+      "path": "Vaults/BasicVaults/BasicLabVault",
+      "note_count": 4,
+      "domain_tags": [
+        "Lab",
+        "Index",
+        "Log"
+      ],
+      "built": "2026-05-26T13:39:47"
+    },
+    "BasicProjectVault": {
+      "path": "Vaults/BasicVaults/BasicProjectVault",
+      "note_count": 2,
+      "domain_tags": [],
+      "built": "2026-05-26T13:39:47"
+    }
+  },
+  "notes": [
+    {
+      "vault_id": "AIHubVault",
+      "title": "CONTENTS_AI_RULES — AIMindVault 전용 AI 작업 규칙",
+      "path": "Contents/CONTENTS_AI_RULES.md",
+      "type": "standard",
+      "tags": []
+    },
+    {
+      "vault_id": "AIHubVault",
+      "title": "CONTENTS_GLOSSARY — AIMindVault 용어",
+      "path": "Contents/CONTENTS_GLOSSARY.md",
+      "type": "standard",
+      "tags": []
+    },
+    {
+      "vault_id": "AIHubVault",
+      "title": "CONTENTS_INDEX — AIHubVault 콘텐츠 지도",
+      "path": "Contents/CONTENTS_INDEX.md",
+      "type": "standard",
+      "tags": []
+    },
+    {
+      "vault_id": "AIHubVault",
+      "title": "TAGS — 태그 규칙/목록(정규화 기준)",
+      "path": "Contents/_archive/20260512_tags_taxonomy/TAGS.md",
+      "type": "tag-taxonomy",
+      "tags": []
+    },
+    {
+      "vault_id": "AIHubVault",
+      "title": "TAG_MASK — 태그 마스킹(기존 태그 → 정규 태그)",
+      "path": "Contents/_archive/20260512_tags_taxonomy/TAG_MASK.md",
+      "type": "tag-mask",
+      "tags": []
+    },
+    {
+      "vault_id": "BasicContentsVault",
+      "title": "CONTENTS_AI_RULES — (볼트명) AI 작업 규칙",
+      "path": "Contents/CONTENTS_AI_RULES.md",
+      "type": "standard",
+      "tags": []
+    },
+    {
+      "vault_id": "BasicContentsVault",
+      "title": "CONTENTS_GLOSSARY — (볼트명) 용어",
+      "path": "Contents/CONTENTS_GLOSSARY.md",
+      "type": "standard",
+      "tags": []
+    },
+    {
+      "vault_id": "BasicContentsVault",
+      "title": "",
+      "path": "Contents/Domain/Domain.md",
+      "type": "folder-index",
+      "tags": []
+    },
+    {
+      "vault_id": "BasicContentsVault",
+      "title": "",
+      "path": "Contents/Project/Project.md",
+      "type": "folder-index",
+      "tags": []
+    },
+    {
+      "vault_id": "BasicContentsVault",
+      "title": "TAGS — 태그 규칙/목록(정규화 기준)",
+      "path": "Contents/_archive/20260512_tags_taxonomy/TAGS.md",
+      "type": "tag-taxonomy",
+      "tags": []
+    },
+    {
+      "vault_id": "BasicContentsVault",
+      "title": "TAG_MASK — 태그 마스킹(기존 태그 → 정규 태그)",
+      "path": "Contents/_archive/20260512_tags_taxonomy/TAG_MASK.md",
+      "type": "tag-mask",
+      "tags": []
+    },
+    {
+      "vault_id": "BasicDiaryVault",
+      "title": "TAGS — 태그 규칙/목록(정규화 기준)",
+      "path": "Contents/_archive/20260512_tags_taxonomy/TAGS.md",
+      "type": "tag-taxonomy",
+      "tags": []
+    },
+    {
+      "vault_id": "BasicDiaryVault",
+      "title": "TAG_MASK — 태그 마스킹(기존 태그 → 정규 태그)",
+      "path": "Contents/_archive/20260512_tags_taxonomy/TAG_MASK.md",
+      "type": "tag-mask",
+      "tags": []
+    },
+    {
+      "vault_id": "BasicDomainVault",
+      "title": "TAGS — 태그 규칙/목록(정규화 기준)",
+      "path": "Contents/_archive/20260512_tags_taxonomy/TAGS.md",
+      "type": "tag-taxonomy",
+      "tags": []
+    },
+    {
+      "vault_id": "BasicDomainVault",
+      "title": "TAG_MASK — 태그 마스킹(기존 태그 → 정규 태그)",
+      "path": "Contents/_archive/20260512_tags_taxonomy/TAG_MASK.md",
+      "type": "tag-mask",
+      "tags": []
+    },
+    {
+      "vault_id": "BasicDomainVault",
+      "title": "Index",
+      "path": "Contents/_index.md",
+      "type": "folder-index",
+      "tags": [
+        "ZK",
+        "Index"
+      ]
+    },
+    {
+      "vault_id": "BasicDomainVault",
+      "title": "Log",
+      "path": "Contents/_log.md",
+      "type": "folder-index",
+      "tags": [
+        "ZK",
+        "Log"
+      ]
+    },
+    {
+      "vault_id": "BasicLabVault",
+      "title": "TAGS — 태그 규칙/목록(정규화 기준)",
+      "path": "Contents/_archive/20260512_tags_taxonomy/TAGS.md",
+      "type": "tag-taxonomy",
+      "tags": []
+    },
+    {
+      "vault_id": "BasicLabVault",
+      "title": "TAG_MASK — 태그 마스킹(기존 태그 → 정규 태그)",
+      "path": "Contents/_archive/20260512_tags_taxonomy/TAG_MASK.md",
+      "type": "tag-mask",
+      "tags": []
+    },
+    {
+      "vault_id": "BasicLabVault",
+      "title": "Lab 마스터 카탈로그",
+      "path": "Contents/_index.md",
+      "type": "folder-index",
+      "tags": [
+        "Lab",
+        "Index"
+      ]
+    },
+    {
+      "vault_id": "BasicLabVault",
+      "title": "Lab 작업 연대기",
+      "path": "Contents/_log.md",
+      "type": "folder-index",
+      "tags": [
+        "Lab",
+        "Log"
+      ]
+    },
+    {
+      "vault_id": "BasicProjectVault",
+      "title": "TAGS — 태그 규칙/목록(정규화 기준)",
+      "path": "Contents/_archive/20260512_tags_taxonomy/TAGS.md",
+      "type": "tag-taxonomy",
+      "tags": []
+    },
+    {
+      "vault_id": "BasicProjectVault",
+      "title": "TAG_MASK — 태그 마스킹(기존 태그 → 정규 태그)",
+      "path": "Contents/_archive/20260512_tags_taxonomy/TAG_MASK.md",
+      "type": "tag-mask",
+      "tags": []
+    }
+  ],
+  "tag_index": {
+    "ZK": [
+      "BasicDomainVault:Contents/_index.md",
+      "BasicDomainVault:Contents/_log.md"
+    ],
+    "Index": [
+      "BasicDomainVault:Contents/_index.md",
+      "BasicLabVault:Contents/_index.md"
+    ],
+    "Log": [
+      "BasicDomainVault:Contents/_log.md",
+      "BasicLabVault:Contents/_log.md"
+    ],
+    "Lab": [
+      "BasicLabVault:Contents/_index.md",
+      "BasicLabVault:Contents/_log.md"
+    ]
+  },
+  "concept_map": {
+    "Index": {
+      "vaults": [
+        "BasicDomainVault",
+        "BasicLabVault"
+      ],
+      "count": 2
+    },
+    "Log": {
+      "vaults": [
+        "BasicDomainVault",
+        "BasicLabVault"
+      ],
+      "count": 2
+    }
+  },
+  "tag_owners": {},
+  "tag_aliases": {
+    "ai": "AI",
+    "unity": "Unity",
+    "blender": "Blender",
+    "claude": "Claude",
+    "codex": "Codex",
+    "juggl": "Juggl",
+    "notion": "Notion",
+    "python": "Python",
+    "git": "Git",
+    "mcp": "MCP",
+    "api": "API",
+    "llm": "LLM",
+    "url": "URL",
+    "ui": "UI",
+    "vfx": "VFX",
+    "sfx": "SFX",
+    "bgm": "BGM",
+    "cli": "CLI",
+    "ecs": "ECS",
+    "dots": "DOTS",
+    "qa": "QA",
+    "3d": "3D",
+    "2d": "2D",
+    "zk": "ZK",
+    "usa": "USA",
+    "nodejs": "NodeJS",
+    "agentforge": "AgentForge",
+    "ci-cd": "CICD",
+    "cicd": "CICD",
+    "urp": "URP",
+    "Urp": "URP",
+    "kpi": "KPI",
+    "Kpi": "KPI",
+    "dayloop": "DayLoop",
+    "Dayloop": "DayLoop",
+    "ppe": "PPE",
+    "Ppe": "PPE",
+    "iac": "IaC",
+    "Iac": "IaC",
+    "automation": "Automation",
+    "architecture": "Architecture",
+    "pipeline": "Pipeline",
+    "refactoring": "Refactoring",
+    "roadmap": "Roadmap",
+    "research": "Research",
+    "workflow": "Workflow",
+    "prompt": "Prompt",
+    "agent": "Agent",
+    "json-parser": "JSONParser",
+    "xml-schema": "XMLSchema",
+    "api-gateway": "APIGateway",
+    "url-encoder": "URLEncoder",
+    "api-key": "APIKey",
+    "api-design": "APIDesign",
+    "cli-tool": "CLITool",
+    "ui-design": "UIDesign",
+    "ui-pattern": "UIPattern",
+    "llm-prompt": "LLMPrompt",
+    "llm-api": "LLMAPI",
+    "mcp-server": "MCPServer",
+    "mcp-protocol": "MCPProtocol",
+    "dots-ecs": "DOTSECS",
+    "3d-modeling": "3DModeling",
+    "3d-asset": "3DAsset",
+    "2d-art": "2DArt",
+    "ai-coding": "AICoding",
+    "ai-asset": "AIAsset",
+    "ai-agent": "AIAgent",
+    "ai-tool": "AITool",
+    "ai-workflow": "AIWorkflow"
+  },
+  "connections": {},
+  "connection_count": 0,
+  "owner_conflicts": []
+}

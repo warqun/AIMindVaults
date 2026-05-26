@@ -35,11 +35,9 @@ updated: 2026-04-22
 6. **Domain (ZK) + Project (PARA) 재사용 + Lab 고유 2 타입** — 전체 9 타입.
 7. **관계는 본문 inline field** — Frontmatter 에 wikilink list 금지.
 
-## 대상 위성 (총 4개)
+## 대상 위성
 
-- **Lab_Infra**: ObsidianDev
-- **Lab_Game**: CombatToolKit · TileMapToolKit
-- **Lab_Content**: CookingLab
+- `Lab_*` 카테고리의 사용자 추가 볼트 (`/create-vault` 로 추가, 학습 + 개발 복합 작업용)
 
 ## 폴더 구조 (Contents/)
 
@@ -131,7 +129,6 @@ agent: claude
 
 ## 태그 규칙
 
-- 모든 노트에 `lab` 태그 기본 포함.
 - 타입별 보조 태그: `idea`, `literature`, `experiment`, `failure`, `moc`, `plan`, `report`, `decision`, `adr`.
 - 볼트 식별 태그 불필요 (인덱서 `vault` 필드 사용).
 

@@ -57,6 +57,7 @@ export const DEPLOY_TARGETS = [
     'temp_subst_delete2.py', 'temp_subst_robo.py',
     'setup_new_environment.ps1',
   ]},
+  { type: 'dir', path: 'viz', excludeFiles: ['nul', 'loadIndex.test.js', 'buildOption.test.js'] },
   // Individual files
   { type: 'file', path: '.claude/rules/MANIFEST.md' },
   { type: 'file', path: '.claude/commands/MANIFEST.md' },

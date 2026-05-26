@@ -4,7 +4,7 @@ tags:
   - CoreHub
   - Multi-Hub
   - CoreVersion
-updated: 2026-04-24
+updated: 2026-05-18
 ---
 
 # Core Version Log
@@ -16,6 +16,17 @@ updated: 2026-04-24
 
 | 버전 | 전파 대상 | 결과 | 아이템 | 실패 | 메모 |
 | ---- | --------- | ---- | ------ | ---- | ---- |
+| 202605180001 | default, diary, domain, lab, minimal, project | OK | 12 | 0 |  |
+| 202605140001 | default, diary, domain, lab, minimal, project | OK | 12 | 0 |  |
+| 202605130001 | default, diary, domain, lab, minimal, project | OK | 24 | 0 |  |
+| 202605120002 | default, diary, domain, lab, minimal, project | OK | 18 | 0 |  |
+| 202605120001 | default, diary, domain, lab, minimal, project | OK | 6 | 0 |  |
+| 202605110002 | default, diary, domain, lab, minimal, project | OK | 6 | 0 |  |
+| 202605110001 | default, diary, domain, lab, minimal, project | OK | 24 | 0 |  |
+| 202605080003 | default, diary, domain, lab, minimal, project | OK | 6 | 0 |  |
+| 202605080002 | default, diary, domain, lab, minimal, project | OK | 6 | 0 |  |
+| 202605080001 | default, diary, domain, lab, minimal, project | OK | 24 | 0 |  |
+| 202604290001 | default, diary, domain, lab, minimal, project | OK | 102 | 0 |  |
 | 202604240005 | default, diary, domain, lab, minimal, project | OK | 18 | 0 |  |
 | 202604240004 | default, diary, domain, lab, minimal, project | OK | 6 | 0 |  |
 | 202604240003 | default, diary, domain, lab, minimal, project | OK | 54 | 0 |  |

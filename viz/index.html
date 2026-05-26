@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light" data-layout="normal">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AIMindVaults Visualization</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles/tokens.css" />
+  <link rel="stylesheet" href="/styles/base.css" />
+  <link rel="stylesheet" href="/styles/components.css" />
+  <link rel="stylesheet" href="/styles/pages.css" />
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+</head>
+<body>
+  <div class="app">
+    <header class="header" id="app-header"></header>
+    <main id="page-root" role="main"></main>
+    <footer class="footer">
+      <span id="footer-left">AIMindVaults Visualization</span>
+      <span>v0.4 · theme: <span id="theme-label">light</span></span>
+    </footer>
+  </div>
+  <script type="module" src="/router.js"></script>
+</body>
+</html>

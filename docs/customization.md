@@ -430,5 +430,5 @@ Obsidian 플러그인은 AIHubVault에서 중앙 관리하고 동기화로 전�
 - 볼트 라우팅 키워드: 루트 `CLAUDE.md` > 볼트 진입 프로토콜
 - 규칙 주입 구조 및 컨텍스트 창 최적화: [context-optimization.md](context-optimization.md)
 - 노트 작성·세션 종료·편집 모드 등 통합 규칙: `.claude/rules/core/_essentials.md`
-- 볼트 생성 상세 규칙: `.claude/rules-archive/vault-individualization.md` (`/create-vault` Skill 호출 시 Read)
+- 볼트 생성 상세 규칙: `.agents/rules/custom/CreateVault/vault-individualization.md` (`/create-vault` Skill 호출 시 Read)
 - Skill Router: `.claude/rules/core/_skill-router.md`

@@ -1,0 +1,97 @@
+{
+  "vault": "BasicDomainVault",
+  "built": "2026-05-26T13:39:47",
+  "notes": [
+    {
+      "path": "Contents/_archive/20260512_tags_taxonomy/TAGS.md",
+      "title": "TAGS — 태그 규칙/목록(정규화 기준)",
+      "type": "tag-taxonomy",
+      "tags": [],
+      "headings": [
+        "규칙",
+        "핵심 태그(권장)",
+        "문서 유형",
+        "상태/우선순위",
+        "에이전트(운용)"
+      ],
+      "summary": "> 목적: 검색/필터/에이전트 컨텍스트를 단순화하기 위해 태그를 “정규화된 소수”로 유지한다.",
+      "links_to": [],
+      "links_from": [],
+      "mtime": "2026-04-22T11:49:54",
+      "created": "2026-04-22T11:49:54",
+      "hash": "6bd2df31"
+    },
+    {
+      "path": "Contents/_archive/20260512_tags_taxonomy/TAG_MASK.md",
+      "title": "TAG_MASK — 태그 마스킹(기존 태그 → 정규 태그)",
+      "type": "tag-mask",
+      "tags": [],
+      "headings": [
+        "매핑 테이블",
+        "체크리스트 (마스킹 시)"
+      ],
+      "summary": "> 목적: 이미 흩어진 태그를 \"정규 태그\"로 점진적으로 통일한다.",
+      "links_to": [],
+      "links_from": [],
+      "mtime": "2026-04-22T11:49:54",
+      "created": "2026-04-22T11:49:54",
+      "hash": "f4b60fed"
+    },
+    {
+      "path": "Contents/_index.md",
+      "title": "Index",
+      "type": "folder-index",
+      "tags": [
+        "ZK",
+        "Index"
+      ],
+      "headings": [
+        "MOC",
+        "Synthesis",
+        "자동 목록: permanent (최근 수정순)"
+      ],
+      "summary": "> 마스터 카탈로그. 월간 rebuild.",
+      "links_to": [],
+      "links_from": [],
+      "mtime": "2026-05-11T20:45:17",
+      "created": "2026-04-22T11:50:49",
+      "hash": "45a330ef"
+    },
+    {
+      "path": "Contents/_log.md",
+      "title": "Log",
+      "type": "folder-index",
+      "tags": [
+        "ZK",
+        "Log"
+      ],
+      "headings": [
+        "2026-04-22"
+      ],
+      "summary": "> 이 볼트의 작업 연대기. 주간 append.",
+      "links_to": [],
+      "links_from": [],
+      "mtime": "2026-05-11T20:45:17",
+      "created": "2026-04-22T11:50:46",
+      "hash": "3bd2ffd8"
+    }
+  ],
+  "tag_index": {
+    "ZK": [
+      "Contents/_index.md",
+      "Contents/_log.md"
+    ],
+    "Index": [
+      "Contents/_index.md"
+    ],
+    "Log": [
+      "Contents/_log.md"
+    ]
+  },
+  "link_graph": {
+    "TAGS": [],
+    "TAG_MASK": [],
+    "_index": [],
+    "_log": []
+  }
+}

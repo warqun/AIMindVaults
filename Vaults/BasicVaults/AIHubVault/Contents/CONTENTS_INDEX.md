@@ -1,7 +1,6 @@
 ---
 type: standard
 tags:
-  - Meta
 aliases:
   - "콘텐츠 인덱스"
   - "콘텐츠 지도"
@@ -26,7 +25,6 @@ agent: antigravity
 | `guides/` | AI 기능 활용 가이드 | Claude Code 운영, Obsidian 연동 등 |
 | `research/` | 조사 정보 정리 | 리서치 결과 정리 노트 |
 | `prompt/` | AI 프롬프트 작성 | 프롬프트 엔지니어링 방법론 |
-| `HowAgentWorks/` | 에이전트 작업 방식 | AI 작업 유형 분류, 에이전트별 수행 패턴 |
 
 ## Contents/Project/ — 목표 달성·작업 관리
 

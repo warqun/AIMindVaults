@@ -1,6 +1,6 @@
 ---
 type: folder-index
-tags: [lab, log]
+tags: [Lab, Log]
 agent: claude
 updated: 2026-04-22
 ---

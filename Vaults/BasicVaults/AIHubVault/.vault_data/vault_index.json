@@ -1,0 +1,125 @@
+{
+  "vault": "AIHubVault",
+  "built": "2026-05-26T13:39:47",
+  "notes": [
+    {
+      "path": "Contents/CONTENTS_AI_RULES.md",
+      "title": "CONTENTS_AI_RULES — AIMindVault 전용 AI 작업 규칙",
+      "type": "standard",
+      "tags": [],
+      "headings": [
+        "작업 우선순위",
+        "파일 수정 규칙",
+        "노트 생성 시 주의",
+        "금지 사항"
+      ],
+      "summary": "> `_Standards/Core/` 규칙에 추가(override)된다.",
+      "links_to": [
+        "CONTENTS_GLOSSARY"
+      ],
+      "links_from": [
+        "CONTENTS_GLOSSARY",
+        "CONTENTS_INDEX"
+      ],
+      "mtime": "2026-05-11T20:45:17",
+      "created": "2026-04-18T06:00:33",
+      "hash": "5c1e0272"
+    },
+    {
+      "path": "Contents/CONTENTS_GLOSSARY.md",
+      "title": "CONTENTS_GLOSSARY — AIMindVault 용어",
+      "type": "standard",
+      "tags": [],
+      "headings": [],
+      "summary": "> 관련: [[CONTENTS_AI_RULES]] | [[CONTENTS_INDEX]]",
+      "links_to": [
+        "CONTENTS_AI_RULES",
+        "CONTENTS_INDEX"
+      ],
+      "links_from": [
+        "CONTENTS_AI_RULES",
+        "CONTENTS_INDEX"
+      ],
+      "mtime": "2026-05-11T20:45:17",
+      "created": "2026-04-18T06:00:21",
+      "hash": "ed3bf54b"
+    },
+    {
+      "path": "Contents/CONTENTS_INDEX.md",
+      "title": "CONTENTS_INDEX — AIHubVault 콘텐츠 지도",
+      "type": "standard",
+      "tags": [],
+      "headings": [
+        "Contents/Domain/ — 지식 축적 (PKM)",
+        "Contents/Project/ — 목표 달성·작업 관리"
+      ],
+      "summary": "> 관련: [[CONTENTS_AI_RULES]] | [[CONTENTS_GLOSSARY]]",
+      "links_to": [
+        "CONTENTS_AI_RULES",
+        "CONTENTS_GLOSSARY"
+      ],
+      "links_from": [
+        "CONTENTS_GLOSSARY"
+      ],
+      "mtime": "2026-05-26T13:39:28",
+      "created": "2026-05-26T13:39:28",
+      "hash": "74b81465"
+    },
+    {
+      "path": "Contents/_archive/20260512_tags_taxonomy/TAGS.md",
+      "title": "TAGS — 태그 규칙/목록(정규화 기준)",
+      "type": "tag-taxonomy",
+      "tags": [],
+      "headings": [
+        "규칙",
+        "핵심 태그(권장)",
+        "프로젝트/범주",
+        "Epic",
+        "System (Logic 우선)",
+        "상태/우선순위",
+        "에이전트(운용)"
+      ],
+      "summary": "> 목적: 검색/필터/에이전트 컨텍스트를 단순화하기 위해 태그를 “정규화된 소수”로 유지한다.",
+      "links_to": [],
+      "links_from": [],
+      "mtime": "2026-03-09T05:11:03",
+      "created": "2026-03-09T05:11:03",
+      "hash": "3b88b90d"
+    },
+    {
+      "path": "Contents/_archive/20260512_tags_taxonomy/TAG_MASK.md",
+      "title": "TAG_MASK — 태그 마스킹(기존 태그 → 정규 태그)",
+      "type": "tag-mask",
+      "tags": [],
+      "headings": [
+        "마스킹 규칙",
+        "매핑 테이블",
+        "체크리스트 (마스킹 시)",
+        "전환 기록",
+        "2026-03-08: Project_VamSurLike → AIMindVault 일괄 전환"
+      ],
+      "summary": "> 목적: 이미 흩어진 태그를 \"정규 태그\"로 점진적으로 통일한다.",
+      "links_to": [],
+      "links_from": [],
+      "mtime": "2026-03-09T11:30:14",
+      "created": "2026-03-09T05:11:11",
+      "hash": "08025cb4"
+    }
+  ],
+  "tag_index": {},
+  "link_graph": {
+    "CONTENTS_AI_RULES": [
+      "CONTENTS_GLOSSARY"
+    ],
+    "CONTENTS_GLOSSARY": [
+      "CONTENTS_AI_RULES",
+      "CONTENTS_INDEX"
+    ],
+    "CONTENTS_INDEX": [
+      "CONTENTS_AI_RULES",
+      "CONTENTS_GLOSSARY"
+    ],
+    "TAGS": [],
+    "TAG_MASK": []
+  }
+}

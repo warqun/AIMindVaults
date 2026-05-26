@@ -17,10 +17,11 @@
 | **도메인 지식 참조** | Domains_* 볼트 (Unity, Python, Cooking, AI 등) · 각 볼트 `_VAULT-INDEX.md` |
 | **프로젝트·도구 작업** | Projects_* / Lab_* 볼트 · 해당 볼트 `_STATUS.md` Now·Next 확인 |
 | **Multi-Hub 시스템 변경** | Core 계층 → `Vaults/BasicVaults/CoreHub/` · Custom 계층 → `AIHubVault/` · 루트 규칙·스킬 → `.claude/` |
-| **배포·Git push** | 해당 언어 배포본 레포 (`Korean` / `English`) 경로에서 Git 작업 |
+| **배포·Git push** | `/distribute` 스킬 → `C:/SellingVault/Korean|English/` |
 | **규칙·스킬 추가·수정** | `.claude/rules/core/` (배포 대상) · `.claude/rules/custom/` (개인) · `.claude/commands/`  |
 | **개인 기록·회고** | Diary 볼트 (AI 접근 `ai_scope=none` 기본) |
 | **멀티 에이전트 협업** | `.claude/rules/custom/agent-ownership.md` + 대상 볼트 `AGENT_STATUS.md` |
+| **에이전트 간 소통 (Claude ↔ Codex 메시지·교차검증)** | `_AGENT_COMMS/to_{self}/` 스캔 → `status: open` 처리 · 규약은 `_AGENT_COMMS/README.md` |
 
 각 의도는 **시간(과거/현재) × 대상(볼트/Hub/루트) × 행위(읽기/편집/배포)** 3축의 교차점을 구체적 진입 파일로 가리킨다. 진입 후에도 볼트 경계를 넘으면 "볼트 진입 프로토콜" 의 필수 읽기 순서를 따른다.
 
@@ -39,36 +40,15 @@
 
 | 키워드 | 볼트 ID |
 |-------|---------|
-| _Standards, workspace, 동기화 스크립트 | AIHubVault (workspace 전용 Hub) |
+| `_Standards`, workspace, 동기화 스크립트 | AIHubVault (workspace 전용 Hub) |
 | 콘텐츠, 노트 작성, 지식 관리 | BasicContentsVault |
-| Unity, 유니티 엔진 | Unity |
-| CapCut, 영상편집 | CapCut |
-| Notion, 노션 운영 | Notion |
-| CI/CD, 배포 동기화, 파이프라인 | CICD |
-| 검색, 인덱싱, 인덱서, 텍스트 매칭, Search | Search |
-| AI 활용, 에이전트 활용법, 프롬프트, AI 도구 | AI |
-| AppFlowy, 셀프호스트, Notion 이관 | AppFlowy |
-| Discord, 디스코드, 디코, 디스코드 봇, MEE6, Carl-bot, Welcome 플로우, Rules Screening, 커뮤니티 모더레이션 | Discord |
-| AIMindVaults 프로젝트, 멀티볼트 계획, 배포 계획 | Project_AIMindVaults |
-| Obsidian 플러그인, 플러그인 개발 | ObsidianDev |
-| 전투 시스템, CombatToolKit, 스킬 시스템, 이펙트 패키지, 뱀서 | CombatToolKit |
-| 타일맵, TileMap, 맵 생성, 청크, 절차적 생성 | TileMapToolKit |
-| JissouGame, 지쏘우, jissou | JissouGame |
-| 게임 기획, 게임 디자인, 레벨 디자인, 밸런싱, GameDesign | GameDesign |
-| 게임 아트, 비주얼 기법, Fake 2D, 렌더링 스타일, 셰이더 스타일 | GameArt |
-| Blender, 블렌더, 3D 모델링, 메시, 텍스처링 | Blender |
-| Git, 깃, 버전 관리, 브랜치, 커밋 | Git |
-| AI 에셋, Meshy, AI 텍스처, AI 3D 생성, AI_Gen4Game | AI_Gen4Game |
-| 빛과 색, 색채학, 명암, 색온도, Light and Color | LightAndColor |
-| 아트 인사이트, 미적 감각, 안목, 취향, 유행과 트렌드, 올드와 클래식, 상황과 감정 | ArtInsight |
-| 크라우드 펀딩, 펀딩, 수익 모델, 자금 조달, Funding | Funding |
-| Python, 파이썬, pandas, numpy, pip | Python |
-| JavaScript, 자바스크립트, Node.js, 노드, npm, TypeScript, 타입스크립트 | JavaScript |
-| AI 코딩, 코드 스타일, 클린 코드, 네이밍 규약, 리팩토링, AI_Coding | AI_Coding |
-| 요리, 조리과학, 식재료, 조리 기법, 식문화, Cooking | Cooking |
-| 요리철학, 요리연구, 요리 채널, 레시피 분석, CookingLab | CookingLab |
-| 다이어리, 회고, 성장 기록, 개인 메모 | Diary |
-| Unity 매뉴얼, 스크립트 API, Unity 문서 | Unity_Documentation (readonly) |
+| `<도메인 키워드>` | `<대응 볼트 ID>` |
+
+> 사용자가 볼트를 추가할 때마다 위 표에 자기 환경에 맞춰 매핑을 한 줄씩 추가한다.
+> 예: Unity 작업이 잦다면 `| Unity, 유니티 엔진 | Unity |`,
+>      특정 도메인 (게임 기획·요리·운동 등) 노트를 자주 다루면 그 키워드 → 볼트 ID.
+>
+> 실제 등록된 볼트 목록은 `_STATUS.md` 의 볼트 레지스트리 섹션 참조 (사용자 환경별 다름).
 
 - 파일 경로 포함 시 → 경로에서 볼트 추출
 - 모호하면 → 사용자에게 확인
@@ -103,8 +83,16 @@
 - `.codex/` (루트 Codex 설정)
 - `.cursor/` (루트 Cursor 설정)
 - `docs/` (루트 문서)
+- `_AGENT_COMMS/` (에이전트 간 소통 공간 — 볼트 아님, 런타임 통신용)
 
 볼트 내부 파일은 볼트 진입 프로토콜을 거친 후에만 수정한다.
+
+## Git 운영 (단독 운영, R110)
+
+- 단독 사용자 운영. 모든 작업은 `main` 브랜치에서 직접 수행한다.
+- **Claude Code/에이전트 자동 워크트리 격리 사용 안 함** — `Agent` 도구 호출 시 `isolation: "worktree"` 파라미터 지정 금지.
+- 기존 `claude/*` 임시 브랜치 + `.claude/worktrees/*` 잔재 발견 시 정리 (브랜치 삭제 + 디렉토리 제거).
+- 예외: 사용자가 명시적으로 위험한 실험을 격리하길 원할 때만 워크트리 생성 (이때도 종료 시 즉시 삭제).
 
 ## 주입 구조 (2026-04-18 Phase 1 이후)
 
@@ -136,4 +124,5 @@
 - **매 사용자 메시지 수신 시**: `_essentials.md` + `_skill-router.md` 기반 작업 판정. 트리거 키워드 감지 시 해당 규칙 파일을 Read한 후 작업 시작.
 - **볼트 생성 시**: `vault-individualization.md` 규칙을 따라 이름/분류/CLAUDE.md/태그를 구체화한다.
 - **멀티볼트 커스텀 설정 시**: `multivault-personalization.md`를 참조하여 사용자의 에이전트/플러그인 선택을 반영한다.
+- **workspace 편집 시 (R081)**: 파일을 **정본 / 전파본 / 생성물** 로 먼저 분류한다. 전파본·생성물 직접 편집 금지 — 정본·템플릿·installer/sync 로직을 우선 수정 후 버전 신호 (`bump-version --broadcast`, `_WORKSPACE_VERSION.md`, `_ROOT_VERSION.md`) 와 최종 위치 idempotency 검증. 상세: `_essentials.md § 4` + `rules-archive/edit-mode-separation.md`.
 - **에이전트 진입점 파일** (`CLAUDE.md`, `CODEX.md`, `AGENT_STATUS.md`)은 볼트 개별 파일이므로 배포 동기화에 포함하지 않는다.

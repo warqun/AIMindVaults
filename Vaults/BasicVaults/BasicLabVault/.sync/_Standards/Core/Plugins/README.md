@@ -1,8 +1,7 @@
----
+﻿---
 type: standard
 updated: 2026-03-08
 tags:
-  - TileMapToolKit
   - AIMindVault
 ---
 

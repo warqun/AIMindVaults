@@ -3,7 +3,7 @@ type: workspace-version
 tags:
   - CoreHub
   - Multi-Hub
-updated: 2026-04-24
+updated: 2026-05-18
 ---
 
 # CoreHub Workspace Version
@@ -14,6 +14,17 @@ updated: 2026-04-24
 
 | 버전 | 변경 내용 |
 | ---- | -------- |
+| 202605180001 | R122: agents-sync CLI 신규 + .agents/ 카테고리화 (Unity/Blender/Meshy/Discord/Notion/Distribution/CreateVault) |
+| 202605140001 | R119: post-edit-review frontmatter 검증 + note-types.yaml 신규 (Phase 1) |
+| 202605130001 | R116 vault_index: add created field (frontmatter created OR fs.birthtime) |
+| 202605120003 | owned-tags-build.js 신규 CLI (Phase O-4) |
+| 202605120001 | tag-aliases.yaml: PPE/IaC alias 추가 (Track A 사후 보강, owned_tags 옵션 C 트랙) |
+| 202605110002 | R114 Phase 6 post-edit-review.js PascalCase 검증 통합 (양 에이전트 공용) |
+| 202605110001 | R111 Phase 2.9 owned_tags Phase 1~4 완료: tag-migrate.js 신규 + tag-aliases.yaml + nested / PascalCase 결합 룰 |
+| 202605080003 | timeseries.test.js dedup 케이스 정책 변경 정합 (Codex 검증 발견 이슈 fix) |
+| 202605080002 | timeseries dedup 정책 변경 (일별 → timestamp별, 매 빌드마다 push) |
+| 202605080001 | W1: KPI timeseries snapshot 누적 (.vault_data/timeseries.json) |
+| 202604290001 | deploy-dist + fs-mirror: --english-mode 옵션 추가 (영문 번역본 보호 — protectExisting → target 존재 시 skip + pruning 비활성) |
 | 202604240005 | sync 런처 설치 시 Hub 템플릿 사용 보강 |
 | 202604240004 | Sync This Vault bat 경로 계산 안정화 |
 | 202604240003 | sync 런처를 볼트 .sync 내부로 이동하고 루트 설치물 cleanup 추가 |

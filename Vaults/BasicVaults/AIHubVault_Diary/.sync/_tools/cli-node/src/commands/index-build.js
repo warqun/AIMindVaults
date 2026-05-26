@@ -64,11 +64,14 @@ export async function indexBuild(opts = {}) {
     const fileName = basename(filePath);
     const fileStat = await stat(filePath);
     const mtime = fileStat.mtime.toISOString().slice(0, 19);
+    const birthtime = fileStat.birthtime.toISOString().slice(0, 19);
 
     // Incremental: mtime check
     if (opts.incremental && existing.has(relPath)) {
       const ex = existing.get(relPath);
       if (ex.mtime === mtime) {
+        // Backfill created for legacy entries (built before R116 added the field)
+        if (!ex.created) ex.created = birthtime;
         notes.push(ex);
         stats.skipped++;
         continue;
@@ -91,6 +94,7 @@ export async function indexBuild(opts = {}) {
       const ex = existing.get(relPath);
       if (ex.hash === hash) {
         ex.mtime = mtime;
+        if (!ex.created) ex.created = birthtime;
         notes.push(ex);
         stats.skipped++;
         continue;
@@ -107,7 +111,7 @@ export async function indexBuild(opts = {}) {
     }
 
     // Build note object
-    const note = buildNoteObject(relPath, content, fm, hash, mtime);
+    const note = buildNoteObject(relPath, content, fm, hash, mtime, birthtime);
     notes.push(note);
 
     if (existing.has(relPath)) {
@@ -193,7 +197,33 @@ function shouldExclude(fileName, noteType) {
   return false;
 }
 
-function buildNoteObject(relPath, content, fm, hash, mtime) {
+/**
+ * Normalize a frontmatter `created` value into the same ISO format as mtime/birthtime
+ * (`YYYY-MM-DDTHH:MM:SS`). Returns null when unparseable so caller can fall back to birthtime.
+ */
+function normalizeCreatedField(raw) {
+  if (raw == null) return null;
+  const s = String(raw).trim().replace(/^["']|["']$/g, '');
+  if (!s) return null;
+  // Already full ISO datetime (with T)
+  const isoT = s.match(/^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2}(?::\d{2})?)/);
+  if (isoT) {
+    const time = isoT[2].length === 5 ? `${isoT[2]}:00` : isoT[2];
+    return `${isoT[1]}T${time}`;
+  }
+  // Space-separated date+time
+  const dt = s.match(/^(\d{4}-\d{2}-\d{2})[ \t]+(\d{2}:\d{2}(?::\d{2})?)/);
+  if (dt) {
+    const time = dt[2].length === 5 ? `${dt[2]}:00` : dt[2];
+    return `${dt[1]}T${time}`;
+  }
+  // Date only
+  const d = s.match(/^(\d{4}-\d{2}-\d{2})$/);
+  if (d) return `${d[1]}T00:00:00`;
+  return null;
+}
+
+function buildNoteObject(relPath, content, fm, hash, mtime, birthtime) {
   const lines = content.split('\n');
 
   // Title: first H1
@@ -237,6 +267,9 @@ function buildNoteObject(relPath, content, fm, hash, mtime) {
     if (target && !linksTo.includes(target)) linksTo.push(target);
   }
 
+  const fmCreated = normalizeCreatedField(fm.created);
+  const created = fmCreated || birthtime;
+
   return {
     path: relPath,
     title,
@@ -247,6 +280,7 @@ function buildNoteObject(relPath, content, fm, hash, mtime) {
     links_to: linksTo,
     links_from: [],
     mtime,
+    created,
     hash,
   };
 }

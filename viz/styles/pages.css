@@ -1,0 +1,1825 @@
+/* AIMindVaults Visualization — Page-specific styles (W1)
+ * 홈 페이지 추가 스타일. 다른 워커 (W2~W5) 가 본 파일에 자기 페이지 스타일 append 또는 페이지별 분리 가능.
+ */
+
+/* ───────────── Home — KPI row ───────────── */
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.kpi {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 18px 20px;
+  box-shadow: var(--shadow);
+}
+
+.kpi .head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.kpi .label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text-3);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.kpi .delta {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  color: var(--accent);
+  background: var(--accent-bg);
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-weight: 500;
+}
+
+.kpi .num {
+  font-size: 34px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: var(--text);
+  margin-bottom: 8px;
+  font-variant-numeric: tabular-nums;
+}
+
+.kpi .spark {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 20px;
+}
+
+.kpi .spark span {
+  flex: 1;
+  background: var(--surface-2);
+  border-radius: 1px;
+  min-height: 2px;
+}
+
+.kpi .spark span.k {
+  background: var(--accent);
+  opacity: 0.7;
+}
+
+/* KPI 카드 — 최근 변화 표시 (sparkline 대체, Phase 2.8 fix) */
+.kpi .change {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text-3);
+  margin-top: 6px;
+  min-height: 20px;
+}
+.kpi .change .delta-num {
+  font-weight: 600;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+.kpi .change.up .delta-num { color: var(--accent); }
+.kpi .change.down .delta-num { color: var(--text-2); }
+.kpi .change .date {
+  color: var(--text-3);
+  opacity: 0.85;
+}
+.kpi .change .vault-label {
+  color: var(--text-2);
+  font-size: 11px;
+  font-weight: 500;
+  opacity: 0.85;
+}
+
+/* KPI 카드 클릭 가능 (change.date 있을 때) — additions 페이지 링크 */
+a.kpi.linkable {
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  transition: transform 0.12s, border-color 0.12s, box-shadow 0.12s;
+}
+a.kpi.linkable:hover {
+  border-color: var(--accent);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+/* Notes KPI 카드 — 생성/갱신 두 sub-link */
+.kpi.multi .change.sub-link {
+  text-decoration: none;
+  color: inherit;
+  padding: 2px 6px;
+  margin-left: -6px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.kpi.multi .change.sub-link:hover {
+  background: rgba(127, 127, 127, 0.08);
+}
+
+/* Obsidian 열기 — vault-chip / open-obs 버튼 (R120) */
+[data-open-vault] {
+  cursor: pointer;
+  transition: opacity 0.12s;
+}
+[data-open-vault]:hover {
+  opacity: 0.75;
+}
+.open-obs {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-2);
+  font-size: 11px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-left: 4px;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+}
+.open-obs:hover {
+  background: var(--accent);
+  color: var(--bg);
+  border-color: var(--accent);
+}
+
+/* ───────────── Home — Recent activity row ───────────── */
+.recent-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+.mini-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 18px 20px;
+  box-shadow: var(--shadow);
+}
+
+.mini-card .head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.mini-card .h {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.mini-card .more {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text-3);
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  padding: 0;
+}
+
+.mini-card .more:hover { color: var(--text-2); }
+
+.activity-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+
+.act {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.act .day {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  color: var(--text-3);
+  letter-spacing: 0.04em;
+}
+
+.act .bar2 {
+  width: 100%;
+  height: 48px;
+  background: var(--surface-2);
+  border-radius: 3px;
+  display: flex;
+  flex-direction: column-reverse;
+  overflow: hidden;
+}
+
+.act .bar2 span {
+  display: block;
+  width: 100%;
+  background: var(--accent);
+}
+
+.act .num2 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text-2);
+  font-weight: 500;
+}
+
+.act-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text-3);
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--border);
+}
+
+.act-foot strong {
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.bar-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.bar {
+  display: grid;
+  grid-template-columns: auto 1fr 44px;
+  gap: 10px;
+  align-items: center;
+  font-size: 11.5px;
+}
+
+.bar .name {
+  color: var(--text-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 140px;
+}
+
+.bar .name .kind {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  color: var(--text-3);
+  background: var(--surface-2);
+  padding: 1px 5px;
+  border-radius: 2px;
+  letter-spacing: 0.04em;
+}
+
+.bar .track {
+  height: 6px;
+  background: var(--surface-2);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.bar .fill {
+  height: 100%;
+  border-radius: 3px;
+}
+
+.bar .num {
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-3);
+  text-align: right;
+  font-size: 10.5px;
+}
+
+/* ───────────── Home — Cards (Views + Tools) ───────────── */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.cards.tools {
+  grid-template-columns: repeat(2, 1fr);
+  margin-bottom: 32px;
+}
+
+.cards.tools .card .glyph { height: 80px; }
+
+/* ───────────── Page placeholder (during dynamic import) ───────────── */
+.page-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 320px;
+  color: var(--text-3);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+}
+
+.page-error {
+  background: var(--danger-bg);
+  color: var(--danger);
+  border: 1px solid var(--danger);
+  border-radius: 6px;
+  padding: 14px 16px;
+  font-size: 12px;
+  margin: 20px 0;
+}
+
+/* ───────────── Additions (날짜별 추가 항목) ───────────── */
+.page-additions .add-main {
+  display: grid;
+  grid-template-columns: minmax(360px, 1fr) minmax(420px, 1.2fr);
+  gap: 16px;
+  flex: 1;
+  min-height: 0;
+}
+
+.page-additions .add-list {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow-y: auto;
+  min-height: 480px;
+  max-height: calc(100vh - 240px);
+}
+
+.page-additions .add-row {
+  display: grid;
+  grid-template-columns: 12px 1fr;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background-color 0.12s ease, border-color 0.12s ease;
+}
+
+.page-additions .add-row:hover {
+  background: var(--surface-2);
+  border-color: var(--border);
+}
+
+.page-additions .add-row.sel {
+  background: var(--accent-bg);
+  border-color: var(--accent);
+}
+
+.page-additions .add-row .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-top: 6px;
+}
+
+.page-additions .add-row .body { min-width: 0; }
+
+.page-additions .add-row .head-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.page-additions .add-row .vault-chip {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px;
+  color: var(--text-2);
+  background: var(--surface-2);
+  padding: 2px 6px;
+  border-radius: 3px;
+  letter-spacing: 0.04em;
+}
+
+.page-additions .add-row .type-chip {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  color: var(--text-3);
+  border: 1px solid var(--border);
+  padding: 1px 5px;
+  border-radius: 3px;
+  letter-spacing: 0.04em;
+}
+
+.page-additions .add-row .time {
+  margin-left: auto;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text-3);
+}
+
+.page-additions .add-row .ttl {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.4;
+  margin-bottom: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.page-additions .add-row .path {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text-3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.page-additions .add-row .tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.page-additions .add-row .tags .tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px;
+  color: var(--text-2);
+  background: var(--surface-2);
+  padding: 1px 6px;
+  border-radius: 3px;
+}
+
+.page-additions .preview {
+  max-height: calc(100vh - 240px);
+  min-height: 480px;
+}
+
+.page-additions .pfront {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text-2);
+  background: var(--surface-2);
+  border-radius: 4px;
+  padding: 10px 12px;
+  white-space: pre-wrap;
+  margin-bottom: 14px;
+}
+
+.page-additions .pfront .k { color: var(--accent); font-weight: 500; }
+
+.page-additions .add-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 40px 20px;
+  color: var(--text-3);
+  height: 100%;
+  min-height: 200px;
+}
+
+.page-additions .add-empty svg {
+  width: 32px;
+  height: 32px;
+  opacity: 0.5;
+}
+
+.page-additions .add-empty .hint {
+  font-size: 11.5px;
+  text-align: center;
+  line-height: 1.6;
+}
+
+.page-additions input[type="date"].search-input {
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.02em;
+}
+
+@media (max-width: 1024px) {
+  .page-additions .add-main {
+    grid-template-columns: 1fr;
+  }
+  .page-additions .add-list,
+  .page-additions .preview {
+    max-height: none;
+  }
+}
+
+/* ───────────── Additions — 4-mode toggle (R116) ───────────── */
+.page-additions .add-main { display: block; }
+
+.page-additions .view-pane {
+  display: grid;
+  grid-template-columns: minmax(360px, 1fr) minmax(420px, 1.2fr);
+  gap: 16px;
+  min-height: 0;
+}
+
+.page-additions .view-pane[data-view="vaults"],
+.page-additions .view-pane[data-view="tags"],
+.page-additions .view-pane[data-view="connections"] {
+  grid-template-columns: 1fr;
+}
+
+/* vaults view — card grid */
+.page-additions .vault-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+  padding: 8px 0;
+}
+.page-additions .vault-card {
+  display: grid;
+  grid-template-columns: 12px 1fr;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  transition: background-color 0.12s ease, border-color 0.12s ease;
+}
+.page-additions .vault-card:hover {
+  background: var(--surface-2);
+  border-color: var(--accent);
+}
+.page-additions .vault-card .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-top: 6px;
+}
+.page-additions .vault-card .body { min-width: 0; }
+.page-additions .vault-card .head-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+.page-additions .vault-card .vault-chip,
+.page-additions .vault-card .type-chip,
+.page-additions .vault-card .time {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  letter-spacing: 0.04em;
+}
+.page-additions .vault-card .vault-chip {
+  background: var(--accent-bg);
+  color: var(--accent);
+  font-weight: 500;
+}
+.page-additions .vault-card .type-chip {
+  background: var(--surface-2);
+  color: var(--text-2);
+}
+.page-additions .vault-card .time { color: var(--text-3); }
+.page-additions .vault-card .ttl {
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+.page-additions .vault-card .path {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.page-additions .vault-card .tags {
+  margin-top: 6px;
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.page-additions .vault-card .tags .tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: var(--surface-2);
+  color: var(--text-2);
+}
+
+/* tags view — horizontal bars */
+.page-additions .tag-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 0;
+}
+.page-additions .tag-bar {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(180px, 2fr) 48px;
+  gap: 10px;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 5px;
+  border: 1px solid transparent;
+  cursor: default;
+}
+.page-additions .tag-bar:hover {
+  background: var(--surface-2);
+  border-color: var(--border);
+}
+.page-additions .tag-bar .left {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  min-width: 0;
+}
+.page-additions .tag-bar .left .vault-chip,
+.page-additions .tag-bar .left .type-chip {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+}
+.page-additions .tag-bar .left .type-chip {
+  background: var(--surface-2);
+  color: var(--text-3);
+}
+.page-additions .tag-bar .left .ttl {
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.page-additions .tag-bar .bar {
+  height: 8px;
+  background: var(--surface-2);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.page-additions .tag-bar .bar .fill {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+}
+.page-additions .tag-bar .num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text-2);
+  text-align: right;
+}
+
+/* connections view — owner → tag → user rows */
+.page-additions .conn-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 0;
+}
+.page-additions .conn-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 5px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+.page-additions .conn-row:hover {
+  border-color: var(--accent);
+  background: var(--surface-2);
+}
+.page-additions .conn-row .vault-chip {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  letter-spacing: 0.04em;
+}
+.page-additions .conn-row .arrow {
+  color: var(--text-3);
+  font-size: 11px;
+}
+.page-additions .conn-row .tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 3px;
+  background: var(--accent-bg);
+  color: var(--accent);
+  font-weight: 500;
+}
+.page-additions .conn-row .count {
+  margin-left: auto;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text-3);
+}
+
+/* notes view 의 view-pane 내부 add-list/preview 는 기존 스타일 그대로 사용 */
+.page-additions .view-pane[data-view="notes"] .add-list,
+.page-additions .view-pane[data-view="notes"] .preview {
+  min-height: 480px;
+  max-height: calc(100vh - 240px);
+}
+
+@media (max-width: 1024px) {
+  .page-additions .view-pane[data-view="notes"] {
+    grid-template-columns: 1fr;
+  }
+  .page-additions .tag-bar {
+    grid-template-columns: minmax(140px, 1fr) minmax(120px, 2fr) 40px;
+  }
+}
+
+/* ───────────── Responsive ───────────── */
+@media (max-width: 768px) {
+  .kpi-row { grid-template-columns: repeat(2, 1fr); }
+  .cards { grid-template-columns: repeat(2, 1fr); }
+  .cards.tools { grid-template-columns: 1fr; }
+  .recent-row { grid-template-columns: 1fr; }
+}
+
+/* ───────────── Calendar (R126 — 상-하 stack + drag resizer + 일별 카드) ───────────── */
+.page-calendar {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 160px);
+  min-height: 560px;
+}
+
+.page-calendar > .toolbar {
+  flex-shrink: 0;
+}
+
+.page-calendar .cal-stack {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  --cal-split: 55%;
+}
+
+.page-calendar .cal-top {
+  flex-grow: 0;
+  flex-shrink: 0;
+  flex-basis: var(--cal-split);
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.page-calendar .cal-top .chart-wrap {
+  margin-bottom: 0;
+  flex: 1;
+  min-height: 0;
+}
+
+.page-calendar .cal-top .chart-wrap > #cal-heatmap {
+  flex: 1;
+  min-height: 0;
+}
+
+.page-calendar .cal-resizer {
+  flex-shrink: 0;
+  height: 18px;
+  margin: 2px 0;
+  cursor: ns-resize;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  background: transparent;
+  transition: background-color 0.12s ease;
+  outline: none;
+  user-select: none;
+  touch-action: none;
+  position: relative;
+  z-index: 5;
+}
+
+.page-calendar .cal-resizer .grip {
+  width: 56px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--border-strong);
+  transition: background-color 0.12s ease, width 0.12s ease, height 0.12s ease;
+  pointer-events: none;
+}
+
+.page-calendar .cal-resizer:hover .grip,
+.page-calendar .cal-resizer:focus-visible .grip,
+.page-calendar .cal-resizer.dragging .grip {
+  background: var(--accent);
+  width: 80px;
+  height: 5px;
+}
+
+.page-calendar .cal-resizer:focus-visible {
+  background: var(--accent-bg);
+}
+
+.page-calendar .cal-bottom {
+  flex: 1;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.page-calendar .day-area {
+  flex: 1;
+  min-height: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  padding: 12px 14px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.page-calendar .day-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.page-calendar .day-head .day-date {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: 0.02em;
+}
+
+.page-calendar .day-head .day-count {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text-2);
+  padding: 2px 8px;
+  background: var(--surface-2);
+  border-radius: 10px;
+}
+
+.page-calendar .day-head .day-added {
+  font-size: 11px;
+  color: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.page-calendar .day-head .day-added .vault-pill {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 8px;
+  background: var(--accent-bg);
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  cursor: pointer;
+}
+
+.page-calendar .day-head .day-added .vault-pill:hover {
+  background: var(--accent);
+  color: #fff;
+}
+
+.page-calendar .day-head .day-link {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 500;
+  padding: 4px 10px;
+  border: 1px solid var(--accent);
+  border-radius: 5px;
+  transition: background-color 0.12s ease, color 0.12s ease;
+}
+
+.page-calendar .day-head .day-link:hover {
+  background: var(--accent);
+  color: #fff;
+}
+
+.page-calendar .cat-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.page-calendar .cat-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.page-calendar .cat-section .cat-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0 6px;
+  border-bottom: 1px dashed var(--border);
+}
+
+.page-calendar .cat-section .cat-head .cat-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.page-calendar .cat-section .cat-head .cat-name {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: 0.02em;
+}
+
+.page-calendar .cat-section .cat-head .cat-count {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text-3);
+  margin-left: auto;
+}
+
+.page-calendar .day-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 8px;
+}
+
+.page-calendar .day-card {
+  display: grid;
+  grid-template-columns: 38px 1fr 28px;
+  gap: 8px;
+  padding: 8px 10px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--cat-color, var(--accent));
+  border-radius: 6px;
+  transition: background-color 0.12s ease, border-color 0.12s ease, transform 0.12s ease;
+  min-width: 0;
+  position: relative;
+}
+
+.page-calendar .day-card:hover {
+  background: var(--surface);
+  border-color: var(--cat-color, var(--accent));
+  transform: translateY(-1px);
+}
+
+.page-calendar .day-card .time {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text-3);
+  align-self: start;
+  padding-top: 1px;
+  letter-spacing: 0.02em;
+}
+
+.page-calendar .day-card .body {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.page-calendar .day-card .ttl {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.page-calendar .day-card .meta {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.page-calendar .day-card .vault-chip,
+.page-calendar .day-card .type-chip {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  padding: 1px 5px;
+  border-radius: 3px;
+  letter-spacing: 0.04em;
+}
+
+.page-calendar .day-card .vault-chip {
+  color: var(--text-2);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: border-color 0.12s ease, color 0.12s ease;
+}
+
+.page-calendar .day-card .vault-chip:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.page-calendar .day-card .type-chip {
+  color: var(--text-3);
+  border: 1px solid var(--border);
+}
+
+.page-calendar .day-card .tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  margin-top: 2px;
+}
+
+.page-calendar .day-card .tags .tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  color: var(--text-2);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 0 4px;
+  border-radius: 3px;
+}
+
+.page-calendar .day-card .open-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  width: 24px;
+  height: 24px;
+  font-size: 12px;
+  color: var(--text-2);
+  cursor: pointer;
+  align-self: start;
+  padding: 0;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.12s ease, color 0.12s ease, background-color 0.12s ease;
+}
+
+.page-calendar .day-card .open-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-bg);
+}
+
+.page-calendar .day-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--text-3);
+  font-size: 11.5px;
+  min-height: 160px;
+  text-align: center;
+  padding: 20px;
+}
+
+.page-calendar .day-empty svg {
+  width: 32px;
+  height: 32px;
+  opacity: 0.5;
+}
+
+.page-calendar .day-empty .hint {
+  max-width: 380px;
+  line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+  .page-calendar .day-cards {
+    grid-template-columns: 1fr;
+  }
+  .page-calendar .day-head {
+    gap: 6px;
+  }
+  .page-calendar .day-head .day-link {
+    margin-left: 0;
+  }
+}
+
+/* ───────────── Distribution (노트 데이터 분석) — 태그 top N slider ───────────── */
+.page-distribution .topn-slider-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  margin: 0 12px;
+  min-width: 80px;
+}
+
+.page-distribution .topn-slider-wrap input[type="range"] {
+  width: 100%;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+/* ───────────── Distribution — 한눈에 카드 (R126 시각 강화) ───────────── */
+.page-distribution .summary-card #dist-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.page-distribution .summary-kpi-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.page-distribution .summary-kpi {
+  background: var(--surface-2);
+  border-left: 3px solid var(--accent);
+  border-radius: 5px;
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.page-distribution .summary-kpi .l {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px;
+  color: var(--text-3);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.page-distribution .summary-kpi .v {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+.page-distribution .summary-kpi .d {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px;
+  color: var(--text-3);
+}
+
+.page-distribution .summary-highlights {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.page-distribution .highlight {
+  background: var(--surface-2);
+  border-left: 3px solid var(--hl-color, var(--accent));
+  border-radius: 5px;
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.page-distribution .highlight .hl-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.page-distribution .highlight .hl-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--hl-color, var(--accent));
+  flex-shrink: 0;
+}
+
+.page-distribution .highlight .hl-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text-3);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.page-distribution .highlight .hl-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  margin-left: auto;
+  letter-spacing: 0.02em;
+}
+
+.page-distribution .highlight .hl-bar {
+  height: 6px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.page-distribution .highlight .hl-bar .fill {
+  display: block;
+  height: 100%;
+  background: var(--hl-color, var(--accent));
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.page-distribution .highlight .hl-bar .fill.dim {
+  background: var(--text-3);
+  opacity: 0.7;
+}
+
+.page-distribution .highlight .hl-bar.inline {
+  flex: 1;
+  margin: 0;
+  height: 5px;
+}
+
+.page-distribution .highlight .hl-meta {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px;
+  color: var(--text-3);
+}
+
+.page-distribution .highlight .hl-pair {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.page-distribution .highlight .hl-pair-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.page-distribution .highlight .vault-pill {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text-2);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 2px 8px;
+  border-radius: 10px;
+  cursor: pointer;
+  min-width: 0;
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: border-color 0.12s ease, color 0.12s ease;
+}
+
+.page-distribution .highlight .vault-pill:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.page-distribution .highlight .vault-pill.max {
+  border-color: var(--hl-color, var(--accent));
+  color: var(--hl-color, var(--accent));
+}
+
+.page-distribution .highlight .hl-count {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text-2);
+  font-weight: 600;
+  min-width: 36px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.page-distribution .highlight .hl-recent {
+  display: flex;
+  align-items: baseline;
+  gap: 18px;
+}
+
+.page-distribution .highlight .recent-item {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.page-distribution .highlight .recent-item .num {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--accent);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.page-distribution .highlight .recent-item .lbl {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text-3);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* ───────────── Tag Explorer (구 태그 순위 → 태그 전용 뷰, R126) ───────────── */
+.page-tags {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 160px);
+  min-height: 560px;
+}
+
+.page-tags > .toolbar {
+  flex-shrink: 0;
+}
+
+.page-tags .tag-main {
+  display: grid;
+  grid-template-columns: clamp(260px, 30vw, 420px) 1fr;
+  gap: 16px;
+  flex: 1;
+  min-height: 0;
+}
+
+.page-tags .tag-list {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  padding: 6px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-height: 0;
+}
+
+.page-tags .tag-list .empty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-3);
+  font-size: 11.5px;
+  padding: 24px;
+}
+
+.page-tags .tag-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.page-tags .group-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 5px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  margin: 4px 0 2px;
+  transition: background-color 0.12s ease, border-color 0.12s ease;
+  min-width: 0;
+}
+
+.page-tags .group-head:hover {
+  background: var(--surface-2);
+  border-color: var(--border);
+}
+
+.page-tags .group-head .ic {
+  width: 12px;
+  font-size: 10px;
+  color: var(--text-3);
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.page-tags .group-head .group-chip {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 9px;
+  border-radius: 10px;
+  letter-spacing: 0.04em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 220px;
+}
+
+.page-tags .group-head .group-chip.unowned {
+  color: var(--text-3);
+  border: 1px dashed var(--border-strong);
+  background: transparent;
+  font-weight: 500;
+}
+
+.page-tags .group-head .group-count {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px;
+  color: var(--text-3);
+  margin-left: auto;
+}
+
+.page-tags .group-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding-left: 14px;
+}
+
+.page-tags .tag-row {
+  display: grid;
+  grid-template-columns: 10px 1fr auto auto;
+  gap: 8px;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background-color 0.12s ease, border-color 0.12s ease;
+  min-width: 0;
+}
+
+.page-tags .tag-row:hover {
+  background: var(--surface-2);
+}
+
+.page-tags .tag-row.sel {
+  background: var(--accent-bg);
+  border-color: var(--accent);
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+.page-tags .tag-row .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.page-tags .tag-row .name {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.page-tags .tag-row .owner-chip,
+.page-tags .tag-row .unowned-chip {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  padding: 1px 6px;
+  border-radius: 3px;
+  letter-spacing: 0.04em;
+  max-width: 110px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.page-tags .tag-row .owner-chip {
+  color: #fff;
+}
+
+.page-tags .tag-row .unowned-chip {
+  color: var(--text-3);
+  border: 1px dashed var(--border-strong);
+}
+
+.page-tags .tag-row .count {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text-3);
+  min-width: 24px;
+  text-align: right;
+}
+
+.page-tags .tag-detail {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  padding: 14px 16px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+}
+
+.page-tags .tag-detail .empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--text-3);
+  font-size: 11.5px;
+  min-height: 200px;
+  text-align: center;
+  padding: 20px;
+}
+
+.page-tags .tag-detail .empty svg {
+  width: 32px;
+  height: 32px;
+  opacity: 0.5;
+}
+
+.page-tags .tag-detail .empty .hint {
+  max-width: 380px;
+  line-height: 1.6;
+}
+
+.page-tags .detail-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.page-tags .detail-head .tag-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.02em;
+}
+
+.page-tags .detail-head .owner-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  color: #fff;
+  padding: 3px 10px;
+  border-radius: 11px;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: filter 0.12s ease;
+}
+
+.page-tags .detail-head .owner-badge:hover {
+  filter: brightness(1.1);
+}
+
+.page-tags .detail-head .unowned-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  color: var(--text-3);
+  padding: 3px 10px;
+  border-radius: 11px;
+  border: 1px dashed var(--border-strong);
+  letter-spacing: 0.04em;
+}
+
+.page-tags .detail-head .stat-pill {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  color: var(--text-2);
+  background: var(--surface-2);
+  padding: 3px 10px;
+  border-radius: 11px;
+}
+
+.page-tags .cat-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.page-tags .cat-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.page-tags .cat-section .cat-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-bottom: 1px dashed var(--border);
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.12s ease;
+  user-select: none;
+}
+
+.page-tags .cat-section .cat-head:hover {
+  background: var(--surface-2);
+}
+
+.page-tags .cat-section .cat-head .ic {
+  width: 12px;
+  font-size: 10px;
+  color: var(--text-3);
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.page-tags .cat-section.collapsed .cat-head {
+  border-bottom: 1px solid var(--border);
+  border-bottom-style: solid;
+}
+
+.page-tags .cat-section .cat-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.page-tags .cat-section .cat-name {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.page-tags .cat-section .cat-count {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text-3);
+  margin-left: auto;
+}
+
+.page-tags .note-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 8px;
+}
+
+.page-tags .note-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 10px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--cat-color, var(--accent));
+  border-radius: 6px;
+  transition: background-color 0.12s ease, border-color 0.12s ease, transform 0.12s ease;
+  min-width: 0;
+}
+
+.page-tags .note-card:hover {
+  background: var(--surface);
+  border-color: var(--cat-color, var(--accent));
+  transform: translateY(-1px);
+}
+
+.page-tags .note-card .head {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.page-tags .note-card .vault-chip,
+.page-tags .note-card .type-chip {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  padding: 1px 5px;
+  border-radius: 3px;
+  letter-spacing: 0.04em;
+}
+
+.page-tags .note-card .vault-chip {
+  color: var(--text-2);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: border-color 0.12s ease, color 0.12s ease;
+}
+
+.page-tags .note-card .vault-chip:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.page-tags .note-card .type-chip {
+  color: var(--text-3);
+  border: 1px solid var(--border);
+}
+
+.page-tags .note-card .date {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px;
+  color: var(--text-3);
+}
+
+.page-tags .note-card .open-btn {
+  margin-left: auto;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  width: 22px;
+  height: 22px;
+  font-size: 11px;
+  color: var(--text-2);
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.12s ease, color 0.12s ease, background-color 0.12s ease;
+}
+
+.page-tags .note-card .open-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-bg);
+}
+
+.page-tags .note-card .ttl {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.page-tags .note-card .path {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px;
+  color: var(--text-3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.page-tags .note-card .tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  margin-top: 2px;
+}
+
+.page-tags .note-card .tags .tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  color: var(--text-2);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 0 4px;
+  border-radius: 3px;
+}
+
+@media (max-width: 768px) {
+  .page-tags .tag-main {
+    grid-template-columns: 1fr;
+    grid-template-rows: 240px 1fr;
+  }
+  .page-tags .note-cards {
+    grid-template-columns: 1fr;
+  }
+}

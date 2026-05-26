@@ -110,7 +110,7 @@ Core 편집 후 CoreHub 에서 `bump-version -m "..." --broadcast` 실행 → �
 - **날짜**: YYYY-MM-DD 형식만 사용.
 - **구조**: H1 제목 1개. 내부 링크는 `[[WikiLink]]` 사용.
 - **Frontmatter 필수**: 모든 노트는 YAML Frontmatter(`---`)로 시작.
-  - `type`, `tags`(볼트 태그 포함), `updated` 또는 `created` 필수.
+  - `type`, `tags`, `updated` 또는 `created` 필수.
   - 새 폴더 생성 시 `_VAULT-INDEX.md`에 등록.
 - **Juggl 임베드**: 제목 바로 아래에 삽입. 예외: `_STATUS.md`, `_VAULT-INDEX.md`, `.claude/` 내 파일.
 

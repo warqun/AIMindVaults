@@ -1,0 +1,889 @@
+/* AIMindVaults Visualization — Common Components (W1)
+ * Spec § 3 — header / crumb / toolbar / card / chart-wrap / side / footer.
+ */
+
+/* ───────────── Header (§ 3.1) ───────────── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 32px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: -0.01em;
+}
+
+.brand .mark {
+  width: 18px;
+  height: 18px;
+  background: var(--accent);
+  border-radius: 4px;
+  position: relative;
+}
+
+.brand .mark::after {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  background: var(--bg);
+  border-radius: 1px;
+}
+
+.crumb {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13.5px;
+  color: var(--text-2);
+}
+
+.crumb .crumb-back {
+  color: var(--text-2);
+  font-weight: 500;
+  transition: color 0.15s ease;
+}
+
+.crumb .crumb-back:hover {
+  color: var(--text);
+}
+
+.crumb .sep {
+  color: var(--text-3);
+}
+
+.crumb .here {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.header-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text-3);
+  letter-spacing: 0.04em;
+}
+
+.header-meta .live {
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.header-meta .live::before {
+  content: '●';
+  margin-right: 4px;
+}
+
+.icon-btn {
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-2);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.icon-btn:hover {
+  border-color: var(--border-strong);
+  color: var(--text);
+}
+
+.icon-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* ───────────── Section bar (label band) ───────────── */
+.section-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  margin-top: 8px;
+}
+
+.section-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text-3);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* ───────────── Toolbar (§ 3.2) ───────────── */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow);
+}
+
+.tool-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-2);
+}
+
+.tool-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text-3);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.range-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.range-wrap input[type='range'] {
+  width: 120px;
+}
+
+.range-wrap .val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text-2);
+  min-width: 28px;
+  text-align: right;
+}
+
+.search-input {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 12px;
+  color: var(--text);
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--border-strong);
+}
+
+.seg {
+  display: inline-flex;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.seg button {
+  padding: 4px 10px;
+  font-size: 11px;
+  color: var(--text-2);
+  background: transparent;
+  border-right: 1px solid var(--border);
+}
+
+.seg button:last-child { border-right: 0; }
+
+.seg button.on {
+  background: var(--accent-bg);
+  color: var(--accent-fg);
+  font-weight: 500;
+}
+
+.cat-filter {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.cat-filter label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--text-2);
+  cursor: pointer;
+}
+
+.cat-filter input[type='checkbox'] {
+  accent-color: var(--accent);
+}
+
+.cat-filter .d {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+/* ───────────── Card (§ 3.3) ───────────── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 18px 18px 16px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.card:hover {
+  border-color: var(--border-strong);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-hover);
+}
+
+.card .glyph {
+  height: 64px;
+  background: var(--surface-2);
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-3);
+  overflow: hidden;
+  position: relative;
+}
+
+.card .glyph svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.card .title {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+
+.card .desc {
+  font-size: 11.5px;
+  color: var(--text-2);
+  line-height: 1.5;
+  flex: 1;
+}
+
+.card .stat {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text-3);
+  letter-spacing: 0.04em;
+  padding-top: 8px;
+  border-top: 1px dashed var(--border);
+}
+
+/* ───────────── Chart wrapper (§ 3.4) ───────────── */
+.chart-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  padding: 16px 18px;
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1;
+}
+
+/* ECharts 컨테이너 (chart-head 외의 모든 자식 div) — height 미정의 시 0 으로 렌더 안 됨 */
+.chart-wrap > div:not(.chart-head) {
+  flex: 1;
+  min-height: 520px;
+}
+
+/* ───────────── Main layout (§ 3 페이지별 좌우 분할) ───────────── */
+/* default — 좌 차트 + 우 사이드 패널 (concepts, network, tags) */
+.main {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 16px;
+  flex: 1;
+  min-height: 0;
+}
+
+/* 좌 트리 + 우 미리보기 (explorer, rules) — 화면 폭에 따라 좌측 동적 축소, 항상 좌·우 유지 */
+.main.tree-preview {
+  grid-template-columns: clamp(160px, 26vw, 340px) 1fr;
+}
+
+/* 분포 분석 2x2 그리드 */
+.main.dist-grid {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+}
+
+@media (max-width: 1024px) {
+  /* .main.tree-preview 는 제외 — 좁아져도 좌·우 유지 (위 clamp 가 처리) */
+  .main, .main.dist-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: none;
+  }
+}
+
+/* ───────────── Tree wrap (explorer / rules 좌측) ───────────── */
+.tree-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  padding: 14px 12px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow-y: auto;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+/* 트리 노드 — explorer.js / rules.js 의 .node 공용 스타일 */
+.tree-wrap .node {
+  padding: 2px 8px;
+  margin-bottom: 1px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text-2);
+  transition: background 0.12s, color 0.12s;
+  position: relative;
+}
+.tree-wrap .node:hover { background: var(--surface-2); color: var(--text); }
+.tree-wrap .node.active,
+.tree-wrap .node.sel {
+  background: var(--accent-bg);
+  color: var(--accent);
+  font-weight: 600;
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+.tree-wrap .node.active:hover,
+.tree-wrap .node.sel:hover {
+  background: var(--accent-bg);
+  color: var(--accent);
+}
+.tree-wrap .node.active .count,
+.tree-wrap .node.sel .count {
+  color: var(--accent);
+  opacity: 0.85;
+}
+.tree-wrap .node .ic {
+  width: 14px;
+  opacity: 0.55;
+  font-size: 10px;
+  flex-shrink: 0;
+  text-align: center;
+}
+.tree-wrap .node .d {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.tree-wrap .node .count {
+  margin-left: auto;
+  padding-left: 8px;
+  font-size: 10.5px;
+  color: var(--text-3);
+  opacity: 0.7;
+}
+.tree-wrap .node.file {
+  color: var(--text-3);
+  font-size: 11.5px;
+}
+.tree-wrap .node.file:hover { color: var(--text-2); }
+
+/* depth indent — 폴더(ind1~4) 좌측 패딩 + 가이드 라인 */
+.tree-wrap .node.ind1 { padding-left: 22px; }
+.tree-wrap .node.ind2 { padding-left: 38px; }
+.tree-wrap .node.ind3 { padding-left: 54px; }
+.tree-wrap .node.ind4 { padding-left: 70px; }
+/* 가이드 라인 — depth 시각 강조 (호버/활성 시 강조) */
+.tree-wrap .node.ind1::before,
+.tree-wrap .node.ind2::before,
+.tree-wrap .node.ind3::before,
+.tree-wrap .node.ind4::before {
+  content: '';
+  position: absolute;
+  left: 10px;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--border);
+  opacity: 0.4;
+}
+.tree-wrap .node.ind2::before { left: 26px; }
+.tree-wrap .node.ind3::before { left: 42px; }
+.tree-wrap .node.ind4::before { left: 58px; }
+
+/* ───────────── Preview (explorer / rules 우측 마크다운) ───────────── */
+.preview {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  padding: 24px 28px;
+  overflow-y: auto;
+  min-height: 520px;
+}
+.preview .pmeta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  color: var(--text-3);
+}
+.preview .pmeta .kind {
+  font-size: 9.5px;
+  color: var(--bg);
+  background: var(--core);
+  padding: 2px 7px;
+  border-radius: 3px;
+  letter-spacing: 0.06em;
+  font-weight: 500;
+}
+.preview .pmeta .kind.custom { background: var(--custom); }
+.preview .pmeta .kind.hook { background: var(--hook); }
+.preview .ptitle {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin-bottom: 14px;
+  line-height: 1.3;
+  color: var(--text);
+}
+.preview .pbody {
+  font-size: 13.5px;
+  color: var(--text-2);
+  line-height: 1.75;
+}
+.preview .pbody h1,
+.preview .pbody h2,
+.preview .pbody h3 {
+  color: var(--text);
+  margin-top: 18px;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+.preview .pbody h1 { font-size: 18px; }
+.preview .pbody h2 { font-size: 15px; border-bottom: 1px solid var(--border); padding-bottom: 4px; }
+.preview .pbody h3 { font-size: 13px; color: var(--text-3); font-family: 'JetBrains Mono', monospace; letter-spacing: 0.04em; text-transform: uppercase; }
+.preview .pbody p { margin-bottom: 10px; }
+.preview .pbody ul, .preview .pbody ol { margin-left: 18px; margin-bottom: 10px; }
+.preview .pbody li { margin-bottom: 4px; }
+.preview .pbody code {
+  background: var(--surface-2);
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--accent);
+}
+.preview .pbody pre {
+  background: var(--surface-2);
+  padding: 10px 12px;
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11.5px;
+  color: var(--text-2);
+  overflow-x: auto;
+  margin: 10px 0;
+}
+.preview .pbody blockquote {
+  border-left: 2px solid var(--accent);
+  padding: 6px 12px;
+  color: var(--text-3);
+  font-size: 12.5px;
+  margin: 10px 0;
+  background: var(--surface-2);
+  border-radius: 0 4px 4px 0;
+}
+.preview .pbody a { color: var(--accent); text-decoration: none; }
+.preview .pbody a:hover { text-decoration: underline; }
+
+/* GFM table — 마크다운 표 렌더 */
+.preview .pbody table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 12px 0;
+  font-size: 12.5px;
+}
+.preview .pbody thead { background: var(--surface-2); }
+.preview .pbody th {
+  text-align: left;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  font-weight: 600;
+  color: var(--text);
+  font-size: 12px;
+}
+.preview .pbody td {
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  color: var(--text-2);
+  vertical-align: top;
+}
+.preview .pbody tbody tr:nth-child(even) { background: var(--surface-2); }
+
+/* ───────────── Settings page (시안 09 톤) ───────────── */
+.settings-page { max-width: 960px; margin: 0 auto; }
+
+.section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  padding: 22px 24px;
+  margin-bottom: 16px;
+}
+.section h2 { font-size: 14px; font-weight: 600; letter-spacing: -0.01em; margin-bottom: 6px; color: var(--text); }
+.section > .desc { font-size: 12px; color: var(--text-3); margin-bottom: 18px; line-height: 1.5; }
+
+.section .row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.section .row:last-child { border-bottom: none; }
+.section .row .label { font-size: 13px; color: var(--text); }
+.section .row .sub { font-size: 11px; color: var(--text-3); margin-top: 2px; font-family: 'JetBrains Mono', monospace; }
+.section .row .ctrl { display: flex; align-items: center; gap: 10px; }
+
+.section .range-wrap { display: flex; align-items: center; gap: 10px; }
+.section .range-wrap input[type=range] { accent-color: var(--accent); width: 140px; }
+.section .range-wrap .val { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-2); min-width: 40px; text-align: right; font-weight: 500; }
+
+/* Custom toggle switch */
+.section .toggle {
+  position: relative;
+  width: 36px;
+  height: 20px;
+  background: var(--border-strong);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: .15s;
+  flex-shrink: 0;
+}
+.section .toggle::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  background: #fff;
+  border-radius: 50%;
+  transition: .15s;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+.section .toggle.on { background: var(--accent); }
+.section .toggle.on::after { left: 18px; }
+
+/* swatches grid (settings 색상 팔레트, 홈 footer .sw 와 별개) */
+.section .swatches {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 12px 8px;
+  margin-bottom: 22px;
+}
+.section .swatch {
+  aspect-ratio: 1;
+  border-radius: 5px;
+  cursor: pointer;
+  position: relative;
+  border: 2px solid transparent;
+  transition: .15s;
+}
+.section .swatch:hover { border-color: var(--border-strong); }
+.section .swatch.active { border-color: var(--text); }
+.section .swatch .hex {
+  position: absolute;
+  bottom: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  color: var(--text-3);
+  white-space: nowrap;
+  opacity: 0;
+  transition: .15s;
+  pointer-events: none;
+}
+.section .swatch:hover .hex { opacity: 1; }
+.section .swatch-del,
+.section .swatch-edit {
+  position: absolute;
+  cursor: pointer;
+  font-size: 9px;
+  background: rgba(0,0,0,0.5);
+  color: #fff;
+  border-radius: 2px;
+  padding: 1px 3px;
+  opacity: 0;
+  transition: .15s;
+}
+.section .swatch:hover .swatch-del,
+.section .swatch:hover .swatch-edit { opacity: 1; }
+.section .swatch-del { top: 2px; right: 2px; }
+.section .swatch-edit { top: 2px; left: 2px; width: auto; height: auto; }
+
+.section .add-color {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+  margin-top: 18px;
+}
+.section .add-color input[type=color] { width: 30px; height: 30px; border: 1px solid var(--border); border-radius: 5px; cursor: pointer; background: transparent; padding: 0; }
+.section .add-color input[type=text] { flex: 1; background: transparent; border: 1px solid var(--border); border-radius: 5px; padding: 6px 10px; color: var(--text); font-family: 'Inter', sans-serif; font-size: 12px; outline: none; }
+.section .add-color input[type=text]:focus { border-color: var(--accent); }
+
+.section .vault-overrides { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--border); }
+.section .vault-overrides h3 { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-3); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 10px; font-weight: 500; }
+
+.section .vault-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+  font-size: 12px;
+}
+.section .vault-row .vn { color: var(--text-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.section .vault-row .sub { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-3); }
+.section .vault-row .reset {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text-3);
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+.section .vault-row .reset:hover { color: var(--accent); background: var(--surface-2); }
+
+/* Standard button — Settings + 다른 영역 공통 */
+.btn {
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: var(--surface-2);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  cursor: pointer;
+  transition: .15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn:hover { border-color: var(--border-strong); }
+.btn.primary { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+.btn.danger { color: var(--danger); border-color: var(--danger); background: var(--danger-bg); }
+
+.io-row { display: flex; gap: 10px; flex-wrap: wrap; }
+
+/* Danger zone */
+.section.danger-zone { border-color: var(--danger); background: var(--danger-bg); }
+.section.danger-zone h2 { color: var(--danger); }
+
+.chart-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.chart-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.chart-meta {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text-3);
+  letter-spacing: 0.04em;
+}
+
+.chart {
+  width: 100%;
+  min-height: 360px;
+}
+
+/* ───────────── Side panel (§ 3.5) ───────────── */
+.side {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  padding: 18px 20px;
+}
+
+.side .empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 40px 20px;
+  color: var(--text-3);
+}
+
+.side .empty svg {
+  width: 32px;
+  height: 32px;
+  opacity: 0.5;
+}
+
+.side .empty .hint {
+  font-size: 11.5px;
+  text-align: center;
+  line-height: 1.6;
+}
+
+.side .panel .kind {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  color: var(--text-3);
+  background: var(--surface-2);
+  padding: 2px 6px;
+  border-radius: 3px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.side .panel .ttl {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 6px;
+  word-break: break-all;
+}
+
+.side .panel .meta {
+  font-size: 11px;
+  color: var(--text-2);
+  margin-bottom: 14px;
+}
+
+.side .panel .stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.side .panel .stats > div {
+  background: var(--surface-2);
+  border-radius: 4px;
+  padding: 8px 10px;
+}
+
+.side .panel .stats .v {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.side .panel .stats .l {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  color: var(--text-3);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.side .panel h4 {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-2);
+  margin: 12px 0 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.side .panel ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.side .panel ul li {
+  font-size: 11.5px;
+  color: var(--text);
+  padding: 4px 0;
+  border-top: 1px dashed var(--border);
+}
+
+/* ───────────── Footer (§ 3.6) ───────────── */
+.footer {
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  color: var(--text-3);
+  letter-spacing: 0.04em;
+}
+
+.swatches {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.swatches .sw {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.swatches .sw .d {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}

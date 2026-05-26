@@ -34,3 +34,6 @@ nul
 **/.claudian/claudian-settings.json
 **/.claude/claudian-settings.json
 .serena/
+
+# npm 의존성 (사용자가 npm install 또는 Setup New Device 로 받음)
+**/node_modules/

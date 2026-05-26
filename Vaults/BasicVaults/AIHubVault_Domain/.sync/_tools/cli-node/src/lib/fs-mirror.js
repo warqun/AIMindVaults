@@ -20,6 +20,7 @@ import { join, relative, basename } from 'node:path';
  * @param {string[]} [options.excludeFiles=[]] - File names to skip.
  * @param {boolean} [options.dryRun=false] - Log actions without executing.
  * @param {boolean} [options.noPrune=false] - Skip deleting target-only files.
+ * @param {boolean} [options.protectExisting=false] - Skip files that exist in target (only copy new files). Used by deploy --english-mode to protect translated files.
  * @param {(msg: string) => void} [options.log] - Logger function.
  * @returns {Promise<{ copied: number, deleted: number, unchanged: number }>}
  */
@@ -29,6 +30,7 @@ export async function mirrorDirectory(source, target, options = {}) {
     excludeFiles = [],
     dryRun = false,
     noPrune = false,
+    protectExisting = false,
     log = () => {},
   } = options;
 
@@ -42,12 +44,12 @@ export async function mirrorDirectory(source, target, options = {}) {
     await mkdir(target, { recursive: true });
   }
 
-  await syncDir(source, target, excludeDirs, excludeFiles, dryRun, noPrune, log, stats);
+  await syncDir(source, target, excludeDirs, excludeFiles, dryRun, noPrune, protectExisting, log, stats);
 
   return stats;
 }
 
-async function syncDir(source, target, excludeDirs, excludeFiles, dryRun, noPrune, log, stats) {
+async function syncDir(source, target, excludeDirs, excludeFiles, dryRun, noPrune, protectExisting, log, stats) {
   // Ensure target dir exists
   if (!existsSync(target) && !dryRun) {
     await mkdir(target, { recursive: true });
@@ -59,8 +61,9 @@ async function syncDir(source, target, excludeDirs, excludeFiles, dryRun, noPrun
 
   const sourceNames = new Set(sourceEntries.map(e => e.name));
 
-  // Delete target entries not in source (unless noPrune)
-  if (!noPrune) for (const entry of targetEntries) {
+  // Delete target entries not in source (unless noPrune or protectExisting)
+  // protectExisting disables pruning to preserve translated files unique to target.
+  if (!noPrune && !protectExisting) for (const entry of targetEntries) {
     if (excludeDirs.includes(entry.name) || excludeFiles.includes(entry.name)) continue;
 
     if (!sourceNames.has(entry.name)) {
@@ -86,9 +89,9 @@ async function syncDir(source, target, excludeDirs, excludeFiles, dryRun, noPrun
     const targetPath = join(target, entry.name);
 
     if (entry.isDirectory) {
-      await syncDir(sourcePath, targetPath, excludeDirs, excludeFiles, dryRun, noPrune, log, stats);
+      await syncDir(sourcePath, targetPath, excludeDirs, excludeFiles, dryRun, noPrune, protectExisting, log, stats);
     } else {
-      const needsCopy = await shouldCopyFile(sourcePath, targetPath);
+      const needsCopy = await shouldCopyFile(sourcePath, targetPath, protectExisting);
       if (needsCopy) {
         log(`[COPY] ${entry.name}`);
         if (!dryRun) {
@@ -104,9 +107,13 @@ async function syncDir(source, target, excludeDirs, excludeFiles, dryRun, noPrun
 
 /**
  * Check if source file differs from target (by size + mtime).
+ *
+ * @param {boolean} protectExisting - If true and target exists, returns false (skip copy).
+ *   Used by deploy --english-mode to preserve translated target files.
  */
-async function shouldCopyFile(sourcePath, targetPath) {
+async function shouldCopyFile(sourcePath, targetPath, protectExisting = false) {
   if (!existsSync(targetPath)) return true;
+  if (protectExisting) return false;
 
   try {
     const [srcStat, tgtStat] = await Promise.all([stat(sourcePath), stat(targetPath)]);

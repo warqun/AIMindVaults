@@ -4,7 +4,7 @@ tags:
   - AIHubVault_Minimal
   - PresetHub
   - Multi-Hub
-updated: 2026-04-24
+updated: 2026-05-14
 ---
 
 # CoreHub Workspace Version
@@ -15,6 +15,7 @@ updated: 2026-04-24
 
 | 버전 | 변경 내용 |
 | ---- | -------- |
+| 202605140001 | R119 propagation: post-edit-review fm 검증 + note-types.yaml |
 | 202604240003 | CoreHub sync 런처 .sync 이동 수신 |
 | 202604240002 | CoreHub sync-all npm 경고 수정 수신 |
 | 202604240001 | CoreHub 수동 sync 런처 전파 수신 |

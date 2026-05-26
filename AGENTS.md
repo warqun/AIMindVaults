@@ -34,13 +34,20 @@ Claude 는 자동 주입 메커니즘이 있고, Codex 는 없으므로 세션 �
 
 ## 세션 시작 순서
 
+0. **`agents-sync --verify` 호출 (Mandatory, R122)** — `.agents/` 정본과 `.codex/` 미러 동기 상태 확인:
+   ```bash
+   node "Vaults/BasicVaults/CoreHub/.sync/_tools/cli-node/bin/cli.js" agents-sync --verify
+   ```
+   - exit 0 = 동기 OK (그대로 진행)
+   - exit 1 = drift 감지 → `node ... agents-sync` 실행 (--apply 기본) 후 사용자에게 보고
+   - Codex 는 hook 비활성이라 룰 따라 매 세션 진입 시 명시 호출 필수
 1. 이 파일 (`AGENTS.md`)
-2. `.claude/rules/core/*.md` — 상시 필수 (모든 파일 Read)
+2. `.claude/rules/core/*.md` — 상시 필수 (모든 파일 Read, `.agents/rules/core/` 정본 미러)
 3. `.claude/rules/custom/*.md` — 상시 필수 (모든 파일 Read)
 4. `_STATUS.md` (루트) — 전체 볼트 현황 + 다른 볼트 작업 확인
 5. `_AGENT_COMMS/to_codex/` — Claude 가 남긴 메시지 스캔 (`status: open` 확인)
-6. `.codex/rules/` — Codex 고유 규칙 (skill-router · edit-scope · status-sync · encoding-safety · vault-routing)
-7. 작업 유형 트리거 매칭 시 `.claude/rules-archive/` 해당 파일 Read (매핑은 `.codex/rules/skill-router.md`)
+6. `.codex/rules/` — Codex 고유 규칙 (skill-router · edit-scope · status-sync · encoding-safety · vault-routing · create-vault-safety · agent-comms)
+7. 작업 유형 트리거 매칭 시 도메인 룰/스킬 Read — 매핑은 `.codex/rules/skill-router.md` + `.agents/_MANIFEST.md` 참조 (R122 이후 도메인 분류: Unity·Blender·Meshy·Discord·Notion·Distribution·CreateVault 등). 대상 = `.codex/rules/custom/{도메인}/` + `.codex/skills/custom/{도메인}/` (미러, R122 이후)
 8. (볼트 진입 시) 대상 볼트 `_STATUS.md`
 
 편집 전에 위 순서를 완료한다.
@@ -59,20 +66,11 @@ Claude 는 자동 주입 메커니즘이 있고, Codex 는 없으므로 세션 �
 1. 명시적 볼트 지정 우선
 2. 키워드 추론:
    - "AI 워크플로우", "에이전트", "_Standards" → AIHubVault
-   - "Unity", "유니티 엔진" → Unity
-   - "CapCut", "영상편집" → CapCut
-   - "Notion", "노션 운영" → Notion
-   - "Obsidian 플러그인", "플러그인 개발" → ObsidianDev
-   - "전투 시스템", "CombatToolKit", "스킬 시스템", "이펙트 패키지", "뱀서" → CombatToolKit
-   - "타일맵", "TileMap", "맵 생성", "청크", "절차적 생성" → TileMapToolKit
-   - "JissouGame", "지쏘우", "jissou" → JissouGame
-   - "게임 기획", "게임 디자인" → GameDesign
-   - "Git", "버전관리" → Git
-   - "Blender", "3D" → Blender
-   - "AI 에셋", "생성형 AI" → AI_Gen4Game
-   - "공장 자동화", "자동화 기계 조립", "기계 조립", "공작현장", "렌치볼트", "육각렌치볼트", "체결부품", "공구", "토크", "공차" → MachineAssembly
-   - "빛과 색", "색채학", "명암", "색온도", "필름룩", "RAW", "LOG" → LightAndColor
-   - "아트 인사이트", "미적 감각", "안목", "취향", "유행과 트렌드", "올드와 클래식", "상황과 감정" → ArtInsight
+   - "콘텐츠", "노트 작성" → BasicContentsVault
+   - `<도메인 키워드>` → `<대응 볼트 ID>`
+
+   > 사용자가 자기 환경 (Unity·게임 기획·요리·운동 등) 에 맞춰 키워드 매핑을 추가한다.
+   > 실제 등록 볼트 목록은 `_STATUS.md` 의 볼트 레지스트리 섹션 참조 (사용자 환경별 다름).
 3. 파일 경로 포함 시 → 경로에서 볼트 추출
 4. 루트 파일만 대상이면 → 루트에서 작업
 5. 모호하면 → 사용자에게 확인
@@ -96,11 +94,13 @@ Claude 는 자동 주입 메커니즘이 있고, Codex 는 없으므로 세션 �
 
 ## Serena MCP — 시맨틱 코드 분석 도구
 
-Serena MCP 서버가 연결되어 있다. 파일을 통째로 읽지 말고 Serena의 심볼 도구를 우선 사용한다.
+Serena MCP는 전역 Codex 시작 설정에 등록하지 않는다. 비-Unity 작업에서 자동 기동하면 세션마다 `serena`/`uvx` 프로세스가 중복 실행되므로, **Unity C# 스크립팅 작업으로 라우팅된 경우에만** 도구 검색으로 Serena를 호출한다.
 
-### 프로젝트 활성화 (세션 시작 시 1회)
+Unity 작업이 아닐 때는 Serena MCP를 호출하지 않는다. 일반 노트·루트·볼트 운영 작업은 인덱서, 파일 조회, 일반 검색 도구로 처리한다.
 
-대상 Unity 프로젝트에 접근하기 전에 활성화한다.
+### 프로젝트 활성화 (Unity 작업 시 1회)
+
+대상 Unity 프로젝트가 확정된 뒤, Serena 첫 사용 전에 활성화한다.
 
 | 프로젝트 | 경로 |
 |----------|------|
@@ -120,6 +120,8 @@ Serena MCP 서버가 연결되어 있다. 파일을 통째로 읽지 말고 Sere
 
 ### 사용 원칙
 
+- Unity/C# 작업 트리거가 감지된 경우에만 `.codex/rules/skill-router.md`의 Unity 행을 적용한다.
+- Serena 도구가 아직 노출되지 않았으면 `tool_search`로 `serena`를 검색해 lazy-load한다.
 - 파일 전체 읽기 전에 `get_symbols_overview`로 구조 파악
 - `find_symbol`로 필요한 심볼만 골라 읽기
 - 광범위 검색은 `search_for_pattern`으로 대체
