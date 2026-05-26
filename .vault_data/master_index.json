@@ -1,25 +1,36 @@
 {
-  "built": "2026-05-26T13:39:48",
+  "built": "2026-05-26T19:11:44",
   "vault_count": 6,
-  "note_count": 23,
+  "note_count": 25,
   "vaults": {
     "AIHubVault": {
       "path": "Vaults/BasicVaults/AIHubVault",
-      "note_count": 5,
-      "domain_tags": [],
-      "built": "2026-05-26T13:39:47"
+      "note_count": 7,
+      "domain_tags": [
+        "AIMindVault",
+        "AI",
+        "Agent",
+        "MultiAgent",
+        "Workflow",
+        "OpenClaw",
+        "Video",
+        "Claude",
+        "RTK",
+        "TokenOptimization"
+      ],
+      "built": "2026-05-13T10:56:29"
     },
     "BasicContentsVault": {
       "path": "Vaults/BasicVaults/BasicContentsVault",
       "note_count": 6,
       "domain_tags": [],
-      "built": "2026-05-26T13:39:47"
+      "built": "2026-05-13T10:56:29"
     },
     "BasicDiaryVault": {
       "path": "Vaults/BasicVaults/BasicDiaryVault",
       "note_count": 2,
       "domain_tags": [],
-      "built": "2026-05-26T13:39:47"
+      "built": "2026-05-13T10:56:29"
     },
     "BasicDomainVault": {
       "path": "Vaults/BasicVaults/BasicDomainVault",
@@ -29,7 +40,7 @@
         "Index",
         "Log"
       ],
-      "built": "2026-05-26T13:39:47"
+      "built": "2026-05-13T10:56:29"
     },
     "BasicLabVault": {
       "path": "Vaults/BasicVaults/BasicLabVault",
@@ -39,13 +50,13 @@
         "Index",
         "Log"
       ],
-      "built": "2026-05-26T13:39:47"
+      "built": "2026-05-13T10:56:29"
     },
     "BasicProjectVault": {
       "path": "Vaults/BasicVaults/BasicProjectVault",
       "note_count": 2,
       "domain_tags": [],
-      "built": "2026-05-26T13:39:47"
+      "built": "2026-05-13T10:56:29"
     }
   },
   "notes": [
@@ -69,6 +80,35 @@
       "path": "Contents/CONTENTS_INDEX.md",
       "type": "standard",
       "tags": []
+    },
+    {
+      "vault_id": "AIHubVault",
+      "title": "AI 에이전트 협업환경 구축법과 오픈클로 영상 정리",
+      "path": "Contents/HowAgentWorks/20260417_AI_에이전트_협업환경_구축법_오픈클로_영상_정리.md",
+      "type": "guide",
+      "tags": [
+        "AIMindVault",
+        "AI",
+        "Agent",
+        "MultiAgent",
+        "Workflow",
+        "OpenClaw",
+        "Video"
+      ]
+    },
+    {
+      "vault_id": "AIHubVault",
+      "title": "Claude Code RTK 토큰 절약 구조와 한계",
+      "path": "Contents/HowAgentWorks/20260419_Claude_Code_RTK_AI_토큰_절약_구조와_한계_영상_정리.md",
+      "type": "guide",
+      "tags": [
+        "AIMindVault",
+        "AI",
+        "Claude",
+        "RTK",
+        "TokenOptimization",
+        "Video"
+      ]
     },
     {
       "vault_id": "AIHubVault",
@@ -224,6 +264,39 @@
     }
   ],
   "tag_index": {
+    "AIMindVault": [
+      "AIHubVault:Contents/HowAgentWorks/20260417_AI_에이전트_협업환경_구축법_오픈클로_영상_정리.md",
+      "AIHubVault:Contents/HowAgentWorks/20260419_Claude_Code_RTK_AI_토큰_절약_구조와_한계_영상_정리.md"
+    ],
+    "AI": [
+      "AIHubVault:Contents/HowAgentWorks/20260417_AI_에이전트_협업환경_구축법_오픈클로_영상_정리.md",
+      "AIHubVault:Contents/HowAgentWorks/20260419_Claude_Code_RTK_AI_토큰_절약_구조와_한계_영상_정리.md"
+    ],
+    "Agent": [
+      "AIHubVault:Contents/HowAgentWorks/20260417_AI_에이전트_협업환경_구축법_오픈클로_영상_정리.md"
+    ],
+    "MultiAgent": [
+      "AIHubVault:Contents/HowAgentWorks/20260417_AI_에이전트_협업환경_구축법_오픈클로_영상_정리.md"
+    ],
+    "Workflow": [
+      "AIHubVault:Contents/HowAgentWorks/20260417_AI_에이전트_협업환경_구축법_오픈클로_영상_정리.md"
+    ],
+    "OpenClaw": [
+      "AIHubVault:Contents/HowAgentWorks/20260417_AI_에이전트_협업환경_구축법_오픈클로_영상_정리.md"
+    ],
+    "Video": [
+      "AIHubVault:Contents/HowAgentWorks/20260417_AI_에이전트_협업환경_구축법_오픈클로_영상_정리.md",
+      "AIHubVault:Contents/HowAgentWorks/20260419_Claude_Code_RTK_AI_토큰_절약_구조와_한계_영상_정리.md"
+    ],
+    "Claude": [
+      "AIHubVault:Contents/HowAgentWorks/20260419_Claude_Code_RTK_AI_토큰_절약_구조와_한계_영상_정리.md"
+    ],
+    "RTK": [
+      "AIHubVault:Contents/HowAgentWorks/20260419_Claude_Code_RTK_AI_토큰_절약_구조와_한계_영상_정리.md"
+    ],
+    "TokenOptimization": [
+      "AIHubVault:Contents/HowAgentWorks/20260419_Claude_Code_RTK_AI_토큰_절약_구조와_한계_영상_정리.md"
+    ],
     "ZK": [
       "BasicDomainVault:Contents/_index.md",
       "BasicDomainVault:Contents/_log.md"
@@ -268,6 +341,7 @@
     "notion": "Notion",
     "python": "Python",
     "git": "Git",
+    "jissougame": "JissouGame",
     "mcp": "MCP",
     "api": "API",
     "llm": "LLM",

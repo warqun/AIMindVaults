@@ -162,8 +162,12 @@ function buildHeatmapOption(state) {
     if (entry.date < start || entry.date > end) continue;
     data.push([entry.date, entry.count]);
   }
-  const { max } = totalsInRange(state.byDate, state.range);
-  const visualMax = Math.max(1, max);
+  // R135 Gap 6 — visualMax 를 P95 로 (outlier 셀 하나가 다른 셀 농도를 압도하는 문제 회피)
+  const positiveCounts = data.map((d) => d[1]).filter((c) => c > 0).sort((a, b) => a - b);
+  const p95 = positiveCounts.length
+    ? positiveCounts[Math.min(positiveCounts.length - 1, Math.floor(positiveCounts.length * 0.95))]
+    : 1;
+  const visualMax = Math.max(1, p95);
   const accentHex = (cssVar('--accent') || '#0f766e').replace(/^\s+|\s+$/g, '');
   const surface2 = cssVar('--surface-2') || '#f4f4f3';
   const text3 = cssVar('--text-3') || '#a8a29e';

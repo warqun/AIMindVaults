@@ -12,8 +12,10 @@
  *   - connection_count: Phase O-5 신규, connections (owner→users) 엣지 수
  *
  * Rules:
- *   - dedup: last snapshot.timestamp === new timestamp → overwrite last (정확히 같은 빌드 시점만)
- *     (이전 정책 = 일별 dedup → 사용자 빌드 다회 시 변화 안 보여서 빌드별 push 로 변경)
+ *   - dedup: last snapshot.date === new snapshot.date → overwrite last (R135 — 일별 dedup 으로 복귀)
+ *     (한 세션 다회 build 시 같은 날 안 42 snapshot 누적되어 sparkline 평선 되는 Gap 4 해결.
+ *     기존 정책 = 빌드별 push 가 일 단위 sampling 의도와 충돌. master_index.built 가 동일
+ *     ISO timestamp 라도 같은 날 (YYYY-MM-DD) 만이면 마지막 snapshot 으로 덮어씀.)
  *   - cap (FIFO): snapshots.length > max_snapshots → shift()
  *   - missing/corrupt file → seed empty structure with max_snapshots=200
  *   - schemaVersion mismatch → fallback to fresh structure
@@ -38,6 +40,14 @@ export async function updateTimeseries(outDir, master) {
 
   let data = await readExistingOrSeed(filePath);
 
+  // R135 Gap 4 — 기존 누적 정리: 같은 날 snapshot 중복은 마지막만 유지 (timestamp ASC 정렬 보존).
+  // 새 일별 dedup 룰 적용 전 기존 데이터에도 일관 적용.
+  if (data.snapshots.length > 0) {
+    const seen = new Map();
+    for (const s of data.snapshots) seen.set(s.date, s);
+    data.snapshots = Array.from(seen.values()).sort((a, b) => String(a.timestamp).localeCompare(String(b.timestamp)));
+  }
+
   const timestamp = master.built;
   const date = String(timestamp).slice(0, 10);
   const snapshot = {
@@ -53,11 +63,11 @@ export async function updateTimeseries(outDir, master) {
   };
 
   const last = data.snapshots[data.snapshots.length - 1];
-  if (last && last.timestamp === snapshot.timestamp) {
-    // 정확히 같은 빌드 시점 (millisecond 단위) — 덮어쓰기
+  if (last && last.date === snapshot.date) {
+    // 같은 날 — 마지막 snapshot 으로 덮어씀 (R135 Gap 4: 일별 dedup)
     data.snapshots[data.snapshots.length - 1] = snapshot;
   } else {
-    // 다른 빌드 — push (일별이어도 매 빌드 누적)
+    // 다른 날 — push (일 단위 sampling 누적)
     data.snapshots.push(snapshot);
   }
 

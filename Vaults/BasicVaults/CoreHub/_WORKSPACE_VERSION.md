@@ -14,6 +14,7 @@ updated: 2026-05-26
 
 | 버전 | 변경 내용 |
 | ---- | -------- |
+| 202605260002 | R135 Phase 1 — timeseries 일별 dedup (Gap 4) |
 | 202605260001 | R133 — sync-all 자동 인덱스 빌드 통합 (B) + --skip-index 옵션 |
 | 202605180001 | R122: agents-sync CLI 신규 + .agents/ 카테고리화 (Unity/Blender/Meshy/Discord/Notion/Distribution/CreateVault) |
 | 202605140001 | R119: post-edit-review frontmatter 검증 + note-types.yaml 신규 (Phase 1) |
