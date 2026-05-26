@@ -45,14 +45,15 @@ export function filterUserVaults(vaultIds) {
 
 /**
  * 노트 배열에서 시스템 Hub 노트 제외.
- * 노트는 `vault` 또는 `vaultId` 필드를 가진다고 가정.
+ * 노트는 `vault` · `vaultId` · `vault_id` 필드 중 하나를 가진다고 가정.
+ * 예: server.js `/api/all-notes` 응답은 `vault_id` 사용 (R134 fix).
  * @param {object[]} notes
  * @returns {object[]}
  */
 export function filterUserNotes(notes) {
   if (!Array.isArray(notes)) return [];
   return notes.filter((n) => {
-    const vid = n?.vault || n?.vaultId;
+    const vid = n?.vault || n?.vaultId || n?.vault_id;
     return vid && !SYSTEM_HUB_IDS.has(vid);
   });
 }
