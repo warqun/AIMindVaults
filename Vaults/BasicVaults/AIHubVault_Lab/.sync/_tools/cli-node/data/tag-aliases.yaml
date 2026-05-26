@@ -33,6 +33,8 @@ aliases:
   notion: Notion
   python: Python
   git: Git
+  jissougame: JissouGame
+
   # 약어 (전체 대문자 통합)
   mcp: MCP
   api: API

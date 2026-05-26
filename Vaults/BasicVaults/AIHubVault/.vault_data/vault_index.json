@@ -1,6 +1,6 @@
 {
   "vault": "AIHubVault",
-  "built": "2026-05-26T13:39:47",
+  "built": "2026-05-13T10:56:29",
   "notes": [
     {
       "path": "Contents/CONTENTS_AI_RULES.md",
@@ -38,7 +38,9 @@
       ],
       "links_from": [
         "CONTENTS_AI_RULES",
-        "CONTENTS_INDEX"
+        "CONTENTS_INDEX",
+        "20260417_AI_에이전트_협업환경_구축법_오픈클로_영상_정리",
+        "20260419_Claude_Code_RTK_AI_토큰_절약_구조와_한계_영상_정리"
       ],
       "mtime": "2026-05-11T20:45:17",
       "created": "2026-04-18T06:00:21",
@@ -59,11 +61,93 @@
         "CONTENTS_GLOSSARY"
       ],
       "links_from": [
-        "CONTENTS_GLOSSARY"
+        "CONTENTS_GLOSSARY",
+        "20260417_AI_에이전트_협업환경_구축법_오픈클로_영상_정리",
+        "20260419_Claude_Code_RTK_AI_토큰_절약_구조와_한계_영상_정리"
       ],
-      "mtime": "2026-05-26T13:39:28",
-      "created": "2026-05-26T13:39:28",
-      "hash": "74b81465"
+      "mtime": "2026-05-11T20:45:17",
+      "created": "2026-03-20T22:29:25",
+      "hash": "2cd16835"
+    },
+    {
+      "path": "Contents/HowAgentWorks/20260417_AI_에이전트_협업환경_구축법_오픈클로_영상_정리.md",
+      "title": "AI 에이전트 협업환경 구축법과 오픈클로 영상 정리",
+      "type": "guide",
+      "tags": [
+        "AIMindVault",
+        "AI",
+        "Agent",
+        "MultiAgent",
+        "Workflow",
+        "OpenClaw",
+        "Video"
+      ],
+      "headings": [
+        "핵심 요약",
+        "소스 개요",
+        "영상에서 설명한 구조",
+        "영상 기준 운영 루프",
+        "AI 에이전트 협업환경 구축법",
+        "1. 중앙 오케스트레이터를 먼저 둔다",
+        "2. 역할을 좁게 나눈다",
+        "3. 승인과 반려를 명시적 상태로 둔다",
+        "4. QA를 증거 기반으로 자동화한다",
+        "5. Harness 방식 검증을 넣는다",
+        "6. 문서를 산출물로 포함한다",
+        "7. 작업이 커지면 파이프라인 자체를 여러 개로 나눈다",
+        "개인 개발자 기준 최소 구성",
+        "확인된 내용과 의견 구분",
+        "내 적용 메모"
+      ],
+      "summary": "## 핵심 요약",
+      "links_to": [
+        "CONTENTS_GLOSSARY",
+        "CONTENTS_INDEX"
+      ],
+      "links_from": [
+        "20260419_Claude_Code_RTK_AI_토큰_절약_구조와_한계_영상_정리"
+      ],
+      "mtime": "2026-05-11T20:45:17",
+      "created": "2026-04-17T06:31:55",
+      "hash": "af7b8adb"
+    },
+    {
+      "path": "Contents/HowAgentWorks/20260419_Claude_Code_RTK_AI_토큰_절약_구조와_한계_영상_정리.md",
+      "title": "Claude Code RTK 토큰 절약 구조와 한계",
+      "type": "guide",
+      "tags": [
+        "AIMindVault",
+        "AI",
+        "Claude",
+        "RTK",
+        "TokenOptimization",
+        "Video"
+      ],
+      "headings": [
+        "핵심 요약",
+        "소스 개요",
+        "RTK가 줄이려는 문제",
+        "영상에서 보여준 압축 사례",
+        "1. 파일 탐색 계열 명령",
+        "2. 변경 확인 계열 명령",
+        "3. 테스트 러너 계열 명령",
+        "RTK 작동 구조",
+        "효과가 큰 조건",
+        "영상의 검증 방식과 사용 팁",
+        "한계와 Trade-Off",
+        "이 영상에서 가져갈 실전 판단",
+        "내 적용 메모"
+      ],
+      "summary": "## 핵심 요약",
+      "links_to": [
+        "CONTENTS_GLOSSARY",
+        "CONTENTS_INDEX",
+        "20260417_AI_에이전트_협업환경_구축법_오픈클로_영상_정리"
+      ],
+      "links_from": [],
+      "mtime": "2026-05-11T20:45:17",
+      "created": "2026-04-20T22:51:52",
+      "hash": "4eaed38f"
     },
     {
       "path": "Contents/_archive/20260512_tags_taxonomy/TAGS.md",
@@ -106,7 +190,41 @@
       "hash": "08025cb4"
     }
   ],
-  "tag_index": {},
+  "tag_index": {
+    "AIMindVault": [
+      "Contents/HowAgentWorks/20260417_AI_에이전트_협업환경_구축법_오픈클로_영상_정리.md",
+      "Contents/HowAgentWorks/20260419_Claude_Code_RTK_AI_토큰_절약_구조와_한계_영상_정리.md"
+    ],
+    "AI": [
+      "Contents/HowAgentWorks/20260417_AI_에이전트_협업환경_구축법_오픈클로_영상_정리.md",
+      "Contents/HowAgentWorks/20260419_Claude_Code_RTK_AI_토큰_절약_구조와_한계_영상_정리.md"
+    ],
+    "Agent": [
+      "Contents/HowAgentWorks/20260417_AI_에이전트_협업환경_구축법_오픈클로_영상_정리.md"
+    ],
+    "MultiAgent": [
+      "Contents/HowAgentWorks/20260417_AI_에이전트_협업환경_구축법_오픈클로_영상_정리.md"
+    ],
+    "Workflow": [
+      "Contents/HowAgentWorks/20260417_AI_에이전트_협업환경_구축법_오픈클로_영상_정리.md"
+    ],
+    "OpenClaw": [
+      "Contents/HowAgentWorks/20260417_AI_에이전트_협업환경_구축법_오픈클로_영상_정리.md"
+    ],
+    "Video": [
+      "Contents/HowAgentWorks/20260417_AI_에이전트_협업환경_구축법_오픈클로_영상_정리.md",
+      "Contents/HowAgentWorks/20260419_Claude_Code_RTK_AI_토큰_절약_구조와_한계_영상_정리.md"
+    ],
+    "Claude": [
+      "Contents/HowAgentWorks/20260419_Claude_Code_RTK_AI_토큰_절약_구조와_한계_영상_정리.md"
+    ],
+    "RTK": [
+      "Contents/HowAgentWorks/20260419_Claude_Code_RTK_AI_토큰_절약_구조와_한계_영상_정리.md"
+    ],
+    "TokenOptimization": [
+      "Contents/HowAgentWorks/20260419_Claude_Code_RTK_AI_토큰_절약_구조와_한계_영상_정리.md"
+    ]
+  },
   "link_graph": {
     "CONTENTS_AI_RULES": [
       "CONTENTS_GLOSSARY"
@@ -118,6 +236,15 @@
     "CONTENTS_INDEX": [
       "CONTENTS_AI_RULES",
       "CONTENTS_GLOSSARY"
+    ],
+    "20260417_AI_에이전트_협업환경_구축법_오픈클로_영상_정리": [
+      "CONTENTS_GLOSSARY",
+      "CONTENTS_INDEX"
+    ],
+    "20260419_Claude_Code_RTK_AI_토큰_절약_구조와_한계_영상_정리": [
+      "CONTENTS_GLOSSARY",
+      "CONTENTS_INDEX",
+      "20260417_AI_에이전트_협업환경_구축법_오픈클로_영상_정리"
     ],
     "TAGS": [],
     "TAG_MASK": []

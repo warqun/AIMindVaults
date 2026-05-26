@@ -102,6 +102,46 @@ async function runPreSync(vaultName, vaultRoot, cliPath, logFile, opts) {
   return { ok: result.status === 0, seconds: elapsed, exitCode: result.status };
 }
 
+async function runIndexBuild(vaultName, vaultRoot, cliPath, logFile, opts) {
+  if (opts.skipIndex) {
+    await appendLog(logFile, `[${timestamp()}] [${vaultName}] index build... SKIP (--skip-index)\n`);
+    return { ok: true, seconds: 0, skipped: true };
+  }
+  if (opts.dryRun) {
+    await appendLog(logFile, `[${timestamp()}] [${vaultName}] index build... DRY_RUN\n`);
+    return { ok: true, seconds: 0, skipped: true };
+  }
+
+  const start = Date.now();
+  await appendLog(logFile, `[${timestamp()}] [${vaultName}] index build... START\n`);
+  const result = runCommand(process.execPath, [cliPath, 'index', 'build', '-r', vaultRoot, '-i'], vaultRoot);
+  const elapsed = secondsSince(start);
+  if (result.stdout) await appendLog(logFile, result.stdout);
+  if (result.stderr) await appendLog(logFile, result.stderr);
+  await appendLog(logFile, `[${timestamp()}] [${vaultName}] index build... ${result.status === 0 ? 'OK' : 'FAIL'} (${elapsed}s)\n`);
+  return { ok: result.status === 0, seconds: elapsed, exitCode: result.status, skipped: false };
+}
+
+async function runMasterBuild(aimRoot, cliPath, logFile, opts) {
+  if (opts.skipIndex) {
+    await appendLog(logFile, `[${timestamp()}] [master] index master-build... SKIP (--skip-index)\n`);
+    return { ok: true, seconds: 0, skipped: true };
+  }
+  if (opts.dryRun) {
+    await appendLog(logFile, `[${timestamp()}] [master] index master-build... DRY_RUN\n`);
+    return { ok: true, seconds: 0, skipped: true };
+  }
+
+  const start = Date.now();
+  await appendLog(logFile, `[${timestamp()}] [master] index master-build... START\n`);
+  const result = runCommand(process.execPath, [cliPath, 'index', 'master-build', '-r', aimRoot], aimRoot);
+  const elapsed = secondsSince(start);
+  if (result.stdout) await appendLog(logFile, result.stdout);
+  if (result.stderr) await appendLog(logFile, result.stderr);
+  await appendLog(logFile, `[${timestamp()}] [master] index master-build... ${result.status === 0 ? 'OK' : 'FAIL'} (${elapsed}s)\n`);
+  return { ok: result.status === 0, seconds: elapsed, exitCode: result.status, skipped: false };
+}
+
 export async function syncAll(opts = {}) {
   const aimRoot = resolveAIMRoot(opts.root);
   if (!aimRoot) {
@@ -126,6 +166,8 @@ export async function syncAll(opts = {}) {
   let npmInstalled = 0;
   let launcherCopied = 0;
   let legacyRemoved = 0;
+  let indexBuilt = 0;
+  let indexFailed = 0;
   const vaultTemplateDir = coreHubRoot
     ? join(coreHubRoot, '.sync', '_tools', 'launchers', 'vault')
     : undefined;
@@ -174,8 +216,34 @@ export async function syncAll(opts = {}) {
       legacyRemoved += launchResult.removed || 0;
     }
 
+    // 자동 인덱스 빌드 (R133 — 디바이스 간 git 동기화 후 vault_index 누락 자동 보완)
+    const indexResult = await runIndexBuild(vaultName, vaultRoot, cliPath, logFile, opts);
+    if (indexResult.skipped) {
+      // skip 은 카운트 X
+    } else if (indexResult.ok) {
+      indexBuilt++;
+    } else {
+      indexFailed++;
+      log.warn(`  index build failed (${vaultName}) — 인덱스 누락 가능, 'aimv index build -r ${vaultRoot}' 수동 권장`);
+    }
+
     okCount++;
     log.info(`  OK (${vaultName})`);
+  }
+
+  // 모든 vault sync 후 master 인덱스 합산 (CoreHub 의 cli.js 사용)
+  let masterBuildStatus = 'skipped';
+  if (coreHubRoot) {
+    const masterCliPath = join(coreHubRoot, '.sync', '_tools', 'cli-node', 'bin', 'cli.js');
+    if (existsSync(masterCliPath)) {
+      const masterResult = await runMasterBuild(aimRoot, masterCliPath, logFile, opts);
+      if (masterResult.skipped) masterBuildStatus = 'skipped';
+      else if (masterResult.ok) masterBuildStatus = 'ok';
+      else masterBuildStatus = 'fail';
+      if (masterBuildStatus === 'fail') {
+        log.warn(`master-build failed — 'aimv index master-build -r ${aimRoot}' 수동 권장`);
+      }
+    }
   }
 
   const elapsed = secondsSince(startAll);
@@ -188,9 +256,14 @@ export async function syncAll(opts = {}) {
   log.info(`npm installs : ${npmInstalled}`);
   log.info(`Launchers    : ${launcherCopied} copied`);
   log.info(`Cleanup      : ${legacyRemoved} legacy launchers removed`);
+  log.info(`Index builds : ${indexBuilt} ok, ${indexFailed} fail`);
+  log.info(`Master index : ${masterBuildStatus}`);
   log.info(`Elapsed      : ${elapsed}s`);
   log.envVar('SYNC_ALL_SUCCESS', String(okCount));
   log.envVar('SYNC_ALL_FAILED', String(failCount));
+  log.envVar('SYNC_ALL_INDEX_BUILT', String(indexBuilt));
+  log.envVar('SYNC_ALL_INDEX_FAILED', String(indexFailed));
+  log.envVar('SYNC_ALL_MASTER_BUILD', masterBuildStatus);
 
   if (failCount > 0) {
     process.exitCode = 1;

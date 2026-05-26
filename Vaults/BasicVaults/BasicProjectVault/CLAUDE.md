@@ -37,7 +37,7 @@ updated: 2026-04-22
 | 철학 | PARA (Projects·Areas·Resources·Archive) + ADR (Architecture Decision Record) |
 | 축 | 시간·실행 (Domain 은 개념축, Diary 는 일자축) |
 | 타입 수 | 9 (idea · plan · spec · design · task · decision · issue · report · retro) |
-| 대상 위성 | `Projects_*` 카테고리의 사용자 추가 프로젝트 볼트 (`/create-vault` 로 추가) |
+| 대상 위성 | Projects_Game (JissouGame) · Projects_Infra (Project_AIMindVaults) · 향후 VamSurLike 등 |
 
 ## 폴더 구조
 

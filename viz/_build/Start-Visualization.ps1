@@ -142,6 +142,43 @@ if ($isOurInstance) {
     exit 0
 }
 
+# R133 — viz 시작 시 인덱스 검증 + 자동 빌드 (sync-all 안 쓴 사용자 대응 안전망)
+# master_index.json 부재 시 CoreHub cli.js 로 자동 master-build. 빌드 실패해도 server 는 진입 (사용자 인지 가능).
+$masterIndexPath = Join-Path $myRoot '.vault_data\master_index.json'
+$coreCliPath = Join-Path $myRoot 'Vaults\BasicVaults\CoreHub\.sync\_tools\cli-node\bin\cli.js'
+$coreNodeModules = Join-Path $myRoot 'Vaults\BasicVaults\CoreHub\.sync\_tools\cli-node\node_modules'
+
+if (-not (Test-Path $masterIndexPath)) {
+    if ((Test-Path $coreCliPath) -and (Test-Path $coreNodeModules)) {
+        $buildLog = Join-Path $env:TEMP 'aimv_viz_first_build.log'
+        $buildErr = Join-Path $env:TEMP 'aimv_viz_first_build_err.log'
+        $buildProc = Start-Process -FilePath $nodeCmd.Source `
+            -ArgumentList @($coreCliPath, 'index', 'master-build', '-r', $myRoot) `
+            -WorkingDirectory $myRoot `
+            -WindowStyle Hidden `
+            -RedirectStandardOutput $buildLog `
+            -RedirectStandardError $buildErr `
+            -PassThru -Wait
+        if ($buildProc.ExitCode -ne 0 -or -not (Test-Path $masterIndexPath)) {
+            Add-Type -AssemblyName System.Windows.Forms
+            [System.Windows.Forms.MessageBox]::Show(
+                "master_index 자동 빌드 실패. 'Sync All Vaults' 를 먼저 실행하세요.`n`n로그: $buildLog",
+                'AIMindVaults Visualization',
+                [System.Windows.Forms.MessageBoxButtons]::OK,
+                [System.Windows.Forms.MessageBoxIcon]::Warning
+            ) | Out-Null
+        }
+    } else {
+        Add-Type -AssemblyName System.Windows.Forms
+        [System.Windows.Forms.MessageBox]::Show(
+            "master_index.json 이 없습니다.`n`n'Sync All Vaults' 또는 'Setup New Device' 를 먼저 실행하여 인덱스를 빌드하세요.",
+            'AIMindVaults Visualization',
+            [System.Windows.Forms.MessageBoxButtons]::OK,
+            [System.Windows.Forms.MessageBoxIcon]::Information
+        ) | Out-Null
+    }
+}
+
 # 4초 후 브라우저 띄움 — 별도 PowerShell 프로세스 (창 숨김)
 $browserCmd = if ($browser) {
     "Start-Sleep -Seconds 4; Start-Process -FilePath '$browser' -ArgumentList '--app=$url'"

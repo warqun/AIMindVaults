@@ -106,10 +106,11 @@ program
 
 program
   .command('sync-all')
-  .description('Run pre-sync across all vaults under an AIMindVaults root')
+  .description('Run pre-sync + auto index build across all vaults under an AIMindVaults root')
   .option('-r, --root <path>', 'AIMindVaults root path (auto-detect if omitted)')
   .option('-d, --dry-run', 'Preview without running npm install or pre-sync')
   .option('--skip-npm', 'Do not run npm install when node_modules is missing')
+  .option('--skip-index', 'Do not auto-run index build + master-build after sync (R133)')
   .option('--no-install-launchers', 'Do not refresh Sync This Vault launchers')
   .action(async (opts) => {
     const { syncAll } = await import('../src/commands/sync-all.js');
@@ -117,6 +118,7 @@ program
       root: opts.root,
       dryRun: opts.dryRun,
       skipNpm: opts.skipNpm,
+      skipIndex: opts.skipIndex,
       installLaunchers: opts.installLaunchers,
     });
   });

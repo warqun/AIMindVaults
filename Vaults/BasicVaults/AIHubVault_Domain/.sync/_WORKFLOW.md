@@ -1,5 +1,6 @@
-﻿---
+---
 tags:
+  - TileMapToolKit
 type: workflow
 updated: 2026-03-17
 agent: claude
