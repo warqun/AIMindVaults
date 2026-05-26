@@ -72,20 +72,72 @@ function Open-VizBrowser {
     }
 }
 
-# 기존 viz 인스턴스 감지 — port 가 이미 listening 중이면 server 안 띄우고 Chrome 만.
-$alreadyRunning = $false
-try {
-    $client = New-Object System.Net.Sockets.TcpClient
-    $task = $client.ConnectAsync('localhost', $port)
-    if ($task.Wait(500) -and $client.Connected) {
-        $alreadyRunning = $true
+# 다중 AIMindVaults 클론 동시 실행 대응 (R132 — 노트북 교차검증 이슈 1).
+# 8765 부터 순회하며:
+#   1. free port 발견 → 그 port 로 자기 server 새로 시작
+#   2. listening 중 → GET / 의 X-AIMV-Root 헤더로 자기 클론인지 확인
+#      - 자기 ROOT 일치 → 기존 인스턴스 활성화 (Chrome 만 열고 종료)
+#      - 다른 클론 → 다음 port 로 계속 순회
+# server.js 의 ROOT_DIR = viz/ 의 부모 = AIMindVaults 멀티볼트 루트.
+$myRoot = Split-Path -Parent $exeDir
+$startPort = [int]$env:AIMV_VIZ_PORT
+$maxScan = 20
+$resolvedPort = $null
+$isOurInstance = $false
+
+for ($p = $startPort; $p -lt ($startPort + $maxScan); $p++) {
+    # listening 여부 체크 (TCP connect 시도)
+    $listening = $false
+    try {
+        $tcp = New-Object System.Net.Sockets.TcpClient
+        $task = $tcp.ConnectAsync('localhost', $p)
+        if ($task.Wait(300) -and $tcp.Connected) {
+            $listening = $true
+        }
+        $tcp.Close()
+    } catch {
+        $listening = $false
     }
-    $client.Close()
-} catch {
-    $alreadyRunning = $false
+
+    if (-not $listening) {
+        # free — 우리가 시작할 port
+        $resolvedPort = $p
+        $isOurInstance = $false
+        break
+    }
+
+    # listening 중 — X-AIMV-Root 헤더로 정체성 확인
+    try {
+        $resp = Invoke-WebRequest -Uri "http://localhost:$p/" -UseBasicParsing -TimeoutSec 2 -ErrorAction Stop
+        $serverRoot = $resp.Headers['X-AIMV-Root']
+        if ($serverRoot -is [array]) { $serverRoot = $serverRoot[0] }
+        if ($serverRoot -and ($serverRoot.TrimEnd('\') -eq $myRoot.TrimEnd('\'))) {
+            # 우리 클론의 기존 인스턴스
+            $resolvedPort = $p
+            $isOurInstance = $true
+            break
+        }
+    } catch {
+        # 응답 없음 또는 viz 가 아닌 다른 server — skip
+    }
+    # 다른 AIMindVaults 클론의 viz — 다음 port 계속
 }
 
-if ($alreadyRunning) {
+if (-not $resolvedPort) {
+    Add-Type -AssemblyName System.Windows.Forms
+    [System.Windows.Forms.MessageBox]::Show(
+        ("사용 가능한 port 를 찾을 수 없습니다 ({0} ~ {1}).`n다른 viz 인스턴스를 종료하고 다시 시도하세요." -f $startPort, ($startPort + $maxScan - 1)),
+        'AIMindVaults Visualization',
+        [System.Windows.Forms.MessageBoxButtons]::OK,
+        [System.Windows.Forms.MessageBoxIcon]::Error
+    ) | Out-Null
+    exit 1
+}
+
+$env:AIMV_VIZ_PORT = $resolvedPort.ToString()
+$url = "http://localhost:$resolvedPort"
+
+if ($isOurInstance) {
     Open-VizBrowser -Browser $browser -Url $url
     exit 0
 }

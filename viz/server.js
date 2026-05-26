@@ -425,6 +425,8 @@ async function handleApiVaultBirths(res) {
 }
 
 async function handleRequest(req, res) {
+  // 정체성 헤더 — 런처가 다른 AIMindVaults 클론과 구별할 때 사용 (X-AIMV-Root 비교).
+  res.setHeader('X-AIMV-Root', ROOT_DIR);
   if (req.method !== 'GET') {
     res.writeHead(405, { 'Content-Type': 'text/plain; charset=utf-8' });
     res.end('Method Not Allowed');
