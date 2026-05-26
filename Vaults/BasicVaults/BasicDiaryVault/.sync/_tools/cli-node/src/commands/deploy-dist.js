@@ -23,9 +23,14 @@ import * as log from '../lib/logger.js';
  * @param {boolean} [opts.dryRun=false]
  * @param {boolean} [opts.force=false] - Overwrite protected files too
  * @param {boolean} [opts.verbose=false]
+ * @param {boolean} [opts.englishMode=false] - Protect existing target files
+ *   (skip overwrite of translated content). Used for English SellingVault
+ *   deploy where target is human-translated and source remains in Korean.
+ *   Only new source files are copied; existing target files are preserved.
+ *   Pruning is also disabled in this mode.
  */
 export async function deployDist(opts) {
-  const { target, dryRun = false, force = false, verbose = false } = opts;
+  const { target, dryRun = false, force = false, verbose = false, englishMode = false } = opts;
   let { source } = opts;
 
   if (!source) {
@@ -49,6 +54,7 @@ export async function deployDist(opts) {
 
   log.info(`Deploy: ${source} → ${target}`);
   if (dryRun) log.info('[DRY-RUN] No files will be modified.\n');
+  if (englishMode) log.info('[ENGLISH-MODE] Protecting existing target files (translated content preservation).\n');
 
   const totals = { copied: 0, deleted: 0, unchanged: 0, skipped: 0 };
 
@@ -62,9 +68,9 @@ export async function deployDist(opts) {
     }
 
     if (entry.type === 'dir') {
-      await deployDir(entry, srcPath, tgtPath, { dryRun, force, verbose }, totals);
+      await deployDir(entry, srcPath, tgtPath, { dryRun, force, verbose, englishMode }, totals);
     } else {
-      await deployFile(entry.path, srcPath, tgtPath, { dryRun, force, verbose }, totals);
+      await deployFile(entry.path, srcPath, tgtPath, { dryRun, force, verbose, englishMode }, totals);
     }
   }
 
@@ -85,7 +91,7 @@ export async function deployDist(opts) {
 }
 
 async function deployDir(entry, srcPath, tgtPath, opts, totals) {
-  const { dryRun, force, verbose } = opts;
+  const { dryRun, force, verbose, englishMode } = opts;
 
   if (verbose) log.info(`\n[DIR] ${entry.path}`);
 
@@ -108,6 +114,7 @@ async function deployDir(entry, srcPath, tgtPath, opts, totals) {
     excludeDirs,
     excludeFiles,
     dryRun,
+    protectExisting: englishMode,
     log: verbose ? (msg) => log.info(`  ${msg}`) : () => {},
   });
 
@@ -121,7 +128,14 @@ async function deployDir(entry, srcPath, tgtPath, opts, totals) {
 }
 
 async function deployFile(relPath, srcPath, tgtPath, opts, totals) {
-  const { dryRun, force, verbose } = opts;
+  const { dryRun, force, verbose, englishMode } = opts;
+
+  // English mode: skip if target exists (preserve translated content)
+  if (englishMode && existsSync(tgtPath)) {
+    if (verbose) log.info(`[SKIP-EN] ${relPath} (existing target, english-mode)`);
+    totals.skipped++;
+    return;
+  }
 
   // Check if protected
   if (!force && DEPLOY_PROTECTED_FILES.includes(relPath)) {

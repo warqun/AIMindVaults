@@ -63,12 +63,16 @@ export async function indexBuild(opts = {}) {
     const relPath = toRelativePath(vaultRoot, filePath);
     const fileName = basename(filePath);
     const fileStat = await stat(filePath);
-    const mtime = fileStat.mtime.toISOString().slice(0, 19);
+    const fsMtime = fileStat.mtime.toISOString().slice(0, 19);
+    const birthtime = fileStat.birthtime.toISOString().slice(0, 19);
 
-    // Incremental: mtime check
+    // Incremental fast-path: fs.mtime 변경 안 됐으면 content 변경 가능성 0 → skip.
+    // legacy entry (ex.fsMtime 부재) 는 ex.mtime 으로 비교 (backward compat).
     if (opts.incremental && existing.has(relPath)) {
       const ex = existing.get(relPath);
-      if (ex.mtime === mtime) {
+      const exFsMtime = ex.fsMtime || ex.mtime;
+      if (exFsMtime === fsMtime) {
+        if (!ex.created) ex.created = birthtime;
         notes.push(ex);
         stats.skipped++;
         continue;
@@ -86,11 +90,12 @@ export async function indexBuild(opts = {}) {
       continue;
     }
 
-    // Incremental: hash check (mtime differs but content same)
+    // Incremental: hash check (fs.mtime 변경됐지만 content 동일 — git pull 시각 리셋 케이스)
     if (opts.incremental && existing.has(relPath)) {
       const ex = existing.get(relPath);
       if (ex.hash === hash) {
-        ex.mtime = mtime;
+        ex.fsMtime = fsMtime;
+        if (!ex.created) ex.created = birthtime;
         notes.push(ex);
         stats.skipped++;
         continue;
@@ -106,8 +111,14 @@ export async function indexBuild(opts = {}) {
       continue;
     }
 
+    // R136 Gap 1 fix — mtime 결정: frontmatter.updated 우선, fs.stat.mtime fallback.
+    // git pull 이 fs.mtime 을 pull 시각으로 리셋해도 사용자가 명시한 frontmatter.updated 가 보존됨.
+    const fmUpdated = normalizeCreatedField(fm.updated);
+    const mtime = fmUpdated || fsMtime;
+
     // Build note object
-    const note = buildNoteObject(relPath, content, fm, hash, mtime);
+    const note = buildNoteObject(relPath, content, fm, hash, mtime, birthtime);
+    note.fsMtime = fsMtime;  // incremental schema 확장 (다음 fast-path 비교용)
     notes.push(note);
 
     if (existing.has(relPath)) {
@@ -193,7 +204,33 @@ function shouldExclude(fileName, noteType) {
   return false;
 }
 
-function buildNoteObject(relPath, content, fm, hash, mtime) {
+/**
+ * Normalize a frontmatter `created` value into the same ISO format as mtime/birthtime
+ * (`YYYY-MM-DDTHH:MM:SS`). Returns null when unparseable so caller can fall back to birthtime.
+ */
+function normalizeCreatedField(raw) {
+  if (raw == null) return null;
+  const s = String(raw).trim().replace(/^["']|["']$/g, '');
+  if (!s) return null;
+  // Already full ISO datetime (with T)
+  const isoT = s.match(/^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2}(?::\d{2})?)/);
+  if (isoT) {
+    const time = isoT[2].length === 5 ? `${isoT[2]}:00` : isoT[2];
+    return `${isoT[1]}T${time}`;
+  }
+  // Space-separated date+time
+  const dt = s.match(/^(\d{4}-\d{2}-\d{2})[ \t]+(\d{2}:\d{2}(?::\d{2})?)/);
+  if (dt) {
+    const time = dt[2].length === 5 ? `${dt[2]}:00` : dt[2];
+    return `${dt[1]}T${time}`;
+  }
+  // Date only
+  const d = s.match(/^(\d{4}-\d{2}-\d{2})$/);
+  if (d) return `${d[1]}T00:00:00`;
+  return null;
+}
+
+function buildNoteObject(relPath, content, fm, hash, mtime, birthtime) {
   const lines = content.split('\n');
 
   // Title: first H1
@@ -237,6 +274,9 @@ function buildNoteObject(relPath, content, fm, hash, mtime) {
     if (target && !linksTo.includes(target)) linksTo.push(target);
   }
 
+  const fmCreated = normalizeCreatedField(fm.created);
+  const created = fmCreated || birthtime;
+
   return {
     path: relPath,
     title,
@@ -247,6 +287,7 @@ function buildNoteObject(relPath, content, fm, hash, mtime) {
     links_to: linksTo,
     links_from: [],
     mtime,
+    created,
     hash,
   };
 }

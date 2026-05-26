@@ -1,0 +1,131 @@
+# note-types.yaml — 노트 type 정본 사전 (Core 정본)
+#
+# 정본 위치: Vaults/BasicVaults/CoreHub/.sync/_tools/cli-node/data/note-types.yaml
+# 전파: bump-version --broadcast 로 모든 Preset Hub 에 전파
+# 로드: post-edit-review.js (검증) + 향후 인덱서·viz 가 CLI 자기 위치 기반 상대경로로 read
+#
+# 정책 (R119 노트 작성 플로우 정교화 결정 1·2 — 본 트랙 진입 시 R 번호 확정):
+#   - kebab-case, 단수형, -note 접미사 금지 (knowledge O / knowledge-note X)
+#   - 코어 type 위반 시 post-edit-review WARN (1개월 후 BAD — 결정 4 D 항목별 단계)
+#   - 볼트 전용 type 은 해당 볼트 CLAUDE.md 에 정의 (본 yaml 과 무관, 검증 시 합집합)
+#   - 사용자 작성 시 type 미지정 → BAD (즉시 차단)
+#
+# 본 사전 갱신 절차:
+#   1. CoreHub 에서 본 파일 편집
+#   2. node .sync/_tools/cli-node/bin/cli.js bump-version -m "note-types: <변경>" --broadcast
+#   3. 모든 Preset Hub 자동 sync (위성은 다음 pre-sync 시 수신)
+#
+# 형식:
+#   types:
+#     <type-name>:
+#       category: <category>          # content / issue / temp / structure / ops
+#       description: <설명>
+#       deprecated: true              # (선택) 신규 사용 금지, alias 로 대체
+
+types:
+  # ===== 콘텐츠 (지식·분석·설계·기록) — 11개 =====
+  study-note:
+    category: content
+    description: 영상·문서·강의 학습 노트 (source 필드 권장)
+  knowledge:
+    category: content
+    description: 도메인 지식 정리 (개념·원리·이론). 일반 노트 기본 type
+  design:
+    category: content
+    description: 시스템·기능 설계 노트
+  plan:
+    category: content
+    description: 작업 계획 노트 (Phase 분할 등)
+  research:
+    category: content
+    description: 조사·리서치 노트 (외부 자료 기반)
+  reference:
+    category: content
+    description: 참조 자료 (cheat sheet, 명령 모음 등)
+  report:
+    category: content
+    description: 보고서 (조사·분석·결정 가이드)
+  spec:
+    category: content
+    description: 시스템 사양 명세 (현황 + 의도된 동작)
+  guide:
+    category: content
+    description: 사용자·에이전트 가이드 (how-to)
+  concept:
+    category: content
+    description: 개념 정의 노트 (단일 개념 1장)
+  memo:
+    category: content
+    description: 짧은 메모·결정 기록
+
+  # ===== 이슈 트래킹 — 6개 =====
+  issue:
+    category: issue
+    description: 이슈 본문 (버그·요청·결정 안건)
+  issue-index:
+    category: issue
+    description: 이슈 모음 인덱스
+  issue-spec:
+    category: issue
+    description: 이슈에 대한 사양 정의
+  issue-design:
+    category: issue
+    description: 이슈 해결 설계
+  issue-report:
+    category: issue
+    description: 이슈 처리 결과 보고
+  debug-design:
+    category: issue
+    description: 디버깅 시나리오·가설 설계
+
+  # ===== 임시 (작성 단계) — 2개 =====
+  temp-draft:
+    category: temp
+    description: 작성 중 초안 (정식 type 결정 전)
+  temp-review:
+    category: temp
+    description: 검토 중 임시 노트
+
+  # ===== 구조 (메타 노트) — 2개 =====
+  standard:
+    category: structure
+    description: 표준·규약 정의 (`_Standards/` 하위)
+  folder-index:
+    category: structure
+    description: 폴더 인덱스 (`Domain.md`, `_index.md` 등)
+
+  # ===== 운영 (시스템 자동 생성·관리) — 4개 =====
+  session-handoff:
+    category: ops
+    description: 세션 종료 핸드오프 (`_SESSION_HANDOFF_*.md`)
+  agent-comm:
+    category: ops
+    description: 에이전트 간 소통 큐 (`_AGENT_COMMS/` 하위)
+  status-hub:
+    category: ops
+    description: 상태 허브 (`_STATUS.md` — 루트 + 볼트별)
+  agent-status:
+    category: ops
+    description: 에이전트별 작업 상태 (`AGENT_STATUS.md`, `.codex/AGENT_STATUS.md`)
+
+# aliases (오기·구버전 표기 → 정규 type)
+# post-edit-review 가 본 alias 매핑 적용 후 검증 (자동 보정 옵션 켜진 경우 frontmatter 갱신)
+aliases:
+  note: knowledge              # R119 /juggl-note 양식 변경 (결정 2 B) — 기존 type=note 일괄 마이그레이션
+  knowledge-note: knowledge    # -note 접미사 금지 룰 자동 보정
+  study: study-note
+  draft: temp-draft
+  review: temp-review
+  handoff: session-handoff
+  status: status-hub
+
+# 정책 참조 (코드 내장, 본 yaml 은 사람용 안내)
+rules:
+  description: |
+    검증 단계 (post-edit-review.js):
+      1. frontmatter 존재 → BAD (즉시)
+      2. type 필드 존재 → BAD (즉시)
+      3. type 이 본 yaml 의 types 또는 볼트 CLAUDE.md 의 볼트 전용 type 인지 확인 → WARN (1개월 후 BAD)
+      4. aliases 매핑 시 자동 보정 가능 (POST_EDIT_REVIEW_AUTO_FIX=1 옵션)
+      5. -note 접미사 금지 (knowledge O / knowledge-note X) → alias 로 자동 매핑
+      6. 단수형 (concepts X, concept O) → 자동 변환 룰 별도 (필요 시 추가)

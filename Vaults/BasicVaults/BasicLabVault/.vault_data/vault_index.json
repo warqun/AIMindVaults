@@ -1,6 +1,6 @@
 {
   "vault": "BasicLabVault",
-  "built": "2026-05-13T10:56:29",
+  "built": "2026-05-26T20:07:43",
   "notes": [
     {
       "path": "Contents/_archive/20260512_tags_taxonomy/TAGS.md",
@@ -19,7 +19,8 @@
       "links_from": [],
       "mtime": "2026-04-12T22:02:28",
       "created": "2026-04-01T09:33:31",
-      "hash": "6bd2df31"
+      "hash": "6bd2df31",
+      "fsMtime": "2026-04-12T22:02:28"
     },
     {
       "path": "Contents/_archive/20260512_tags_taxonomy/TAG_MASK.md",
@@ -35,7 +36,8 @@
       "links_from": [],
       "mtime": "2026-04-12T22:02:28",
       "created": "2026-04-01T09:33:46",
-      "hash": "f4b60fed"
+      "hash": "f4b60fed",
+      "fsMtime": "2026-04-12T22:02:28"
     },
     {
       "path": "Contents/_index.md",
@@ -52,9 +54,10 @@
       "summary": "> 폴더 · 타입별 진입점.",
       "links_to": [],
       "links_from": [],
-      "mtime": "2026-05-11T20:45:17",
+      "mtime": "2026-04-22T00:00:00",
       "created": "2026-04-22T11:51:01",
-      "hash": "94e6fb0e"
+      "hash": "94e6fb0e",
+      "fsMtime": "2026-05-11T20:45:17"
     },
     {
       "path": "Contents/_log.md",
@@ -68,9 +71,10 @@
       "summary": "> 일일·experiment 단위 append. 최신이 위로.",
       "links_to": [],
       "links_from": [],
-      "mtime": "2026-05-11T20:45:17",
+      "mtime": "2026-04-22T00:00:00",
       "created": "2026-04-22T11:50:55",
-      "hash": "95d717a3"
+      "hash": "95d717a3",
+      "fsMtime": "2026-05-11T20:45:17"
     }
   ],
   "tag_index": {

@@ -1,6 +1,6 @@
 {
   "vault": "BasicDomainVault",
-  "built": "2026-05-13T10:56:29",
+  "built": "2026-05-26T20:07:42",
   "notes": [
     {
       "path": "Contents/_archive/20260512_tags_taxonomy/TAGS.md",
@@ -19,7 +19,8 @@
       "links_from": [],
       "mtime": "2026-04-22T11:49:54",
       "created": "2026-04-22T11:49:54",
-      "hash": "6bd2df31"
+      "hash": "6bd2df31",
+      "fsMtime": "2026-04-22T11:49:54"
     },
     {
       "path": "Contents/_archive/20260512_tags_taxonomy/TAG_MASK.md",
@@ -35,7 +36,8 @@
       "links_from": [],
       "mtime": "2026-04-22T11:49:54",
       "created": "2026-04-22T11:49:54",
-      "hash": "f4b60fed"
+      "hash": "f4b60fed",
+      "fsMtime": "2026-04-22T11:49:54"
     },
     {
       "path": "Contents/_index.md",
@@ -53,9 +55,10 @@
       "summary": "> 마스터 카탈로그. 월간 rebuild.",
       "links_to": [],
       "links_from": [],
-      "mtime": "2026-05-11T20:45:17",
+      "mtime": "2026-04-22T00:00:00",
       "created": "2026-04-22T11:50:49",
-      "hash": "45a330ef"
+      "hash": "45a330ef",
+      "fsMtime": "2026-05-11T20:45:17"
     },
     {
       "path": "Contents/_log.md",
@@ -71,9 +74,10 @@
       "summary": "> 이 볼트의 작업 연대기. 주간 append.",
       "links_to": [],
       "links_from": [],
-      "mtime": "2026-05-11T20:45:17",
+      "mtime": "2026-04-22T00:00:00",
       "created": "2026-04-22T11:50:46",
-      "hash": "3bd2ffd8"
+      "hash": "3bd2ffd8",
+      "fsMtime": "2026-05-11T20:45:17"
     }
   ],
   "tag_index": {

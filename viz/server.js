@@ -404,11 +404,34 @@ async function handleApiVaultBirths(res) {
       const vaultPath = meta && meta.path ? join(ROOT_DIR, meta.path) : null;
       if (!vaultPath) continue;
       try {
-        const s = statSync(vaultPath);
+        // R136 Gap 2 fix — vault_index 의 가장 오래된 노트 created 우선.
+        // NTFS statSync().birthtime 는 git clone 시각이라 디바이스간 vault 출생 시점이 달라짐.
+        // 사용자 노트 created (frontmatter 기반) 가 정확한 vault 사용 시작 시각.
+        let birthtime = null;
+        try {
+          const vidxPath = join(ROOT_DIR, meta.path, '.vault_data', 'vault_index.json');
+          const vidxRaw = await readFile(vidxPath, 'utf-8');
+          const vidx = JSON.parse(vidxRaw);
+          if (Array.isArray(vidx.notes) && vidx.notes.length > 0) {
+            const createds = vidx.notes
+              .map((n) => n && n.created)
+              .filter((c) => typeof c === 'string' && c.length > 0);
+            if (createds.length > 0) {
+              createds.sort();
+              birthtime = createds[0];
+            }
+          }
+        } catch {
+          // vault_index 부재 또는 파싱 실패 — fs.statSync fallback
+        }
+        if (!birthtime) {
+          const s = statSync(vaultPath);
+          birthtime = s.birthtime.toISOString();
+        }
         list.push({
           vaultId,
           path: meta.path,
-          birthtime: s.birthtime.toISOString(),
+          birthtime,
           note_count: typeof meta.note_count === 'number' ? meta.note_count : 0,
         });
       } catch (err) {

@@ -106,10 +106,11 @@ program
 
 program
   .command('sync-all')
-  .description('Run pre-sync across all vaults under an AIMindVaults root')
+  .description('Run pre-sync + auto index build across all vaults under an AIMindVaults root')
   .option('-r, --root <path>', 'AIMindVaults root path (auto-detect if omitted)')
   .option('-d, --dry-run', 'Preview without running npm install or pre-sync')
   .option('--skip-npm', 'Do not run npm install when node_modules is missing')
+  .option('--skip-index', 'Do not auto-run index build + master-build after sync (R133)')
   .option('--no-install-launchers', 'Do not refresh Sync This Vault launchers')
   .action(async (opts) => {
     const { syncAll } = await import('../src/commands/sync-all.js');
@@ -117,6 +118,7 @@ program
       root: opts.root,
       dryRun: opts.dryRun,
       skipNpm: opts.skipNpm,
+      skipIndex: opts.skipIndex,
       installLaunchers: opts.installLaunchers,
     });
   });
@@ -293,9 +295,10 @@ program
   .option('-d, --dry-run', 'Preview changes without executing')
   .option('-f, --force', 'Overwrite protected files (CLAUDE.md, _STATUS.md, etc.)')
   .option('-v, --verbose', 'Show detailed file operations')
+  .option('--english-mode', 'Protect existing target files (skip overwrite). Use for English SellingVault where target is human-translated. Only new source files are copied; pruning disabled.')
   .action(async (opts) => {
     const { deployDist } = await import('../src/commands/deploy-dist.js');
-    await deployDist({ source: opts.source, target: opts.target, dryRun: opts.dryRun, force: opts.force, verbose: opts.verbose });
+    await deployDist({ source: opts.source, target: opts.target, dryRun: opts.dryRun, force: opts.force, verbose: opts.verbose, englishMode: opts.englishMode });
   });
 
 // Phase 6: utility commands
@@ -354,6 +357,49 @@ program
   });
 
 program
+  .command('owned-tags-build')
+  .description('Aggregate per-vault Tags/OWNED_TAGS.md → root Tags/OWNED_TAGS.md (Phase O-4)')
+  .option('-r, --root <path>', 'AIMindVaults root path (auto-detect if omitted)')
+  .option('-d, --dry-run', 'Preview without writing root Tags/OWNED_TAGS.md')
+  .option('--apply', 'Actually write root Tags/OWNED_TAGS.md (default if neither --dry-run nor --apply)')
+  .option('--output <path>', 'Override output path (testing)')
+  .action(async (opts) => {
+    const { ownedTagsBuild } = await import('../src/commands/owned-tags-build.js');
+    await ownedTagsBuild({
+      root: opts.root,
+      dryRun: opts.dryRun,
+      apply: opts.apply,
+      outputPath: opts.output,
+    });
+  });
+
+program
+  .command('tag-migrate')
+  .description('Cross-vault tag normalization (PascalCase + acronym + CJK keep)')
+  .option('-r, --root <path>', 'AIMindVaults root path (auto-detect if omitted)')
+  .option('-v, --vault <name>', 'Filter to a single vault')
+  .option('-s, --scope <type>', 'frontmatter | inline | all', 'all')
+  .option('-d, --dry-run', 'Explicit dry-run (default mode when --apply absent)')
+  .option('--apply', 'Actually rewrite files (default: dry-run)')
+  .option('--reindex', 'After apply, advise main session to rebuild indices')
+  .option('--report <path>', 'Write report to file (default: stdout)')
+  .option('--backup-dir <path>', 'Override backup destination (apply only)')
+  .option('--aliases-file <path>', 'Override tag-aliases.yaml path (testing)')
+  .action(async (opts) => {
+    const { tagMigrate } = await import('../src/commands/tag-migrate.js');
+    await tagMigrate({
+      root: opts.root,
+      vault: opts.vault,
+      scope: opts.scope,
+      apply: opts.apply,
+      reindex: opts.reindex,
+      report: opts.report,
+      backupDir: opts.backupDir,
+      aliasesFile: opts.aliasesFile,
+    });
+  });
+
+program
   .command('standards')
   .description('Display _Standards/ directory structure')
   .option('-r, --vault-root <path>', 'Vault root path (auto-detect if omitted)')
@@ -361,6 +407,25 @@ program
   .action(async (opts) => {
     const { checkStandards } = await import('../src/commands/check-standards.js');
     checkStandards({ vaultRoot: opts.vaultRoot, deep: opts.deep });
+  });
+
+program
+  .command('agents-sync')
+  .description('Sync .agents/ core+domain rules/commands/hooks to .claude/ + .codex/ mirrors (R122)')
+  .option('-r, --root <path>', 'AIMindVaults root path (auto-detect if omitted)')
+  .option('-d, --dry-run', 'Preview without writing mirror files')
+  .option('--verify', 'Exit 1 if drift detected (for SessionStart hook + CI)')
+  .option('--area <name>', 'Sync only specific area: core | Unity | Blender | Meshy | Discord | Notion | Distribution | CreateVault | all')
+  .option('-v, --verbose', 'Show all mappings even if no change')
+  .action(async (opts) => {
+    const { agentsSync } = await import('../src/commands/agents-sync.js');
+    await agentsSync({
+      root: opts.root,
+      dryRun: opts.dryRun,
+      verify: opts.verify,
+      area: opts.area,
+      verbose: opts.verbose,
+    });
   });
 
 program.parse();

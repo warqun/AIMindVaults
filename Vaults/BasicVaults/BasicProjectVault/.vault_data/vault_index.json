@@ -1,6 +1,6 @@
 {
   "vault": "BasicProjectVault",
-  "built": "2026-05-13T10:56:29",
+  "built": "2026-05-26T20:07:43",
   "notes": [
     {
       "path": "Contents/_archive/20260512_tags_taxonomy/TAGS.md",
@@ -19,7 +19,8 @@
       "links_from": [],
       "mtime": "2026-04-12T22:02:28",
       "created": "2026-04-01T09:33:31",
-      "hash": "6bd2df31"
+      "hash": "6bd2df31",
+      "fsMtime": "2026-04-12T22:02:28"
     },
     {
       "path": "Contents/_archive/20260512_tags_taxonomy/TAG_MASK.md",
@@ -35,7 +36,8 @@
       "links_from": [],
       "mtime": "2026-04-12T22:02:28",
       "created": "2026-04-01T09:33:46",
-      "hash": "f4b60fed"
+      "hash": "f4b60fed",
+      "fsMtime": "2026-04-12T22:02:28"
     }
   ],
   "tag_index": {},
