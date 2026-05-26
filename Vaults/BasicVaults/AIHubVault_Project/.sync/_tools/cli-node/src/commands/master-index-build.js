@@ -119,7 +119,7 @@ export async function masterIndexBuild(opts = {}) {
       built: vIndex.built,
     };
 
-    // Aggregate notes (lightweight: title, tags, type, vault_id only)
+    // Aggregate notes (R137 Gap 5 — mtime/created 포함, master.notes 만으로 시계열 시각화 가능)
     for (const note of vIndex.notes) {
       masterNotes.push({
         vault_id: vName,
@@ -127,6 +127,8 @@ export async function masterIndexBuild(opts = {}) {
         path: note.path,
         type: note.type,
         tags: Array.isArray(note.tags) ? note.tags : [],
+        mtime: note.mtime || null,
+        created: note.created || null,
       });
     }
 

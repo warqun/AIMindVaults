@@ -14,6 +14,7 @@ updated: 2026-05-26
 
 | 버전 | 변경 내용 |
 | ---- | -------- |
+| 202605260004 | R137 Phase 3 — Gap 5 master.notes mtime/created + Gap 3 정렬 + Contents 부재 vault skip |
 | 202605260003 | R136 Phase 2 — Gap 1 (mtime frontmatter 우선) + Gap 2 (vault birth) |
 | 202605260002 | R135 Phase 1 — timeseries 일별 dedup (Gap 4) |
 | 202605260001 | R133 — sync-all 자동 인덱스 빌드 통합 (B) + --skip-index 옵션 |

@@ -29,8 +29,11 @@ export async function indexBuild(opts = {}) {
 
   const contentsDir = join(vaultRoot, 'Contents');
   if (!existsSync(contentsDir)) {
-    log.error(`Contents/ folder not found: ${contentsDir}`);
-    process.exitCode = 1;
+    // R137 — Contents/ 부재 vault (CoreHub · AIHubVault_Minimal · AIHubVault_{Domain,Lab,Project,Diary})
+    // 는 인프라성 Hub 라 콘텐츠 인덱싱 대상이 아님. ERROR 가 아닌 INFO 로 강등 + success exit.
+    // sync-all 의 자동 인덱싱이 모든 vault 시도해도 fail 로 카운트되지 않게.
+    log.info(`Contents/ folder absent (infra Hub): ${vaultRoot} — skipping vault_index build`);
+    log.envVar('POST_EDIT_INDEX_SKIPPED', '1');
     return;
   }
 

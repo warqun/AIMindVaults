@@ -352,10 +352,20 @@ async function handleApiAdditions(req, res) {
       // default = 가장 최근 날짜 (선택된 basis 기준)
       targetDate = allNotes.reduce((a, n) => n.date > a ? n.date : a, '0000-00-00');
     }
+    // R137 Gap 3 — basis=created 시 created 가 date only (T00:00:00 패딩) 이면 같은 날 노트 시간 정렬 불가.
+    // 1차 sortKey 동률 시 mtime 으로 2차 정렬 (mtime 은 R136 이후 frontmatter.updated 우선이라 정확).
     const sortKey = basis === 'created' ? 'created' : 'mtime';
     const filtered = allNotes
       .filter((n) => n.date === targetDate)
-      .sort((a, b) => ((b[sortKey] || '') > (a[sortKey] || '') ? 1 : -1));
+      .sort((a, b) => {
+        const av = a[sortKey] || '';
+        const bv = b[sortKey] || '';
+        if (av !== bv) return bv > av ? 1 : -1;
+        // 동률 — mtime 2차 정렬
+        const am = a.mtime || '';
+        const bm = b.mtime || '';
+        return bm > am ? 1 : (bm < am ? -1 : 0);
+      });
     res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-cache' });
     res.end(JSON.stringify({ date: targetDate, basis, count: filtered.length, notes: filtered }));
   } catch (err) {

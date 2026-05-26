@@ -1,5 +1,5 @@
 {
-  "built": "2026-05-26T20:09:01",
+  "built": "2026-05-26T20:45:17",
   "vault_count": 6,
   "note_count": 25,
   "vaults": {
@@ -18,19 +18,19 @@
         "RTK",
         "TokenOptimization"
       ],
-      "built": "2026-05-26T20:07:40"
+      "built": "2026-05-26T20:44:36"
     },
     "BasicContentsVault": {
       "path": "Vaults/BasicVaults/BasicContentsVault",
       "note_count": 6,
       "domain_tags": [],
-      "built": "2026-05-26T20:07:41"
+      "built": "2026-05-26T20:44:38"
     },
     "BasicDiaryVault": {
       "path": "Vaults/BasicVaults/BasicDiaryVault",
       "note_count": 2,
       "domain_tags": [],
-      "built": "2026-05-26T20:07:41"
+      "built": "2026-05-26T20:44:38"
     },
     "BasicDomainVault": {
       "path": "Vaults/BasicVaults/BasicDomainVault",
@@ -40,7 +40,7 @@
         "Index",
         "Log"
       ],
-      "built": "2026-05-26T20:07:42"
+      "built": "2026-05-26T20:44:39"
     },
     "BasicLabVault": {
       "path": "Vaults/BasicVaults/BasicLabVault",
@@ -50,13 +50,13 @@
         "Index",
         "Log"
       ],
-      "built": "2026-05-26T20:07:43"
+      "built": "2026-05-26T20:44:39"
     },
     "BasicProjectVault": {
       "path": "Vaults/BasicVaults/BasicProjectVault",
       "note_count": 2,
       "domain_tags": [],
-      "built": "2026-05-26T20:07:43"
+      "built": "2026-05-26T20:44:39"
     }
   },
   "notes": [
@@ -65,21 +65,27 @@
       "title": "CONTENTS_AI_RULES — AIMindVault 전용 AI 작업 규칙",
       "path": "Contents/CONTENTS_AI_RULES.md",
       "type": "standard",
-      "tags": []
+      "tags": [],
+      "mtime": "2026-03-23T00:00:00",
+      "created": "2026-04-18T06:00:33"
     },
     {
       "vault_id": "AIHubVault",
       "title": "CONTENTS_GLOSSARY — AIMindVault 용어",
       "path": "Contents/CONTENTS_GLOSSARY.md",
       "type": "standard",
-      "tags": []
+      "tags": [],
+      "mtime": "2026-03-23T00:00:00",
+      "created": "2026-04-18T06:00:21"
     },
     {
       "vault_id": "AIHubVault",
       "title": "CONTENTS_INDEX — AIHubVault 콘텐츠 지도",
       "path": "Contents/CONTENTS_INDEX.md",
       "type": "standard",
-      "tags": []
+      "tags": [],
+      "mtime": "2026-03-23T00:00:00",
+      "created": "2026-03-20T22:29:25"
     },
     {
       "vault_id": "AIHubVault",
@@ -94,7 +100,9 @@
         "Workflow",
         "OpenClaw",
         "Video"
-      ]
+      ],
+      "mtime": "2026-04-17T00:00:00",
+      "created": "2026-04-17T06:31:55"
     },
     {
       "vault_id": "AIHubVault",
@@ -108,91 +116,117 @@
         "RTK",
         "TokenOptimization",
         "Video"
-      ]
+      ],
+      "mtime": "2026-04-21T00:00:00",
+      "created": "2026-04-20T22:51:52"
     },
     {
       "vault_id": "AIHubVault",
       "title": "TAGS — 태그 규칙/목록(정규화 기준)",
       "path": "Contents/_archive/20260512_tags_taxonomy/TAGS.md",
       "type": "tag-taxonomy",
-      "tags": []
+      "tags": [],
+      "mtime": "2026-03-02T00:00:00",
+      "created": "2026-03-09T05:11:03"
     },
     {
       "vault_id": "AIHubVault",
       "title": "TAG_MASK — 태그 마스킹(기존 태그 → 정규 태그)",
       "path": "Contents/_archive/20260512_tags_taxonomy/TAG_MASK.md",
       "type": "tag-mask",
-      "tags": []
+      "tags": [],
+      "mtime": "2026-03-08T00:00:00",
+      "created": "2026-03-09T05:11:11"
     },
     {
       "vault_id": "BasicContentsVault",
       "title": "CONTENTS_AI_RULES — (볼트명) AI 작업 규칙",
       "path": "Contents/CONTENTS_AI_RULES.md",
       "type": "standard",
-      "tags": []
+      "tags": [],
+      "mtime": "2026-04-12T22:02:28",
+      "created": "2026-04-01T09:33:02"
     },
     {
       "vault_id": "BasicContentsVault",
       "title": "CONTENTS_GLOSSARY — (볼트명) 용어",
       "path": "Contents/CONTENTS_GLOSSARY.md",
       "type": "standard",
-      "tags": []
+      "tags": [],
+      "mtime": "2026-04-12T22:02:28",
+      "created": "2026-04-01T09:33:13"
     },
     {
       "vault_id": "BasicContentsVault",
       "title": "",
       "path": "Contents/Domain/Domain.md",
       "type": "folder-index",
-      "tags": []
+      "tags": [],
+      "mtime": "2026-04-12T21:45:13",
+      "created": "2026-03-10T05:22:48"
     },
     {
       "vault_id": "BasicContentsVault",
       "title": "",
       "path": "Contents/Project/Project.md",
       "type": "folder-index",
-      "tags": []
+      "tags": [],
+      "mtime": "2026-04-12T21:45:13",
+      "created": "2026-03-10T05:22:35"
     },
     {
       "vault_id": "BasicContentsVault",
       "title": "TAGS — 태그 규칙/목록(정규화 기준)",
       "path": "Contents/_archive/20260512_tags_taxonomy/TAGS.md",
       "type": "tag-taxonomy",
-      "tags": []
+      "tags": [],
+      "mtime": "2026-04-12T22:02:28",
+      "created": "2026-04-01T09:33:31"
     },
     {
       "vault_id": "BasicContentsVault",
       "title": "TAG_MASK — 태그 마스킹(기존 태그 → 정규 태그)",
       "path": "Contents/_archive/20260512_tags_taxonomy/TAG_MASK.md",
       "type": "tag-mask",
-      "tags": []
+      "tags": [],
+      "mtime": "2026-04-12T22:02:28",
+      "created": "2026-04-01T09:33:46"
     },
     {
       "vault_id": "BasicDiaryVault",
       "title": "TAGS — 태그 규칙/목록(정규화 기준)",
       "path": "Contents/_archive/20260512_tags_taxonomy/TAGS.md",
       "type": "tag-taxonomy",
-      "tags": []
+      "tags": [],
+      "mtime": "2026-04-12T22:02:28",
+      "created": "2026-04-01T09:33:31"
     },
     {
       "vault_id": "BasicDiaryVault",
       "title": "TAG_MASK — 태그 마스킹(기존 태그 → 정규 태그)",
       "path": "Contents/_archive/20260512_tags_taxonomy/TAG_MASK.md",
       "type": "tag-mask",
-      "tags": []
+      "tags": [],
+      "mtime": "2026-04-12T22:02:28",
+      "created": "2026-04-01T09:33:46"
     },
     {
       "vault_id": "BasicDomainVault",
       "title": "TAGS — 태그 규칙/목록(정규화 기준)",
       "path": "Contents/_archive/20260512_tags_taxonomy/TAGS.md",
       "type": "tag-taxonomy",
-      "tags": []
+      "tags": [],
+      "mtime": "2026-04-22T11:49:54",
+      "created": "2026-04-22T11:49:54"
     },
     {
       "vault_id": "BasicDomainVault",
       "title": "TAG_MASK — 태그 마스킹(기존 태그 → 정규 태그)",
       "path": "Contents/_archive/20260512_tags_taxonomy/TAG_MASK.md",
       "type": "tag-mask",
-      "tags": []
+      "tags": [],
+      "mtime": "2026-04-22T11:49:54",
+      "created": "2026-04-22T11:49:54"
     },
     {
       "vault_id": "BasicDomainVault",
@@ -202,7 +236,9 @@
       "tags": [
         "ZK",
         "Index"
-      ]
+      ],
+      "mtime": "2026-04-22T00:00:00",
+      "created": "2026-04-22T11:50:49"
     },
     {
       "vault_id": "BasicDomainVault",
@@ -212,21 +248,27 @@
       "tags": [
         "ZK",
         "Log"
-      ]
+      ],
+      "mtime": "2026-04-22T00:00:00",
+      "created": "2026-04-22T11:50:46"
     },
     {
       "vault_id": "BasicLabVault",
       "title": "TAGS — 태그 규칙/목록(정규화 기준)",
       "path": "Contents/_archive/20260512_tags_taxonomy/TAGS.md",
       "type": "tag-taxonomy",
-      "tags": []
+      "tags": [],
+      "mtime": "2026-04-12T22:02:28",
+      "created": "2026-04-01T09:33:31"
     },
     {
       "vault_id": "BasicLabVault",
       "title": "TAG_MASK — 태그 마스킹(기존 태그 → 정규 태그)",
       "path": "Contents/_archive/20260512_tags_taxonomy/TAG_MASK.md",
       "type": "tag-mask",
-      "tags": []
+      "tags": [],
+      "mtime": "2026-04-12T22:02:28",
+      "created": "2026-04-01T09:33:46"
     },
     {
       "vault_id": "BasicLabVault",
@@ -236,7 +278,9 @@
       "tags": [
         "Lab",
         "Index"
-      ]
+      ],
+      "mtime": "2026-04-22T00:00:00",
+      "created": "2026-04-22T11:51:01"
     },
     {
       "vault_id": "BasicLabVault",
@@ -246,21 +290,27 @@
       "tags": [
         "Lab",
         "Log"
-      ]
+      ],
+      "mtime": "2026-04-22T00:00:00",
+      "created": "2026-04-22T11:50:55"
     },
     {
       "vault_id": "BasicProjectVault",
       "title": "TAGS — 태그 규칙/목록(정규화 기준)",
       "path": "Contents/_archive/20260512_tags_taxonomy/TAGS.md",
       "type": "tag-taxonomy",
-      "tags": []
+      "tags": [],
+      "mtime": "2026-04-12T22:02:28",
+      "created": "2026-04-01T09:33:31"
     },
     {
       "vault_id": "BasicProjectVault",
       "title": "TAG_MASK — 태그 마스킹(기존 태그 → 정규 태그)",
       "path": "Contents/_archive/20260512_tags_taxonomy/TAG_MASK.md",
       "type": "tag-mask",
-      "tags": []
+      "tags": [],
+      "mtime": "2026-04-12T22:02:28",
+      "created": "2026-04-01T09:33:46"
     }
   ],
   "tag_index": {
