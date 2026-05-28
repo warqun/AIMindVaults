@@ -277,8 +277,12 @@ function buildNoteObject(relPath, content, fm, hash, mtime, birthtime) {
     if (target && !linksTo.includes(target)) linksTo.push(target);
   }
 
+  // R138 Gap created fix — created 결정: frontmatter.created 우선,
+  // frontmatter.updated fallback, fs.stat.birthtime 최후.
+  // git clone 시 NTFS ctime 이 한 시각으로 박혀 응축되는 현상 (디바이스 간 차이) 회피.
   const fmCreated = normalizeCreatedField(fm.created);
-  const created = fmCreated || birthtime;
+  const fmUpdatedForCreated = normalizeCreatedField(fm.updated);
+  const created = fmCreated || fmUpdatedForCreated || birthtime;
 
   return {
     path: relPath,

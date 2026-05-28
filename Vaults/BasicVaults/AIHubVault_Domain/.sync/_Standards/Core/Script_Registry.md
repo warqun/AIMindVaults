@@ -63,6 +63,16 @@ agent: codex
 
 ---
 
+## 프로젝트 도메인 스크립트 (Project-specific, PowerShell 등)
+
+CLI 도구 외 프로젝트 단위 영구 스크립트.
+
+| 스크립트 | 경로 | 용도 | 생성자 | 도입 |
+|---------|------|------|--------|------|
+| `Viz-Snapshot.ps1` | `Vaults/Projects_Infra/Project_AIMindVaults/Contents/Project/scripts/viz_snapshot/Viz-Snapshot.ps1` | viz 디바이스 간 점검 공유 — 화면 캡처 + master_index 메타 dump → 표준 폴더 PNG+MD | claude | 2026-05-27 (R141) |
+
+---
+
 ## 일회성/완료 스크립트 (One-time)
 
 특정 마이그레이션이나 수정을 위해 만들어졌고, 재사용하지 않는 스크립트.

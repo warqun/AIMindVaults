@@ -182,6 +182,58 @@ function parseLatestVersion(filePath) {
 }
 
 /**
+ * Generate next version: YYYYMMDDNNNN (same convention as bump-version.js).
+ */
+function nextVersion(latestVersion) {
+  const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+  if (latestVersion && latestVersion.startsWith(today)) {
+    const seq = parseInt(latestVersion.slice(8), 10);
+    return today + String(seq + 1).padStart(4, '0');
+  }
+  return today + '0001';
+}
+
+/**
+ * R139 — Bump Preset Hub _WORKSPACE_VERSION.md after Core propagation.
+ *
+ * Without this, satellites with matching version → PLUGIN_ONLY → .sync/ mirror skip
+ * → newly propagated Core files (e.g. R138 index-build.js) never reach satellites.
+ *
+ * Appends a new row to Preset Hub _WORKSPACE_VERSION.md so satellites detect
+ * mismatch on next sync and execute full mirror (PULL).
+ *
+ * @returns {string|null} new version, or null on failure
+ */
+async function bumpPresetWorkspaceVersion(presetHub, coreVersion, message) {
+  const verFile = join(presetHub, '_WORKSPACE_VERSION.md');
+  if (!existsSync(verFile)) return null;
+  const latest = parseLatestVersion(verFile);
+  const newVersion = nextVersion(latest);
+  const today = new Date().toISOString().slice(0, 10);
+
+  try {
+    const content = readFileSync(verFile, 'utf8');
+    const lines = content.split('\n');
+    const sepIdx = lines.findIndex(l => /^\|\s*[-: ]+\s*\|/.test(l));
+    if (sepIdx === -1) return null;
+    const msg = message ? message.replace(/\|/g, '\\|') : 'Core 계층 전파 수신';
+    const newRow = `| ${newVersion} | Core 전파 수신 (CoreHub ${coreVersion}) — ${msg} |`;
+    lines.splice(sepIdx + 1, 0, newRow);
+    // Update frontmatter `updated:` if present
+    for (let i = 0; i < lines.length && i < 30; i++) {
+      if (/^updated:\s*/.test(lines[i])) {
+        lines[i] = `updated: ${today}`;
+        break;
+      }
+    }
+    await writeFile(verFile, lines.join('\n'), 'utf8');
+    return newVersion;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Append propagation entry to _CORE_VERSION.md on Core Hub.
  * Creates the file if missing. Non-fatal on error.
  *
@@ -314,6 +366,8 @@ export async function coreSyncAll(opts = {}) {
 
   // Local Core Hub version (for coreHubVersion compat check)
   const coreVersion = marker?.version;
+  // R139 — _WORKSPACE_VERSION latest of CoreHub (for Preset Hub bump message)
+  const coreWorkspaceVersion = parseLatestVersion(join(coreHubRoot, '_WORKSPACE_VERSION.md'));
 
   for (const preset of targets) {
     const presetMarker = readHubMarker(preset);
@@ -366,6 +420,16 @@ export async function coreSyncAll(opts = {}) {
       presetCopied += seedResult.seeded.length;
 
       log.info(`  → ${presetCopied} item(s) ${opts.dryRun ? 'would be synced' : 'synced'}`);
+
+      // R139 — Bump Preset Hub _WORKSPACE_VERSION so satellites detect mismatch on next sync.
+      // Without this, satellite==Preset version → PLUGIN_ONLY → mirror skip → Core changes
+      // never reach satellites. See sync-workspace.js direction logic (line 330).
+      if (!opts.dryRun && coreWorkspaceVersion) {
+        const newPresetVer = await bumpPresetWorkspaceVersion(preset, coreWorkspaceVersion, opts.presetBumpMessage);
+        if (newPresetVer) {
+          log.info(`  [BUMP] _WORKSPACE_VERSION → ${newPresetVer} (satellites will mirror next sync)`);
+        }
+      }
     } catch (err) {
       log.error(`  FAILED: ${err.message}`);
       presetFailed = true;
@@ -387,7 +451,7 @@ export async function coreSyncAll(opts = {}) {
 
   // Append propagation entry to _CORE_VERSION.md (skip on dry-run)
   if (!opts.dryRun) {
-    const version = parseLatestVersion(join(coreHubRoot, '_WORKSPACE_VERSION.md')) || 'unknown';
+    const version = coreWorkspaceVersion || 'unknown';
     const targetInfo = targets.map(t => ({ hubId: readHubMarker(t)?.hubId }));
     await appendCoreVersionEntry(coreHubRoot, {
       version,

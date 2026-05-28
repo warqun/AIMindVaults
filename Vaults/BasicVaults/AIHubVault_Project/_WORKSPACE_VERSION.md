@@ -3,7 +3,7 @@ type: workspace-version
 tags:
   - CoreHub
   - Multi-Hub
-updated: 2026-05-14
+updated: 2026-05-27
 ---
 
 # CoreHub Workspace Version
@@ -14,6 +14,8 @@ updated: 2026-05-14
 
 | 버전 | 변경 내용 |
 | ---- | -------- |
+| 202605270002 | Core 전파 수신 (CoreHub 202605270003) — R140 — Script_Registry 등록 (Viz-Snapshot.ps1 디바이스 간 점검 공유 자동화) |
+| 202605270001 | Core 전파 수신 (CoreHub 202605270002) — R139 — core-sync-all 이 Preset Hub _WORKSPACE_VERSION bump (위성 sync version skip 버그 fix). R138 위성 미전파 잔여 해소. |
 | 202605140001 | R119 propagation: post-edit-review fm 검증 + note-types.yaml |
 | 202604240003 | CoreHub sync 런처 .sync 이동 수신 |
 | 202604240002 | CoreHub sync-all npm 경고 수정 수신 |

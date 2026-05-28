@@ -71,3 +71,61 @@ export function filterUserVaultsMap(vaultsMap) {
   }
   return out;
 }
+
+/**
+ * 메타 노트 type 사전 — calendar/home/additions 등에서 시각화 제외.
+ * 메타 노트는 frontmatter.created 가 없어 birthtime (NTFS) 또는 frontmatter.updated 로
+ * 응축되는 경향 (R138/R139 진단). 시각화 측에서 type 필터링하여 응축 해소.
+ *
+ * 옵션 b 결정 (사용자 2026-05-27): "데이터 수집방식과 형식을 바꾸는 것은 무리,
+ * 시각화 측에 필터가 맞겠음"
+ */
+export const META_NOTE_TYPES = new Set([
+  'folder-index',  // Project.md / Domain.md
+  'standard',      // CONTENTS_AI_RULES.md / CONTENTS_GLOSSARY.md
+]);
+
+/**
+ * 메타 노트 path 패턴 — type 만으로 안 잡히는 시드/공통 노트.
+ */
+export const META_NOTE_PATH_PATTERNS = [
+  /\/Juggl_StyleGuide\//,             // 3-04 시드 응축 (updated=2026-03-04 공통)
+  /\/CONTENTS_[^/]+\.md$/,            // CONTENTS_AI_RULES.md 등 (type 으로도 잡힘, 안전망)
+  /\/Domain\.md$/,                    // folder-index path 보강
+  /\/Project\.md$/,                   // folder-index path 보강
+];
+
+/**
+ * 노트가 메타 노트인지 판정 (type 또는 path 기준).
+ * @param {object} note — { type, path, ... }
+ * @returns {boolean}
+ */
+export function isMetaNote(note) {
+  if (!note) return false;
+  if (META_NOTE_TYPES.has(note.type)) return true;
+  const p = note.path || '';
+  for (const re of META_NOTE_PATH_PATTERNS) {
+    if (re.test(p)) return true;
+  }
+  return false;
+}
+
+/**
+ * 노트 배열에서 메타 노트 제외 (R141 옵션 b).
+ * @param {object[]} notes
+ * @returns {object[]}
+ */
+export function filterMetaNotes(notes) {
+  if (!Array.isArray(notes)) return [];
+  return notes.filter((n) => !isMetaNote(n));
+}
+
+/**
+ * 시각화에 표시할 노트 — 시스템 Hub + 메타 노트 둘 다 제외 (R134 + R141 chain).
+ * calendar / home / additions 의 표준 진입점.
+ * @param {object[]} notes
+ * @returns {object[]}
+ */
+export function filterVisibleNotes(notes) {
+  return filterMetaNotes(filterUserNotes(notes));
+}

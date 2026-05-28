@@ -14,6 +14,7 @@ const VIZ_DIR = dirname(__filename);
 const ROOT_DIR = resolve(VIZ_DIR, '..');
 const MASTER_INDEX_PATH = join(ROOT_DIR, '.vault_data', 'master_index.json');
 const TIMESERIES_PATH = join(ROOT_DIR, '.vault_data', 'timeseries.json');
+const SYNC_STATUS_PATH = join(ROOT_DIR, '.vault_data', '.sync-status.json');
 
 const DEFAULT_PORT = parseInt(process.env.AIMV_VIZ_PORT ?? '8765', 10);
 const PORT_FALLBACKS = [DEFAULT_PORT, DEFAULT_PORT + 1, DEFAULT_PORT + 2];
@@ -457,6 +458,23 @@ async function handleApiVaultBirths(res) {
   res.end(JSON.stringify(payload));
 }
 
+/* ───────────── /api/sync-status (R149) ─────────────
+ * `.vault_data/.sync-status.json` 노출 — Start-Visualization.ps1 의 백그라운드 sync 상태.
+ * SPA sync-banner.js 가 polling 으로 진행/완료/실패 표시.
+ * 상태 파일 부재 시 idle 반환 (자동 동기화 미실행 또는 viz 직접 server.js 실행).
+ */
+async function handleApiSyncStatus(res) {
+  let payload = { status: 'idle', message: '동기화 상태 정보 없음' };
+  try {
+    const raw = await readFile(SYNC_STATUS_PATH, 'utf-8');
+    payload = JSON.parse(raw);
+  } catch (err) {
+    if (err.code !== 'ENOENT') console.warn(`[/api/sync-status] read failed: ${err.message}`);
+  }
+  res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-cache' });
+  res.end(JSON.stringify(payload));
+}
+
 async function handleRequest(req, res) {
   // 정체성 헤더 — 런처가 다른 AIMindVaults 클론과 구별할 때 사용 (X-AIMV-Root 비교).
   res.setHeader('X-AIMV-Root', ROOT_DIR);
@@ -487,6 +505,7 @@ async function handleRequest(req, res) {
   if (pathname === '/api/additions') return handleApiAdditions(req, res);
   if (pathname === '/api/timeseries') return handleApiTimeseries(res);
   if (pathname === '/api/vault-births') return handleApiVaultBirths(res);
+  if (pathname === '/api/sync-status') return handleApiSyncStatus(res);
   if (pathname === '/router.js') return serveFile(join(VIZ_DIR, 'router.js'), res);
   if (pathname.startsWith('/static/') || pathname.startsWith('/lib/') || pathname.startsWith('/pages/') || pathname.startsWith('/components/') || pathname.startsWith('/styles/')) {
     let sub;

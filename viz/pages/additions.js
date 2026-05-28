@@ -20,7 +20,7 @@
 import { renderMarkdown, splitFrontmatter } from '../lib/markdown.js';
 import { presetColorByCategory } from '../lib/buildOption.js';
 import { openNote, openVault } from '../lib/obsidian-uri.js';
-import { isSystemVault, filterUserNotes } from '../lib/system-vaults.js';
+import { isSystemVault, filterVisibleNotes } from '../lib/system-vaults.js';
 
 const VIEWS = ['notes', 'vaults', 'tags', 'connections'];
 const BASES = ['mtime', 'created'];
@@ -84,7 +84,7 @@ async function fetchAdditions(date, basis) {
   if (!r.ok) throw new Error(`HTTP ${r.status}`);
   const json = await r.json();
   if (Array.isArray(json?.notes)) {
-    json.notes = filterUserNotes(json.notes);
+    json.notes = filterVisibleNotes(json.notes);
     json.count = json.notes.length;
   }
   return json;

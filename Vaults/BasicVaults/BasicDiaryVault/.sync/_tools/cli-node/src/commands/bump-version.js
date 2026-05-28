@@ -129,6 +129,11 @@ export async function bumpVersion(opts) {
     }
     log.info('\n--- Broadcast (core-sync-all) ---');
     const { coreSyncAll } = await import('./core-sync-all.js');
-    await coreSyncAll({ coreHubRoot: hubRoot, dryRun: opts.dryRun });
+    // R139 — pass message so Preset Hub _WORKSPACE_VERSION rows include context.
+    await coreSyncAll({
+      coreHubRoot: hubRoot,
+      dryRun: opts.dryRun,
+      presetBumpMessage: opts.message,
+    });
   }
 }

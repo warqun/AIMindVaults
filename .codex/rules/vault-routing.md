@@ -14,3 +14,4 @@
 
 - `AIHubVault`: AI workflow, agent setup, `_Standards`, `_tools`, vault infrastructure
 - `BasicContentsVault`: content writing, knowledge notes, general PKM, note organization
+- `DevFoundation`: 개발 기초, CS, 컴퓨터구조, 운영체제, 네트워크, HTTP, 웹/서버/DB, 인증·보안 기초, 클라우드·인프라 입문

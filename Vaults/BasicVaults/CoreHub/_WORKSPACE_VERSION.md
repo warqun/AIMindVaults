@@ -3,7 +3,7 @@ type: workspace-version
 tags:
   - CoreHub
   - Multi-Hub
-updated: 2026-05-26
+updated: 2026-05-27
 ---
 
 # CoreHub Workspace Version
@@ -14,6 +14,9 @@ updated: 2026-05-26
 
 | 버전 | 변경 내용 |
 | ---- | -------- |
+| 202605270003 | R140 — Script_Registry 등록 (Viz-Snapshot.ps1 디바이스 간 점검 공유 자동화) |
+| 202605270002 | R139 — core-sync-all 이 Preset Hub _WORKSPACE_VERSION bump (위성 sync version skip 버그 fix). R138 위성 미전파 잔여 해소. |
+| 202605270001 | R138 — index-build.js created fallback 강화 (fmCreated \|\| fmUpdated \|\| birthtime). NTFS ctime 응축 회피. |
 | 202605260004 | R137 Phase 3 — Gap 5 master.notes mtime/created + Gap 3 정렬 + Contents 부재 vault skip |
 | 202605260003 | R136 Phase 2 — Gap 1 (mtime frontmatter 우선) + Gap 2 (vault birth) |
 | 202605260002 | R135 Phase 1 — timeseries 일별 dedup (Gap 4) |

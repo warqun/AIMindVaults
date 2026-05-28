@@ -29,6 +29,7 @@
 | `shell-redirect-safety.md` | 셸별 NUL 리다이렉트 구문 안전 (Bash `2>/dev/null` · PowerShell `2>$null` · CMD `2>nul` 구분) |
 | `temp-file-management.md` | 임시 파일 관리 |
 | `user-guidance.md` | 유저 가이드 (D안 슬림판: 고위험 6섹션 인라인 유지, 저위험은 Skill Router 위임) |
+| `viz-device-sync.md` | viz 디바이스 간 동기화 워크플로우 (R146/R149 자동 동기화, R141 viz_snapshots, R148 KPI 노트 기반 derive, _AGENT_COMMS 큐 패턴) |
 
 ## custom/ — 사용자 규칙 (동기화 미대상)
 
@@ -40,7 +41,7 @@
 | `multivault-personalization.md` | 멀티볼트 개인화 (에이전트/플러그인/스킬 커스텀) |
 | `agent-ownership.md` | 에이전트 소유권 분리 (Claude/Codex 동시 수정 방지) |
 
-> Phase 2-A (2026-04-18): 6개 도메인 규칙(blender-mcp, notion-sync, serena-mcp, unity-scripting-style, unity-tools, discord-bot)을 rules-archive/로 이관하고 `/blender-workflow`, `/notion-record`, `/unity-dev`, `/discord-admin` Skill로 전환.
+> Phase 2-A (2026-04-18): 도메인 규칙들을 `rules-archive/` 로 이관하고 도메인별 Skill 로 전환. 구체 도메인은 사용자 환경에 따라 다름 — 본 매니페스트는 일반 인프라 룰만 등록.
 
 ## rules-archive/ — 자동 주입 제외 (트리거 시 수동 Read)
 
@@ -75,18 +76,14 @@
 
 ### Phase 2-A: 도메인 Skill 전환 (2026-04-18)
 
-도메인 규칙 Skill로 통합. Skill 호출 시 해당 archive 파일 Read 지시.
+도메인 규칙들을 Skill 로 통합. Skill 호출 시 해당 archive 파일 Read 지시. 도메인별 트리거 매핑은 `.claude/rules/core/_skill-router.md` 참조 (사용자 환경에 따라 활성·비활성 도메인 다름).
+
+배포 운영 관련 일반 인프라 archive:
 
 | 파일명 | 트리거 조건 | Skill |
 |--------|-----------|-------|
-| `distribution-deploy.md` | 배포, SellingVault, git push, 영문 배포 | `/distribute` |
-| `sync-version-priority.md` | cli.js sync, pre-sync, _WORKSPACE_VERSION, sync-version | `/distribute` |
-| `blender-mcp.md` | Blender, 블렌더, 3D 모델링, bpy | `/blender-workflow` |
-| `notion-sync.md` | Notion, 노션, 작업 관리 DB | `/notion-record` |
-| `serena-mcp.md` | Serena, find_symbol, 심볼 기반 편집 | `/unity-dev` (Unity 코드 편집 시) |
-| `unity-scripting-style.md` | Unity C# 스크립팅, 스타일 | `/unity-dev` |
-| `unity-tools.md` | unity-cli, mcp-unity, Unity 도구 | `/unity-dev` |
-| `discord-bot.md` | Discord, 디스코드, Admin Bot, 봇 | `/discord-admin` |
+| `distribution-deploy.md` | 배포, SellingVault, git push | `/distribute` |
+| `sync-version-priority.md` | cli.js sync, pre-sync, _WORKSPACE_VERSION | `/distribute` |
 
 ### Phase 3: 참조 문서 이관 (2026-04-18)
 

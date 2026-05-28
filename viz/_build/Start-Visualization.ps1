@@ -46,6 +46,9 @@ if (-not $nodeCmd) {
 if (-not $env:AIMV_VIZ_PORT)            { $env:AIMV_VIZ_PORT = '8765' }
 if (-not $env:AIMV_VIZ_IDLE_MS)         { $env:AIMV_VIZ_IDLE_MS = '15000' }
 if (-not $env:AIMV_VIZ_BOOT_GRACE_MS)   { $env:AIMV_VIZ_BOOT_GRACE_MS = '90000' }
+# R146 — viz 시작 시 디바이스 자동 동기화 (기본 on, env var 으로 off 가능)
+if (-not $env:AIMV_VIZ_AUTO_PULL)        { $env:AIMV_VIZ_AUTO_PULL = 'true' }
+if (-not $env:AIMV_VIZ_AUTO_SYNC)        { $env:AIMV_VIZ_AUTO_SYNC = 'true' }
 
 $port = [int]$env:AIMV_VIZ_PORT
 $url = "http://localhost:$port"
@@ -142,11 +145,124 @@ if ($isOurInstance) {
     exit 0
 }
 
-# R133 — viz 시작 시 인덱스 검증 + 자동 빌드 (sync-all 안 쓴 사용자 대응 안전망)
-# master_index.json 부재 시 CoreHub cli.js 로 자동 master-build. 빌드 실패해도 server 는 진입 (사용자 인지 가능).
+# 공통 경로 (R146 + R133 양쪽에서 사용)
 $masterIndexPath = Join-Path $myRoot '.vault_data\master_index.json'
 $coreCliPath = Join-Path $myRoot 'Vaults\BasicVaults\CoreHub\.sync\_tools\cli-node\bin\cli.js'
 $coreNodeModules = Join-Path $myRoot 'Vaults\BasicVaults\CoreHub\.sync\_tools\cli-node\node_modules'
+
+# R149 — 디바이스 자동 동기화 백그라운드 + UI 상태 표시
+# R146 의 wait 동기 방식 (35-57s 사용자 대기) 을 비동기 백그라운드로 전환.
+# viz UI 는 즉시 띄움 (master 가 stale 해도 표시). 백그라운드 powershell 이
+# git pull + sync-all 진행하며 .vault_data/.sync-status.json 갱신.
+# viz SPA sync-banner.js 가 /api/sync-status polling → 진행/완료/실패 표시.
+# fail-safe 동일: 실패해도 viz 진입 계속.
+
+$statusFile = Join-Path $myRoot '.vault_data\.sync-status.json'
+$statusDir = Split-Path $statusFile -Parent
+if (-not (Test-Path $statusDir)) {
+    New-Item -ItemType Directory -Path $statusDir -Force | Out-Null
+}
+
+# 초기 상태 — running, step=starting
+$initStatus = @{
+    status = 'running'
+    started_at = (Get-Date).ToString('o')
+    completed_at = $null
+    step = 'starting'
+    message = '동기화 시작 중'
+    error = $null
+} | ConvertTo-Json -Compress
+[System.IO.File]::WriteAllText($statusFile, $initStatus, [System.Text.UTF8Encoding]::new($false))
+
+# 백그라운드 sync script — 별도 PowerShell 프로세스로 실행
+if (($env:AIMV_VIZ_AUTO_PULL -eq 'true') -or ($env:AIMV_VIZ_AUTO_SYNC -eq 'true')) {
+    $bgScriptPath = Join-Path $env:TEMP 'aimv_viz_bg_sync.ps1'
+    $bgScript = @"
+`$ErrorActionPreference = 'Continue'
+`$statusFile = '$statusFile'
+`$myRoot = '$myRoot'
+`$coreCliPath = '$coreCliPath'
+`$nodeExe = '$($nodeCmd.Source)'
+`$autoPull = '$($env:AIMV_VIZ_AUTO_PULL)'
+`$autoSync = '$($env:AIMV_VIZ_AUTO_SYNC)'
+
+function Set-SyncStatus(`$status, `$step, `$message, `$error_val, `$completed) {
+    `$obj = @{
+        status = `$status
+        started_at = `$started_at
+        completed_at = if (`$completed) { (Get-Date).ToString('o') } else { `$null }
+        step = `$step
+        message = `$message
+        error = `$error_val
+    }
+    `$json = `$obj | ConvertTo-Json -Compress
+    [System.IO.File]::WriteAllText(`$statusFile, `$json, [System.Text.UTF8Encoding]::new(`$false))
+}
+
+`$started_at = (Get-Date).ToString('o')
+
+# 1. git pull + 변동 감지
+`$pullChanged = `$false
+if (`$autoPull -eq 'true') {
+    Set-SyncStatus 'running' 'git_pull' 'git pull --ff-only origin main' `$null `$false
+    `$pullLog = Join-Path `$env:TEMP 'aimv_viz_git_pull.log'
+    try {
+        `$gitExe = (Get-Command git -ErrorAction Stop).Source
+        if (Test-Path (Join-Path `$myRoot '.git')) {
+            & `$gitExe -C `$myRoot pull --ff-only origin main *> `$pullLog
+            # R149.2 — 변동 감지: 'Already up to date' 가 아니면 변동 있음
+            `$pullContent = Get-Content `$pullLog -Raw -ErrorAction SilentlyContinue
+            if (`$pullContent -and (`$pullContent -notmatch 'Already up to date')) {
+                `$pullChanged = `$true
+            }
+        }
+    } catch {
+        # git 없음 또는 fail — 계속 진행
+    }
+}
+
+# 2. sync-all (변동 있을 때만)
+if (`$autoSync -eq 'true') {
+    if (-not `$pullChanged -and `$autoPull -eq 'true') {
+        # R149.2 — git pull 변동 0 → sync-all skip (이미 최신)
+        Set-SyncStatus 'done' 'done' '이미 최신 (git pull 변동 없음 → sync 건너뜀)' `$null `$true
+        return
+    }
+    Set-SyncStatus 'running' 'sync_all' 'sync-all --skip-npm (vault 인덱싱 + master 빌드)' `$null `$false
+    `$syncLog = Join-Path `$env:TEMP 'aimv_viz_sync_all.log'
+    try {
+        if ((Test-Path `$coreCliPath)) {
+            & `$nodeExe `$coreCliPath sync-all --skip-npm *> `$syncLog
+        }
+    } catch {
+        Set-SyncStatus 'failed' 'sync_all' '동기화 실패' `$_.Exception.Message `$true
+        return
+    }
+}
+
+# 3. done
+Set-SyncStatus 'done' 'done' '동기화 완료 — 새 데이터 보려면 reload' `$null `$true
+"@
+    # R149.1 — UTF-8 with BOM 저장 (PowerShell 5.1 이 BOM 없으면 cp949 로 해석 → 한글 mojibake).
+    [System.IO.File]::WriteAllText($bgScriptPath, $bgScript, [System.Text.UTF8Encoding]::new($true))
+    Start-Process -FilePath 'powershell.exe' `
+        -ArgumentList @('-NoProfile', '-WindowStyle', 'Hidden', '-File', $bgScriptPath) `
+        -WindowStyle Hidden | Out-Null
+} else {
+    # 자동 동기화 둘 다 off — idle 표시
+    $idleStatus = @{
+        status = 'idle'
+        started_at = (Get-Date).ToString('o')
+        completed_at = (Get-Date).ToString('o')
+        step = $null
+        message = '자동 동기화 비활성 (AIMV_VIZ_AUTO_PULL/SYNC=false)'
+        error = $null
+    } | ConvertTo-Json -Compress
+    [System.IO.File]::WriteAllText($statusFile, $idleStatus, [System.Text.UTF8Encoding]::new($false))
+}
+
+# R133 — viz 시작 시 인덱스 검증 + 자동 빌드 (sync-all 안 쓴 사용자 대응 안전망)
+# master_index.json 부재 시 CoreHub cli.js 로 자동 master-build. R146 가 정상 동작했으면 이미 존재.
 
 if (-not (Test-Path $masterIndexPath)) {
     if ((Test-Path $coreCliPath) -and (Test-Path $coreNodeModules)) {
@@ -179,11 +295,12 @@ if (-not (Test-Path $masterIndexPath)) {
     }
 }
 
-# 4초 후 브라우저 띄움 — 별도 PowerShell 프로세스 (창 숨김)
+# R149.1 — server port polling 후 즉시 chrome (이전 고정 4s 대기 → 평균 1-2s 단축)
+# 별도 PS 프로세스에서 TcpClient 로 port listening 확인되면 chrome 띄움. 최대 10s 폴백.
 $browserCmd = if ($browser) {
-    "Start-Sleep -Seconds 4; Start-Process -FilePath '$browser' -ArgumentList '--app=$url'"
+    "for (`$i = 0; `$i -lt 30; `$i++) { try { `$tcp = New-Object System.Net.Sockets.TcpClient; `$t = `$tcp.ConnectAsync('localhost', $resolvedPort); if (`$t.Wait(300) -and `$tcp.Connected) { `$tcp.Close(); break } `$tcp.Close() } catch {} Start-Sleep -Milliseconds 200 }; Start-Process -FilePath '$browser' -ArgumentList '--app=$url'"
 } else {
-    "Start-Sleep -Seconds 4; Start-Process '$url'"
+    "for (`$i = 0; `$i -lt 30; `$i++) { try { `$tcp = New-Object System.Net.Sockets.TcpClient; `$t = `$tcp.ConnectAsync('localhost', $resolvedPort); if (`$t.Wait(300) -and `$tcp.Connected) { `$tcp.Close(); break } `$tcp.Close() } catch {} Start-Sleep -Milliseconds 200 }; Start-Process '$url'"
 }
 Start-Process -FilePath 'powershell.exe' `
     -ArgumentList @('-NoProfile', '-WindowStyle', 'Hidden', '-Command', $browserCmd) `

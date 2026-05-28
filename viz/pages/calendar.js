@@ -17,7 +17,7 @@
 
 import { presetColorByCategory } from '../lib/buildOption.js';
 import { openNote, openVault } from '../lib/obsidian-uri.js';
-import { filterUserNotes } from '../lib/system-vaults.js';
+import { filterVisibleNotes } from '../lib/system-vaults.js';
 
 const LOOKBACK_OPTIONS = [
   { key: '3m', label: '3개월', days: 90 },
@@ -517,7 +517,7 @@ export async function initPage(container, data /* , userConfig */) {
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
       const j = await r.json();
       if (gen !== state.dailyGen || aborted) return;
-      state.dailyNotes = filterUserNotes(Array.isArray(j.notes) ? j.notes : []);
+      state.dailyNotes = filterVisibleNotes(Array.isArray(j.notes) ? j.notes : []);
       state.dailyLoading = false;
       renderDayArea();
     } catch (err) {
@@ -537,7 +537,7 @@ export async function initPage(container, data /* , userConfig */) {
       if (!notesRes.ok) throw new Error(`HTTP ${notesRes.status}`);
       const payload = await notesRes.json();
       if (aborted) return;
-      state.notes = filterUserNotes(Array.isArray(payload.notes) ? payload.notes : []);
+      state.notes = filterVisibleNotes(Array.isArray(payload.notes) ? payload.notes : []);
       state.byDate = aggregateByDate(state.notes, state.basis);
       state.dataMinDate = computeMinDate(state.notes, state.basis);
       if (state.lookback === 'all') {

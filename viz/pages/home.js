@@ -8,7 +8,7 @@
  *   PageContext = { destroy(), refresh(data) }
  */
 
-import { isSystemVault, filterUserNotes, filterUserVaultsMap } from '../lib/system-vaults.js';
+import { isSystemVault, filterVisibleNotes, filterUserVaultsMap } from '../lib/system-vaults.js';
 
 const KIND_COLOR = {
   VAULT: 'var(--personal)',
@@ -174,18 +174,29 @@ function renderKpi(root, data, snapshots, vaultBirths, allNotes) {
   }
   const m = data.master;
   const connectionCount = countConnections(data);
-  const tagCount = countTags(data);
+  const tagCountRaw = countTags(data);
   const snaps = Array.isArray(snapshots) ? snapshots : [];
   const births = Array.isArray(vaultBirths) ? vaultBirths : [];
   const notes = Array.isArray(allNotes) ? allNotes : [];
+  // R142.5 — KPI 카드도 R142 client filter 적용된 노트 기반으로 derive.
+  //   master raw (m.note_count, m.tag_index) 와 캘린더/additions 페이지의 visible 카운트
+  //   불일치 회피. notes 가 비동기 fetch 라 초기 빈 배열일 때 master raw fallback.
+  const visibleNoteCount = notes.length || m.note_count || 0;
+  const visibleTagSet = new Set();
+  notes.forEach((n) => (Array.isArray(n.tags) ? n.tags : []).forEach((t) => visibleTagSet.add(t)));
+  const visibleTagCount = visibleTagSet.size || tagCountRaw;
   // Notes: 노트만 갱신/생성 둘 다 의미 있음 → 두 sub-link. 다른 카드는 created 단일.
   const notesCreated = computeLatestNote(notes, 'created');
   const notesMtime = computeLatestNote(notes, 'mtime');
+  // R148 — Tags/Connections change 도 노트 기반 derive (디바이스 무관).
+  //   timeseries snapshot 시점이 디바이스마다 다르면 같은 master 데이터인데도
+  //   "+N today" 가 다르게 표시되는 문제 회피. 노트의 mtime 분포 기반으로 통일.
+  //   Connected 는 vault-pair 단위라 노트 기반 derive 어려움 → change 표시 제거.
   const items = [
-    { label: 'Vaults',    num: m.vault_count,   change: computeVaultsFromBirths(births), view: 'vaults' },
-    { label: 'Notes',     num: m.note_count,    notes: { created: notesCreated, mtime: notesMtime } },
-    { label: 'Connected', num: connectionCount, change: computeRecentChange(snaps, 'connection_count'), view: 'connections' },
-    { label: 'Tags',      num: tagCount,        change: computeRecentChange(snaps, 'tag_count'),        view: 'tags' },
+    { label: 'Vaults',    num: m.vault_count,    change: computeVaultsFromBirths(births), view: 'vaults' },
+    { label: 'Notes',     num: visibleNoteCount, notes: { created: notesCreated, mtime: notesMtime } },
+    { label: 'Connected', num: connectionCount,  change: null,                                       view: 'connections' },
+    { label: 'Tags',      num: visibleTagCount,  change: computeTagsRecentFromNotes(notes),          view: 'tags' },
   ];
   slot.innerHTML = items.map((it) => {
     const head = `<div class="head"><span class="label">${escapeHtml(it.label)}</span></div>
@@ -266,6 +277,34 @@ export function computeRecentChange(snapshots, key) {
   return { delta: dailyAdded.get(lastDate), date: lastDate };
 }
 
+/**
+ * R148 — Tags KPI change 를 노트 기반 derive.
+ *
+ * timeseries snapshot 시점이 디바이스마다 다르면 같은 master 데이터인데도
+ * `computeRecentChange(snaps, 'tag_count')` 가 디바이스마다 다른 +N 표시 (예: main +4 vs notebook +12).
+ *
+ * 대신 노트의 mtime 기반 — "가장 최근 mtime 일자 + 그 날 mtime 인 노트들의 unique tags Set size".
+ * master.notes 만 보면 됨 → 디바이스 무관.
+ *
+ * @param {object[]} notes — { mtime, tags, ... }
+ * @returns {{delta: number, date: string|null}}
+ */
+export function computeTagsRecentFromNotes(notes) {
+  if (!Array.isArray(notes) || !notes.length) return { delta: 0, date: null };
+  const byDate = new Map();
+  for (const n of notes) {
+    const date = String(n && n.mtime || '').slice(0, 10);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) continue;
+    if (!byDate.has(date)) byDate.set(date, new Set());
+    const tags = Array.isArray(n.tags) ? n.tags : [];
+    for (const t of tags) byDate.get(date).add(t);
+  }
+  if (!byDate.size) return { delta: 0, date: null };
+  const sortedDates = [...byDate.keys()].sort();
+  const last = sortedDates[sortedDates.length - 1];
+  return { delta: byDate.get(last).size, date: last };
+}
+
 function changeText(change) {
   if (!change || !change.date || change.delta <= 0) {
     return '<div class="change"><span class="date">—</span></div>';
@@ -307,7 +346,7 @@ async function fetchAllNotes() {
     if (!r.ok) throw new Error(`HTTP ${r.status}`);
     const json = await r.json();
     const raw = Array.isArray(json) ? json : (Array.isArray(json.notes) ? json.notes : []);
-    return filterUserNotes(raw);
+    return filterVisibleNotes(raw);
   } catch (err) {
     console.warn('[home] /api/all-notes fetch failed:', err.message);
     return [];

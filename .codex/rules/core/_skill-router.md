@@ -29,6 +29,7 @@
 | Obsidian 인스턴스 제어 | Obsidian 창, 옵시디언 창, ob 창, 인스턴스, instance, N개로 맞춰, N개로 줄여, N개로 늘려, Obsidian 정리, 옵시디언 닫아, Obsidian 몇 개 | `/obsidian-windows` Skill + `.claude/rules/custom/obsidian-instance-control.md` (custom 주입됨) |
 | 에이전트 작업 위임 | 위임, 떠넘겨, 백그라운드로, 별도 인스턴스로, 워커, delegate, 병렬 작업, 동시 작업, 다른 클로드, 다른 에이전트가, 큐로 던져, 긴 작업이라 따로, 이건 다른 세션에서 | `/delegate-task` Skill (큐 작성 + spawn + 트리거 + 추적 + 완료 통합 워크플로우) |
 | Canvas 작성 (Obsidian Advanced Canvas) | 캔버스, 구조도, 다이어그램, advanced canvas, Obsidian Canvas, .canvas, 노드 + 엣지, 시스템 도식 | `/canvas-create` Skill + `.agents/rules/custom/Canvas/canvas-design.md` Read |
+| viz · 디바이스 간 동기화 | viz, 시각화, 동기화, sync-banner, sync-status, viz `.exe`, Generate Visualization, viz_snapshots, Viz-Snapshot, 디바이스 정합, KPI 불일치, 캘린더 헤더, master_index 차이, vault_index, 자동 동기화, AIMV_VIZ_AUTO | `.claude/rules/core/viz-device-sync.md` (core 주입됨) |
 
 ## 매칭 실패 시
 
