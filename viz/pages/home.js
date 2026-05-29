@@ -191,11 +191,13 @@ function renderKpi(root, data, snapshots, vaultBirths, allNotes) {
   // R148 — Tags/Connections change 도 노트 기반 derive (디바이스 무관).
   //   timeseries snapshot 시점이 디바이스마다 다르면 같은 master 데이터인데도
   //   "+N today" 가 다르게 표시되는 문제 회피. 노트의 mtime 분포 기반으로 통일.
-  //   Connected 는 vault-pair 단위라 노트 기반 derive 어려움 → change 표시 제거.
+  // R153 — Connected 도 노트 기반 2지표 derive (신규 owner-user-tag 쌍 + 기존 connection 의 새 노트).
+  const connPairs = computeConnectionsNewPairs(notes, m.connections);
+  const connNotes = computeConnectionsNewNotes(notes, m.connections);
   const items = [
     { label: 'Vaults',    num: m.vault_count,    change: computeVaultsFromBirths(births), view: 'vaults' },
     { label: 'Notes',     num: visibleNoteCount, notes: { created: notesCreated, mtime: notesMtime } },
-    { label: 'Connected', num: connectionCount,  change: null,                                       view: 'connections' },
+    { label: 'Connected', num: connectionCount,  conns: { pairs: connPairs, notes: connNotes } },
     { label: 'Tags',      num: visibleTagCount,  change: computeTagsRecentFromNotes(notes),          view: 'tags' },
   ];
   slot.innerHTML = items.map((it) => {
@@ -204,6 +206,10 @@ function renderKpi(root, data, snapshots, vaultBirths, allNotes) {
     // Notes 카드: 생성/갱신 두 sub-link
     if (it.notes) {
       return `<div class="kpi multi">${head}${notesSubLink(it.notes.created, 'created', '생성')}${notesSubLink(it.notes.mtime, 'mtime', '갱신')}</div>`;
+    }
+    // R153 — Connected 카드: 연결/노트 두 sub-link (둘 다 #connections 직진)
+    if (it.conns) {
+      return `<div class="kpi multi">${head}${connectionsSubLink(it.conns.pairs, '연결')}${connectionsSubLink(it.conns.notes, '노트')}</div>`;
     }
     // 단일 카드 — change.date 있으면 그 날짜의 additions 페이지로 링크 (R116).
     // basis=created: timeseries delta 는 인덱스 빌드 시 신규 노트 추가 기반이라 mtime 으로 가면 0건 빈 결과.
@@ -226,6 +232,16 @@ function notesSubLink(change, basis, label) {
   }
   const dateLabel = change.date.slice(5).replace('-', '/');
   return `<a class="change up sub-link" href="#additions?date=${change.date}&basis=${basis}">
+    <span class="delta-num">+${change.delta}</span><span class="vault-label">${escapeHtml(label)}</span><span class="date">${dateLabel}</span>
+  </a>`;
+}
+
+function connectionsSubLink(change, label) {
+  if (!change || !change.date || change.delta <= 0) {
+    return `<div class="change"><span class="vault-label">${escapeHtml(label)}</span><span class="date">—</span></div>`;
+  }
+  const dateLabel = change.date.slice(5).replace('-', '/');
+  return `<a class="change up sub-link" href="#connections">
     <span class="delta-num">+${change.delta}</span><span class="vault-label">${escapeHtml(label)}</span><span class="date">${dateLabel}</span>
   </a>`;
 }
@@ -307,6 +323,107 @@ export function computeTagsRecentFromNotes(notes) {
   const sortedDates = [...byDate.keys()].sort();
   const last = sortedDates[sortedDates.length - 1];
   return { delta: byDate.get(last).size, date: last };
+}
+
+function normalizeConnections(connections) {
+  if (!connections) return [];
+  if (Array.isArray(connections)) return connections;
+  if (typeof connections === 'object') {
+    return Object.entries(connections).map(([tag, v]) => ({ tag, ...(v || {}) }));
+  }
+  return [];
+}
+
+function buildFirstSeen(notes, tagFilter) {
+  const firstSeen = new Map();
+  for (const n of notes) {
+    const date = String(n && n.created || '').slice(0, 10);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) continue;
+    const vault = n.vault_id;
+    if (!vault) continue;
+    const tags = Array.isArray(n.tags) ? n.tags : [];
+    for (const t of tags) {
+      if (tagFilter && !tagFilter.has(t)) continue;
+      const key = `${vault}::${t}`;
+      const prev = firstSeen.get(key);
+      if (!prev || date < prev) firstSeen.set(key, date);
+    }
+  }
+  return firstSeen;
+}
+
+/**
+ * R153 — 지표 1: 신규 owner-user-tag 쌍 형성일 분포 → 가장 최근 일자 + 그 날 신규 쌍 수.
+ * 디바이스 무관 — 노트 created 분포만 의존. (vault, tag) 첫 등장 일자 기반.
+ * @param {object[]} notes
+ * @param {object|Array} connections — master.connections
+ * @returns {{delta: number, date: string|null}}
+ */
+export function computeConnectionsNewPairs(notes, connections) {
+  if (!Array.isArray(notes) || !notes.length) return { delta: 0, date: null };
+  const conns = normalizeConnections(connections);
+  if (!conns.length) return { delta: 0, date: null };
+  const tagFilter = new Set(conns.map((c) => c.tag).filter(Boolean));
+  const firstSeen = buildFirstSeen(notes, tagFilter);
+  const dailyPairs = new Map();
+  for (const c of conns) {
+    if (!c.owner || !c.tag || !Array.isArray(c.users)) continue;
+    const ownerDate = firstSeen.get(`${c.owner}::${c.tag}`);
+    if (!ownerDate) continue;
+    for (const user of c.users) {
+      const userDate = firstSeen.get(`${user}::${c.tag}`);
+      if (!userDate) continue;
+      const formed = ownerDate > userDate ? ownerDate : userDate;
+      dailyPairs.set(formed, (dailyPairs.get(formed) || 0) + 1);
+    }
+  }
+  if (!dailyPairs.size) return { delta: 0, date: null };
+  const sorted = [...dailyPairs.keys()].sort();
+  const last = sorted[sorted.length - 1];
+  return { delta: dailyPairs.get(last), date: last };
+}
+
+/**
+ * R153 — 지표 2: 기존 connection 에 추가된 노트 수.
+ * owned tag (master.connections 의 tag) 를 가진 노트 중 (vault, tag) 첫 등장이 아닌 노트의
+ * created 분포. 가장 최근 일자 + 그 날 추가된 노트 수. 지표 1 (첫 등장) 과 중복 회피.
+ * @param {object[]} notes
+ * @param {object|Array} connections
+ * @returns {{delta: number, date: string|null}}
+ */
+export function computeConnectionsNewNotes(notes, connections) {
+  if (!Array.isArray(notes) || !notes.length) return { delta: 0, date: null };
+  const conns = normalizeConnections(connections);
+  if (!conns.length) return { delta: 0, date: null };
+  const tagToVaults = new Map();
+  for (const c of conns) {
+    if (!c.tag) continue;
+    const set = new Set([c.owner, ...(Array.isArray(c.users) ? c.users : [])].filter(Boolean));
+    tagToVaults.set(c.tag, set);
+  }
+  const tagFilter = new Set(tagToVaults.keys());
+  const firstSeen = buildFirstSeen(notes, tagFilter);
+  const dailyNotes = new Map();
+  for (const n of notes) {
+    const date = String(n && n.created || '').slice(0, 10);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) continue;
+    const vault = n.vault_id;
+    if (!vault) continue;
+    const tags = Array.isArray(n.tags) ? n.tags : [];
+    let counted = false;
+    for (const t of tags) {
+      if (!tagToVaults.has(t)) continue;
+      if (!tagToVaults.get(t).has(vault)) continue;
+      if (firstSeen.get(`${vault}::${t}`) === date) continue;
+      counted = true;
+      break;
+    }
+    if (counted) dailyNotes.set(date, (dailyNotes.get(date) || 0) + 1);
+  }
+  if (!dailyNotes.size) return { delta: 0, date: null };
+  const sorted = [...dailyNotes.keys()].sort();
+  const last = sorted[sorted.length - 1];
+  return { delta: dailyNotes.get(last), date: last };
 }
 
 function changeText(change) {
