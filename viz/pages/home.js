@@ -212,6 +212,10 @@ function renderKpi(root, data, snapshots, vaultBirths, allNotes) {
       const viewQ = (it.view && it.view !== 'notes') ? `&view=${it.view}` : '';
       return `<a class="kpi linkable" href="#additions?date=${it.change.date}${viewQ}&basis=created">${inner}</a>`;
     }
+    // R152 — change 없어도 view 있으면 해당 페이지 직진 (Connected 등 vault-pair 단위 카드 진입 동선).
+    if (it.view) {
+      return `<a class="kpi linkable" href="#${it.view}">${inner}</a>`;
+    }
     return `<div class="kpi">${inner}</div>`;
   }).join('');
 }
