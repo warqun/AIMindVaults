@@ -15,7 +15,7 @@ updated: 2026-04-20
 
 ## 이 볼트의 역할
 
-PARA 기반 프로젝트 실행 Preset — Core 6 + Custom 5 (tasks-plugin, metadata-menu, mermaid-tools, obsidian-git, mcp-tools). 9 타입 (idea/plan/spec/design/task/decision/issue/report/retro). 대상: Projects_Game, Projects_Infra.
+PARA 기반 프로젝트 실행 Preset — Core 6 + Custom 6 (tasks-plugin, metadata-menu, mermaid-tools, obsidian-git, mcp-tools, juggl). 9 타입 (idea/plan/spec/design/task/decision/issue/report/retro). 대상: Projects_Game, Projects_Infra.
 
 ## Core 편집은 Core Hub 에서만
 

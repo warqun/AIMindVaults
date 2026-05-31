@@ -15,7 +15,7 @@ updated: 2026-04-20
 
 ## 이 볼트의 역할
 
-Core 6 + 일기 전용 Custom 4 (Calendar, Periodic Notes, Heatmap Calendar, Journal Review). 최소 UI · 프라이버시 우선 · AI scope 기본 none. 대상: Vaults/Personal/Diary.
+Core 6 + 일기 전용 Custom 5 (Calendar, Periodic Notes, Heatmap Calendar, Journal Review, Juggl). 최소 UI · 프라이버시 우선 · AI scope 기본 none. 대상: Vaults/Personal/Diary.
 
 ## Core 편집은 Core Hub 에서만
 

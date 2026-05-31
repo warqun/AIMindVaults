@@ -15,7 +15,7 @@ updated: 2026-04-20
 
 ## 이 볼트의 역할
 
-실험·반복 R&D Preset — 3축 (Iteration·Knowledge·Phase). Core 6 + Custom 6 (git, mcp-tools, tasks, mermaid, metadata-menu, quickadd). 9 타입 (idea/literature/permanent/moc/experiment/failure-log/plan/report/decision). 대상: ObsidianDev, CombatToolKit, TileMapToolKit, CookingLab.
+실험·반복 R&D Preset — 3축 (Iteration·Knowledge·Phase). Core 6 + Custom 7 (git, mcp-tools, tasks, mermaid, metadata-menu, quickadd, juggl). 9 타입 (idea/literature/permanent/moc/experiment/failure-log/plan/report/decision). 대상: ObsidianDev, CombatToolKit, TileMapToolKit, CookingLab.
 
 ## Core 편집은 Core Hub 에서만
 

@@ -1,0 +1,234 @@
+/*
+  Juggl graph style for Projects_VamSurLike
+  Finalized status/priority mapping (2026-03-04)
+*/
+
+node {
+  shape: round-rectangle;
+  width: label;
+  height: label;
+  padding: 10px;
+  background-color: #2f6fed;
+  border-color: #1b3f8a;
+  border-width: 1.5px;
+  color: #f8fafc;
+  font-size: 12px;
+  font-weight: 600;
+  text-wrap: wrap;
+  text-max-width: 170px;
+  text-valign: center;
+  text-halign: center;
+  label: data(name);
+}
+
+node:selected {
+  border-width: 4px;
+  border-color: #f59e0b;
+  overlay-opacity: 0;
+}
+
+edge {
+  width: 1.4px;
+  line-color: #7c8aa5;
+  target-arrow-color: #7c8aa5;
+  target-arrow-shape: triangle;
+  curve-style: bezier;
+  opacity: 0.85;
+}
+
+edge:selected {
+  width: 2.4px;
+  line-color: #f59e0b;
+  target-arrow-color: #f59e0b;
+}
+
+/* Section by folder */
+node[path *= "docs/01-concept/"] {
+  shape: hexagon;
+  background-color: #0ea5a6;
+  border-color: #0b7677;
+}
+
+node[path *= "docs/02-design/"] {
+  shape: round-rectangle;
+  background-color: #2563eb;
+  border-color: #1e40af;
+}
+
+node[path *= "docs/03-spec/"] {
+  shape: rectangle;
+  background-color: #4338ca;
+  border-color: #312e81;
+}
+
+node[path *= "docs/issues/"] {
+  shape: diamond;
+  background-color: #475569;
+  border-color: #334155;
+}
+
+node[path *= "docs/04-debug/"] {
+  shape: star;
+  background-color: #a855f7;
+  border-color: #7e22ce;
+}
+
+node[path *= "docs/temp/"] {
+  shape: round-rectangle;
+  background-color: #64748b;
+  border-color: #475569;
+  opacity: 0.72;
+}
+
+/* Mirror style rules for isolated examples */
+node[path *= "Juggl_StyleGuide/Examples/01-concept/"] {
+  shape: hexagon;
+  background-color: #0ea5a6;
+  border-color: #0b7677;
+}
+
+node[path *= "Juggl_StyleGuide/Examples/02-design/"] {
+  shape: round-rectangle;
+  background-color: #2563eb;
+  border-color: #1e40af;
+}
+
+node[path *= "Juggl_StyleGuide/Examples/03-spec/"] {
+  shape: rectangle;
+  background-color: #4338ca;
+  border-color: #312e81;
+}
+
+node[path *= "Juggl_StyleGuide/Examples/issues/"] {
+  shape: diamond;
+  background-color: #475569;
+  border-color: #334155;
+}
+
+node[path *= "Juggl_StyleGuide/Examples/04-debug/"] {
+  shape: star;
+  background-color: #a855f7;
+  border-color: #7e22ce;
+}
+
+node[path *= "Juggl_StyleGuide/Examples/temp/"] {
+  shape: round-rectangle;
+  background-color: #64748b;
+  border-color: #475569;
+  opacity: 0.72;
+}
+
+/* Issue priority color (issue notes only, priority field + tag fallback) */
+node[path *= "docs/issues/"][priority *= "high"],
+node[path *= "docs/issues/"][priority *= "High"],
+node[path *= "docs/issues/"][priority *= "HIGH"],
+node[path *= "docs/issues/"][tags *= "priority/high"],
+node[path *= "docs/issues/"][tags *= ", high,"],
+node[path *= "docs/issues/"][tags *= "[high"],
+node[path *= "Juggl_StyleGuide/Examples/issues/"][priority *= "high"],
+node[path *= "Juggl_StyleGuide/Examples/issues/"][priority *= "High"],
+node[path *= "Juggl_StyleGuide/Examples/issues/"][priority *= "HIGH"],
+node[path *= "Juggl_StyleGuide/Examples/issues/"][tags *= "priority/high"],
+node[path *= "Juggl_StyleGuide/Examples/issues/"][tags *= ", high,"],
+node[path *= "Juggl_StyleGuide/Examples/issues/"][tags *= "[high"] {
+  background-color: #dc2626;
+  border-color: #991b1b;
+}
+
+node[path *= "docs/issues/"][priority *= "medium"],
+node[path *= "docs/issues/"][priority *= "Medium"],
+node[path *= "docs/issues/"][priority *= "MEDIUM"],
+node[path *= "docs/issues/"][tags *= "priority/medium"],
+node[path *= "docs/issues/"][tags *= ", medium,"],
+node[path *= "docs/issues/"][tags *= "[medium"],
+node[path *= "Juggl_StyleGuide/Examples/issues/"][priority *= "medium"],
+node[path *= "Juggl_StyleGuide/Examples/issues/"][priority *= "Medium"],
+node[path *= "Juggl_StyleGuide/Examples/issues/"][priority *= "MEDIUM"],
+node[path *= "Juggl_StyleGuide/Examples/issues/"][tags *= "priority/medium"],
+node[path *= "Juggl_StyleGuide/Examples/issues/"][tags *= ", medium,"],
+node[path *= "Juggl_StyleGuide/Examples/issues/"][tags *= "[medium"] {
+  background-color: #facc15;
+  border-color: #ca8a04;
+  color: #111827;
+}
+
+node[path *= "docs/issues/"][priority *= "low"],
+node[path *= "docs/issues/"][priority *= "Low"],
+node[path *= "docs/issues/"][priority *= "LOW"],
+node[path *= "docs/issues/"][tags *= "priority/low"],
+node[path *= "docs/issues/"][tags *= ", low,"],
+node[path *= "docs/issues/"][tags *= "[low"],
+node[path *= "Juggl_StyleGuide/Examples/issues/"][priority *= "low"],
+node[path *= "Juggl_StyleGuide/Examples/issues/"][priority *= "Low"],
+node[path *= "Juggl_StyleGuide/Examples/issues/"][priority *= "LOW"],
+node[path *= "Juggl_StyleGuide/Examples/issues/"][tags *= "priority/low"],
+node[path *= "Juggl_StyleGuide/Examples/issues/"][tags *= ", low,"],
+node[path *= "Juggl_StyleGuide/Examples/issues/"][tags *= "[low"] {
+  background-color: #38bdf8;
+  border-color: #0284c7;
+  color: #082f49;
+}
+/* Status border (all notes) */
+node[status *= "미결"],
+node[status *= "todo"],
+node[status *= "Todo"],
+node[status *= "TODO"],
+node[status *= "open"],
+node[status *= "Open"],
+node[status *= "OPEN"] {
+  border-width: 3px;
+  border-color: #f59e0b;
+}
+
+node[status *= "진행"],
+node[status *= "in_progress"],
+node[status *= "In Progress"],
+node[status *= "doing"],
+node[status *= "Doing"],
+node[status *= "방향확정"],
+node[status *= "방향 확정"],
+node[status *= "direction_confirmed"] {
+  border-width: 3px;
+  border-color: #22c55e;
+}
+
+node[status *= "문제재발"],
+node[status *= "reopen"],
+node[status *= "reopened"],
+node[status *= "regression"] {
+  border-width: 3px;
+  border-color: #dc2626;
+}
+
+
+node[status *= "대기"],
+node[status *= "waiting"],
+node[status *= "Waiting"],
+node[status *= "pending"],
+node[status *= "Pending"] {
+  border-width: 3px;
+  border-color: #ffffff;
+}node[status *= "완료"],
+node[status *= "완결"],
+node[status *= "done"],
+node[status *= "Done"],
+node[status *= "DONE"],
+node[status *= "closed"],
+node[status *= "Closed"],
+node[status *= "resolved"],
+node[status *= "Resolved"] {
+  border-width: 1.5px;
+}
+
+/* De-emphasize index/helper notes */
+node[name *= "_INDEX"],
+node[name *= "INDEX"],
+node[name *= "VAULT-INDEX"],
+node[name *= "STATUS"] {
+  font-size: 10px;
+  background-color: #334155;
+  border-color: #1e293b;
+  opacity: 0.7;
+}
+
+
