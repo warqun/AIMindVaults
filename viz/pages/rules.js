@@ -1,6 +1,43 @@
-// AIMindVaults Visualization — AI 룰·스킬 뷰어 페이지 (W5)
-// Spec: Phase 2.5 § 5.3 rules · 시안 viz_design_drafts/08_rules.html
-// Interface: export async function initPage(container, data, userConfig): Promise<PageContext>
+/**
+ * AIMindVaults Visualization — AI Rules · Skills Viewer 페이지 (W5)
+ *
+ * 역할:
+ *   `.claude/` + `.codex/` 의 룰·스킬·후크 파일 트리 + 우측 마크다운 preview.
+ *   에이전트 (claude / codex / other) → top 카테고리 (rules / commands / skills / hooks) → sub (core/custom/...) → 파일.
+ *
+ * 트리 구조:
+ *   - `.claude/` (claude)
+ *     ├ rules/ — core/, custom/, 도메인별 (Unity/Blender/...)
+ *     ├ commands/ — core/, custom/, 도메인별
+ *     └ hooks/ — 단일 레벨 (sub 없음, isHookGroup)
+ *   - `.codex/` (codex)
+ *     ├ rules/
+ *     └ skills/
+ *   - other/ (그 외)
+ *
+ * 색 구분 (KIND_VAR):
+ *   - core   (배포 대상)
+ *   - custom (개인)
+ *   - hook   (자동 실행)
+ *
+ * 데이터 입력:
+ *   - GET /api/rules — `[{path, name, kind, content}]` (server 가 .claude/.codex/ 일괄 수집)
+ *
+ * 주요 함수 카탈로그:
+ *   - initPage              ← 진입점, /api/rules fetch + 트리 + click 핸들러
+ *   - buildRulesTree        ← 평탄 list → 3 단 트리 (agent / top / sub / files)
+ *   - categoryFromPath      ← path → [agent, top, sub] 분류
+ *   - renderTree            ← 트리 DOM 렌더 (재귀 4 레벨)
+ *   - renderItemPreview     ← .md = markdown / .py = code block
+ *
+ * 표준 시그니처:
+ *   export async function initPage(container, data, userConfig): Promise<PageContext>
+ *
+ * 참조:
+ *   Spec:    [[20260513_시스템스펙_04_시각화]] § 5 page mapping (rules)
+ *   시안:    viz_design_drafts/08_rules.html
+ *   영문화:  [[20260530_viz_정본_영문화_매니페스트]] § 6.8
+ */
 
 import { renderMarkdown } from '../lib/markdown.js';
 
@@ -21,6 +58,7 @@ function categoryFromPath(p) {
   return [agent, top, sub];
 }
 
+/** 평탄 items → 3 단 객체 `{agent: {top: {sub|"_": [items]}}}`. sub 없으면 키 `"_"`. */
 function buildRulesTree(items) {
   const tree = {};
   for (const item of items) {
@@ -41,6 +79,10 @@ function el(tag, cls, html) {
   return e;
 }
 
+/**
+ * 트리 DOM 렌더 (재귀). agentOrder + topOrder 로 고정 순서 (claude/codex/other × rules/commands/skills/hooks).
+ * hooks 는 단일 레벨 (sub 없음). 검색 활성 시 filterText 가 file (name + path) 부분 일치.
+ */
 function renderTree(state, treeEl) {
   treeEl.innerHTML = '';
   const filterText = (state.filter || '').toLowerCase().trim();
@@ -125,6 +167,10 @@ function renderItemPreview(previewEl, item) {
     <div class="pbody">${bodyHtml}</div>`;
 }
 
+/**
+ * Rules Viewer 진입점. /api/rules fetch → 트리 빌드 + 렌더 + 검색 + click 위임.
+ * 검색 활성 시 모든 레벨 자동 펼침. 파일 클릭 시 preview (.md → markdown, .py → code block).
+ */
 export async function initPage(container, data, userConfig) {
   container.innerHTML = `
     <div class="rules-page">

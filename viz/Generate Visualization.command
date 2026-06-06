@@ -1,4 +1,6 @@
 #!/bin/bash
+# AIMindVaults Visualization — macOS .command 진입 (Finder 더블클릭)
+# Chrome/Edge --app 백그라운드 (4s 후) + node server.js foreground. 영문화: 매니페스트 § 6.16.
 cd "$(dirname "$0")"
 URL="http://localhost:8765"
 

@@ -1,7 +1,23 @@
-// AIMindVaults Visualization — Network sliders 모듈 (W2)
-// Spec: Vaults/Projects_Infra/Project_AIMindVaults/Contents/Project/spec/20260508_그래프뷰_안정화_인터페이스_명세.md § 2.2
-// 계획서: 20260508_시각화_그래프뷰_안정화_계획.md § 4.3 + § 4.6 (label 슬라이더)
-// localStorage 키 'aimv_viz_user_config' 의 cfg.network 영역만 read/write (settings.js 와 공유, 다른 영역 보존)
+/**
+ * AIMindVaults Visualization — Network Sliders 모듈 (Phase 2.7 W2)
+ *
+ * 역할:
+ *   network 페이지 toolbar 의 force 슬라이더 4 (gravity / repulsion / edgeLen / labelCount) +
+ *   리셋 버튼 setup. 변경 시 chart 에 즉시 적용 (freezeApi 경유 unfreeze→1초 후 자동 refreeze) +
+ *   localStorage 영속 (400ms debounce).
+ *
+ * 슬라이더 범위:
+ *   - gravity:    0.02 ~ 0.15 (step 0.005, default 0.04)
+ *   - repulsion:  200 ~ 1500 (step 50, default 800)
+ *   - edgeLen:    80 ~ 300   (step 10, default 180)
+ *   - labelCount: 10 ~ 200   (step 10, default 50)
+ *
+ * localStorage 키:
+ *   `aimv_viz_user_config` 의 `cfg.network` 영역만 read/write — settings.js 와 공유 (다른 영역 보존).
+ *
+ * Spec:    [[20260508_그래프뷰_안정화_인터페이스_명세]] § 2.2
+ * 영문화:  [[20260530_viz_정본_영문화_매니페스트]] § 6.5
+ */
 
 const STORAGE_KEY = 'aimv_viz_user_config';
 const SAVE_DEBOUNCE_MS = 400;

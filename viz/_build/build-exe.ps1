@@ -1,6 +1,18 @@
 ﻿# AIMindVaults Visualization — .exe 재빌드 스크립트
-# Start-Visualization.ps1 또는 viz.ico 수정 시 재실행.
-# ps2exe 는 _build/tools/ 에 동봉되어 있어 외부 의존 0.
+#
+# 역할:
+#   Start-Visualization.ps1 + viz.ico → `Generate Visualization.exe` ps2exe 컴파일.
+#   Start-Visualization.ps1 또는 viz.ico 수정 시 본 스크립트 재실행.
+#
+# ps2exe 의존:
+#   _build/tools/ps2exe.psm1 동봉 (MIT, 외부 의존 0).
+#
+# 빌드 파라미터:
+#   - NoConsole: 검은 콘솔 창 안 보임 (앱 모드)
+#   - Title / Product / Company / Version / Description 메타
+#   - IconFile: viz.ico
+#
+# 영문화: [[20260530_viz_정본_영문화_매니페스트]] § 6.16
 
 $ErrorActionPreference = 'Stop'
 $buildDir = Split-Path -Parent $MyInvocation.MyCommand.Path

@@ -1,4 +1,22 @@
-// viz/pages/network/labels.js
+/**
+ * AIMindVaults Visualization — Network Labels 모듈 (Phase 2.7 W4)
+ *
+ * 책임:
+ *   노드 중요도 score (nodeImportance = degree + recency boost) 기반 상위 N 위 임계값 계산 →
+ *   threshold 이상의 노드만 라벨 표시. 슬라이더 (sliders.js labelCount) 와 SSE 갱신 (sse-diff) 에서
+ *   updateScoreThreshold / recomputeThreshold 호출.
+ *
+ * Recency boost:
+ *   - mtime 7일 이내: +5
+ *   - 7~14일:        +3
+ *   - 14~30일:       +1
+ *
+ * hub 노드 (HUB_ID_PREFIX 시작) 는 임계와 무관하게 항상 표시.
+ *
+ * Spec:    [[20260508_그래프뷰_안정화_인터페이스_명세]] § 2.4
+ * 영문화:  [[20260530_viz_정본_영문화_매니페스트]] § 6.5
+ */
+
 const HUB_ID_PREFIX = '__hub_';  // hubs.js 부재 시 자체 정의 (메인이 통합 시 import 로 교체)
 
 /**

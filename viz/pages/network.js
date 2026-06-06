@@ -1,15 +1,41 @@
 /**
- * Phase 2.7 — network 페이지 본체 (모듈 통합)
- * spec § 3: Vaults/Projects_Infra/Project_AIMindVaults/Contents/Project/spec/20260508_그래프뷰_안정화_인터페이스_명세.md
+ * AIMindVaults Visualization — Network (멀티볼트 force graph) 페이지 (Phase 2.7)
  *
- * 책임:
- *  - DOM 삽입 (toolbar + chart + side-panel) + 시안 04 정합
- *  - W3 hubs / W1 handlers / W2 sliders / W4 labels / W5 sse-diff 모듈 통합
- *  - buildOptionFromData wrapper (buildOptionA + addCategoryHubs + applyPerformanceOptions + force 슬라이더 값)
- *  - 카테고리 필터 + node/edge multiplier 슬라이더 (toolbar 별도 핸들러)
- *  - destroy / refresh API 유지 (router 호환)
+ * 역할:
+ *   ECharts force-directed network graph — 노드 = vault, 엣지 = cross-vault connection.
+ *   카테고리 그룹 (Domains / Projects / Lab / Basic / Personal / Art) 색 구분 + hub 노드 + 라벨 표시 임계.
+ *   사이드 패널: vault 클릭 시 메타 + 가장 많이 공유하는 볼트 top 5.
+ *
+ * 모듈 통합 (Phase 2.7 W1~W5 분리):
+ *   - W1 handlers.js   — conditional freeze (수렴 후 layout=none) + drag lock + theme observer
+ *   - W2 sliders.js    — gravity/repulsion/edgeLen/labelCount + localStorage 영속 + debounce save
+ *   - W3 hubs.js       — addCategoryHubs (카테고리별 hub 노드 + 연결)
+ *   - W4 labels.js     — nodeImportance score (degree + recency boost) + topN threshold
+ *   - W5 sse-diff.js   — replaceMerge + 위치 보존 + perf (large + hoverLayerThreshold)
+ *
+ * 데이터 입력:
+ *   - data.master (router 전달) — vaults / connections / tag_index 등
+ *   - lib/buildOption.js : buildOptionA(data, cfg) → 기본 그래프 option
+ *   - lib/buildOption.js : deriveConnections(master) → directed 모드용 owner→user 엣지
+ *   - lib/hubs.js        : addCategoryHubs / HUB_ID_PREFIX
+ *   - lib/mask.js        : maskVaultName (UI 표시용)
+ *   - userConfig.colors  — 개별 vault 색 override
+ *
+ * 비자명 패턴:
+ *   - directedMode true: deriveConnections + owner→user 엣지 + edgeSymbol arrow.
+ *   - rebuildBase: buildOptionA 결과의 nodes/links/categories 를 base (cached, mutiplier 안 적용) 로 보관.
+ *   - buildOptionFromData: base → category 필터 + multiplier 적용 + hub 추가 + perf 옵션.
+ *   - legend 우측 vertical 정렬 + 그래프 center 좌측 시프트 (44%) — 우측 패널·legend 겹침 회피.
+ *
+ * 표준 시그니처:
+ *   export async function initPage(container, data, userConfig): Promise<PageContext>
  *
  * 외부 의존성: ECharts CDN (window.echarts)
+ *
+ * 참조:
+ *   Spec:    [[20260508_그래프뷰_안정화_인터페이스_명세]]
+ *   Spec:    [[20260513_시스템스펙_04_시각화]] § 5 page mapping
+ *   영문화:  [[20260530_viz_정본_영문화_매니페스트]] § 6.5
  *
  * @typedef {import('../lib/loadIndex.js').IndexData} IndexData
  * @typedef {Object} PageContext
@@ -114,6 +140,10 @@ function ensurePageStyle() {
   document.head.appendChild(style);
 }
 
+/**
+ * 상단 toolbar HTML — 카테고리 필터 6 + 방향성 토글 + 노드/엣지 multiplier 2 + force 슬라이더 4 (gravity/repulsion/edgeLen/labelCount).
+ * 슬라이더는 sliders.js (W2) 에서 별도 setup. category/multiplier 는 본 파일 onToolbarMisc 핸들러.
+ */
 function buildToolbarHTML(initialCfg) {
   const cats = [
     ['domain', 'Domains', 'var(--domain)'],
@@ -172,6 +202,18 @@ function emptyPanelHTML() {
 }
 
 /**
+ * Network 페이지 진입점. ECharts mount + 5 모듈 setup (handlers / sliders / labels / sse-diff + hubs 통합).
+ *
+ * 흐름:
+ *   1. ensurePageStyle (한 번만 head 에 CSS 주입).
+ *   2. loadNetworkConfig (localStorage 슬라이더 값) → networkCfg.
+ *   3. DOM 렌더 (toolbar + chart + side-panel + 볼트 색 패널).
+ *   4. rebuildBase + buildOptionFromData + chart.setOption.
+ *   5. 5 모듈 setup (의존 순서: labels 먼저 LabelsAPI → freeze/drag/theme/sliders/sse).
+ *   6. 핸들러 부착 (toolbar misc / chart click / 볼트 색 패널 / resize).
+ *
+ * 볼트 색 패널: connections.js 와 동일 패턴 (userConfig.colors + saveUserConfig + broadcast).
+ *
  * @param {HTMLElement} container
  * @param {IndexData} data
  * @param {object} [userConfig]
@@ -226,6 +268,10 @@ export async function initPage(container, data, userConfig) {
   let baseCategories = [];
   let cachedRawData = data;
 
+  /**
+   * Directed 모드 — deriveConnections 결과를 owner→user 엣지로 변환 (pair 단위 합산).
+   * lineStyle width 는 value × 0.6 × edgeMultiplier 를 [1, 12] clamp.
+   */
   function buildDirectedLinks(rawData, edgeMultiplier) {
     if (!rawData || !rawData.master) return [];
     const owned = deriveConnections(rawData.master).filter((c) => c.owner !== null);
@@ -279,6 +325,10 @@ export async function initPage(container, data, userConfig) {
     return opt;
   }
 
+  /**
+   * 매 갱신 시 호출 — base (rebuildBase) 에서 category 필터 + multiplier + directed 분기 + hub 추가 + perf 옵션 적용.
+   * SSE diff (W5) 의 onDataChanged 가 본 함수 호출 → 결과를 chart.setOption 으로 replaceMerge.
+   */
   function buildOptionFromData(d) {
     if (d !== cachedRawData) rebuildBase(d);
     const baseCfg = { ...(userConfig || {}), thicknessMultiplier: 1.0 };

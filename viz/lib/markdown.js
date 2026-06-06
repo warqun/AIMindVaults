@@ -1,6 +1,29 @@
-// AIMindVaults Visualization — markdown mini parser (W5)
-// Phase 2.5 spec § 5.4: 외부 의존성 0 — h1~h3 / p / ul / li / code (inline + fenced) / blockquote 만.
-// 시안 07 · 08 의 .preview .pbody 클래스 위에서 렌더.
+/**
+ * AIMindVaults Visualization — Markdown Mini Parser (W5)
+ *
+ * 역할:
+ *   외부 의존성 0 의 lightweight markdown 파서. explorer / rules / additions 페이지의 노트 preview
+ *   본문 렌더링 (`.preview .pbody`). 전체 spec 지원은 아니고 다음 요소만:
+ *
+ *   - h1 ~ h3 (`# / ## / ###`)
+ *   - paragraph (빈 줄 사이 연속 라인)
+ *   - bullet list (`- ` / `* `)
+ *   - numbered list (`1. ` / `2. ` ...)
+ *   - blockquote (`> `)
+ *   - fenced code block (` ``` lang ... ``` `)
+ *   - inline: `code`, **strong**, *em*, [link](url)
+ *   - GFM table (header + 구분선 + body rows)
+ *   - 자동 HTML escape
+ *
+ * 외부 link 는 `target="_blank" rel="noopener"`. 코드 block 은 `<pre class="md-code" data-lang>`.
+ *
+ * 주요 export:
+ *   - renderMarkdown(text)               ← raw text → HTML string
+ *   - splitFrontmatter(text)             ← `--- ... ---` 분리 → { frontmatter, body }
+ *
+ * Spec: [[20260513_시스템스펙_04_시각화]] § 9.1 마크다운 미니 파서
+ * 영문화: [[20260530_viz_정본_영문화_매니페스트]] § 6.lib
+ */
 
 const ESC = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
 function escapeHtml(s) { return String(s).replace(/[&<>"']/g, (c) => ESC[c]); }

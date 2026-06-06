@@ -1,6 +1,18 @@
-// viz/pages/network/sse-diff.js
-// W5 — SSE diff replaceMerge + performance options.
-// spec § 2.5 / plan § 4.7 / 4.8.
+/**
+ * AIMindVaults Visualization — Network SSE Diff 모듈 (Phase 2.7 W5)
+ *
+ * 책임:
+ *   - applyPerformanceOptions: series[0] 에 large=true (>1000) + hoverLayerThreshold (3000) + SERIES_ID 부여.
+ *   - setupSseDiff:           SSE 'data-changed' 수신 시 newOption build → 노드 ID 기반 x,y 좌표 보존 → merge mode setOption.
+ *     replaceMerge 대신 merge mode 사용 — series[0] 의 type/layout/force/categories/label 등 보존 (replaceMerge 는 통째 교체로 type 사라짐).
+ *
+ * 비자명:
+ *   - 노드 ID 안정성 검증 (개발 모드) — oldIds 와 newIds 가 전체 교체면 console.warn.
+ *   - freezeApi.resetFrozenFlag + labelsApi.recomputeThreshold 후속 호출 (위치 박제 + 라벨 임계 재계산).
+ *
+ * Spec:    [[20260508_그래프뷰_안정화_인터페이스_명세]] § 2.5
+ * 영문화:  [[20260530_viz_정본_영문화_매니페스트]] § 6.5
+ */
 
 const SERIES_ID = 'graph-main';
 const LARGE_THRESHOLD = 1000;

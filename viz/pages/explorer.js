@@ -1,6 +1,37 @@
-// AIMindVaults Visualization — Vault 탐색기 페이지 (W5)
-// Spec: Phase 2.5 § 5.3 explorer · 시안 viz_design_drafts/07_explorer.html
-// Interface: export async function initPage(container, data, userConfig): Promise<PageContext>
+/**
+ * AIMindVaults Visualization — Vault Explorer 페이지 (W5)
+ *
+ * 역할:
+ *   좌측 트리 (카테고리 → 볼트 → 디렉토리 → 노트) + 우측 preview (frontmatter + body markdown).
+ *   카테고리·볼트·디렉토리 각 레벨 접기/펼치기 + 검색 (이름·경로 부분 일치) + Obsidian 열기.
+ *
+ * 트리 구조:
+ *   - 카테고리 (Domains_Game / Projects_Infra / ... — vault meta.path 의 두 번째 segment)
+ *     └ 볼트 (vault_id) — 노트 수 표시 + Obsidian 열기 ↗
+ *         └ 디렉토리 (notes path 의 segment, 재귀)
+ *             └ 노트 (file) — Obsidian 열기 ↗ + 클릭 시 우측 preview
+ *
+ * 데이터 입력:
+ *   - data.master.vaults — vault 메타 (path → categoryOf)
+ *   - data.master.notes  — vault_id 별 노트 + path
+ *   - GET /api/note?vault=&path= — preview 로드 (raw markdown)
+ *
+ * 주요 함수 카탈로그:
+ *   - initPage                          ← 진입점, state + 트리/검색/click 핸들러
+ *   - buildVaultTrees                   ← master → { byVault, byCat } 트리 데이터
+ *   - buildVaultPathTree / insertIntoTree ← 노트 path → 디렉토리 트리
+ *   - renderTreeNodes / renderPathTreeInto ← 트리 DOM 렌더 (재귀)
+ *   - renderEmptyPreview / renderNotePreview ← preview 영역
+ *   - CATEGORY_COLOR_VAR                ← 카테고리 → CSS 변수 매핑 (사용자 카테고리 추가 시 보강 필요)
+ *
+ * 표준 시그니처:
+ *   export async function initPage(container, data, userConfig): Promise<PageContext>
+ *
+ * 참조:
+ *   Spec:    [[20260513_시스템스펙_04_시각화]] § 5 page mapping (explorer)
+ *   시안:    viz_design_drafts/07_explorer.html
+ *   영문화:  [[20260530_viz_정본_영문화_매니페스트]] § 6.7
+ */
 
 import { renderMarkdown, splitFrontmatter } from '../lib/markdown.js';
 import { openNote, openVault } from '../lib/obsidian-uri.js';
@@ -30,6 +61,11 @@ function categoryOf(vaultMeta) {
   return (vaultMeta?.path || '').split('/')[1] || 'unknown';
 }
 
+/**
+ * master.{notes, vaults} → 트리 데이터 2 종:
+ *   - byVault[vault_id] = [notes...]              ← 빠른 vault → notes lookup
+ *   - byCat[category]   = [{vaultId, meta, notes}...] ← 카테고리 그룹 (트리 렌더 source)
+ */
 function buildVaultTrees(master) {
   const byVault = {};
   for (const n of master.notes) {
@@ -65,6 +101,11 @@ function buildVaultPathTree(notes) {
   return root;
 }
 
+/**
+ * 트리 DOM 렌더 (in-place innerHTML 갱신). 카테고리 → 볼트 → 디렉토리 → 노트 재귀.
+ * 검색 활성 시 filterText 가 file 노드를 (title + path) 부분 일치로 필터.
+ * state.collapsedCats / expandedVaults / collapsedDirs / selectedNote 반영.
+ */
 function renderTreeNodes(state, treeWrap) {
   const frag = document.createDocumentFragment();
   const filterText = (state.filter || '').toLowerCase().trim();
@@ -169,6 +210,11 @@ async function fetchNote(vaultId, notePath) {
   return r.text();
 }
 
+/**
+ * Explorer 페이지 진입점. 트리 렌더 + 검색 + click 위임 (카테고리/볼트/디렉토리/노트 분기).
+ * 노트 클릭 시 /api/note 로 raw 로드 → renderNotePreview (frontmatter highlight + body markdown).
+ * 검색 활성 시 모든 카테고리·볼트·디렉토리 자동 펼침 (매칭 노출).
+ */
 export async function initPage(container, data, userConfig) {
   container.innerHTML = `
     <div class="explorer-page">

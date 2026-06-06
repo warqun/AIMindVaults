@@ -17,7 +17,6 @@
 | auto-organize.md | 노트/볼트 생성 시 폴더 자동 분류 |
 | create-vault.md | 새 볼트 생성 (위성) |
 | create-preset-hub.md | 새 Preset Hub 생성 (Multi-Hub 아키텍처) |
-| grok-route.md | Grok 분기 라우터 |
 | juggl-note.md | Juggl 포함 표준 노트 생성 |
 | note-link.md | 노트 간 의미적 연결 |
 | status-update.md | 상태 갱신 |
@@ -37,10 +36,14 @@
 
 ## custom/ — 사용자 스킬 (동기화 미대상)
 
-사용자가 자유롭게 추가하는 개인 스킬.
+사용자가 자유롭게 추가하는 개인 스킬. 본인 환경 (외부 서비스, 도구, 워크플로우) 에 맞춰 자유롭게 추가.
 배포 동기화가 이 폴더를 건드리지 않는다.
 
-| 파일명 | 용도 |
-|--------|------|
-| discord-manage.md | AIMindVaults 디스코드 서버를 봇으로 관리 |
-| spawn-claude.md | AIMindVaults 루트에서 새 Claude CLI 터미널 인스턴스 실행 |
+> 예시 카테고리:
+> - 외부 서비스 봇·API 자동화 (메시징 플랫폼, 협업 도구 등)
+> - CLI 인스턴스 spawn / 워커 관리
+> - 도구별 전용 워크플로우 (3D, 미디어, 코드 분석 등)
+> - 사용자 정의 노트 변환·검토 파이프라인
+> - 디바이스별 셋업·개인화 스크립트
+>
+> 구체 파일명은 사용자 환경에 따라 다르므로 본 매니페스트에 등록 안 함. 신규 추가 시 `custom/` 폴더에 직접 배치 + Skill Router (`.claude/rules/core/_skill-router.md`) 트리거 매핑 추가.

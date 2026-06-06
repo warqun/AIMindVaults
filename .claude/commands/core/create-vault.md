@@ -47,7 +47,7 @@ node "{BasicContentsVault}/.sync/_tools/cli-node/bin/cli.js" clone \
 - `--hub` 생략 시: legacy scan 폴백 (Vaults/ 밑 첫 번째 Hub = AIHubVault)
 - 반드시 이 CLI 를 사용한다. `Copy-Item`, `cp`, `xcopy` 등 수동 복사 금지.
 - AIHubVault 는 소스로 사용하지 않음 (Preset Hub 는 Custom 번들이라 무거움). BasicContentsVault 가 최소 템플릿.
-- **상세 규칙(필수 결정 항목·후속 작업·상위 폴더 분류·배포 제외 항목) 참조**: `.claude/rules-archive/vault-individualization.md` Read
+- **상세 규칙(필수 결정 항목·후속 작업·상위 폴더 분류·배포 제외 항목) 참조**: `.agents/rules/custom/CreateVault/vault-individualization.md` Read
 
 ### 예시
 
@@ -67,7 +67,7 @@ node "{BasicContentsVault}/.sync/_tools/cli-node/bin/cli.js" clone \
   --hub "C:/AIMindVaults/Vaults/BasicVaults/CoreHub"
 ```
 
-### 3. 생성 후 필수 작업
+### 4. 생성 후 필수 작업
 
 1. 새 볼트의 `CLAUDE.md` 수정:
    - 제목을 `# <볼트명> — <볼트 역할 설명>`으로 변경
@@ -80,17 +80,37 @@ node "{BasicContentsVault}/.sync/_tools/cli-node/bin/cli.js" clone \
 3. 루트 `CLAUDE.md` 볼트 레지스트리에 새 볼트 등록
 4. 루트 `_STATUS.md` 볼트 레지스트리에 새 볼트 행 추가 (타입, 콘텐츠 설명, 작업 에이전트)
 5. `_ROOT_VERSION.md`에 변경 기록
+6. **초기 콘텐츠 인덱스 빌드** (강제 — 상세는 `vault-individualization.md § 볼트 생성 후 필수 작업` 4번 참조)
 
-### 4. Obsidian에 볼트 등록 안내
+### 5. Obsidian obsidian.json 등록 (강제 — 자동화 우선, 2026-06-05 incident)
 
-사용자에게 직접 등록하도록 안내한다:
+**누락 시 viz / `obsidian://advanced-uri/` 링크가 `Vault not found` 에러 발생 → 후속 incident.** 이전에 GUI 안내만 했던 운영을 CLI 자동 등록 우선으로 격상 (R159 결정).
+
+#### 5-1. CLI 자동 등록 (권장 경로 · 우선 시도)
+
+```bash
+node "{CoreHub}/.sync/_tools/cli-node/bin/cli.js" register-vaults -r "C:/AIMindVaults" --apply
+```
+
+- **전제**: 모든 Obsidian 인스턴스 종료. CLI 가 실행 중 감지 시 안전상 차단 (`--force` / `--skip-process-check` 강제 옵션은 메모리 캐시 덮어쓰기로 추가 항목 손실 위험 — **사용 금지**).
+- 흐름:
+  1. dry-run 으로 `TO ADD` 가 새 볼트 1건만 잡히는지 먼저 확인 (`--apply` 없이 호출)
+  2. 사용자에게 "Obsidian 모두 닫고 알려주세요" 안내 → 사용자 응답 대기
+  3. `--apply` 호출 → `obsidian.json.bak_YYYYMMDD_HHMMSS` 자동 백업 + `Added : N vault entries` 출력 확인
+  4. 사용자에게 "Obsidian 재시작 → 볼트 목록에 새 볼트 표시 → 첫 진입 시 *Trust author and enable plugins* 클릭" 안내
+
+#### 5-2. GUI 등록 (fallback · Obsidian 종료 곤란 시)
+
+CLI 자동 등록이 불가능한 상황 (사용자가 다른 볼트 작업 중이라 종료 부담, register-vaults CLI 미존재 환경 등):
 
 > Obsidian 볼트 매니저 → "보관함 폴더 열기" → `{생성된 볼트 경로}` 선택
 
-**`obsidian://open?path=` URI로 미등록 볼트를 여는 것을 금지한다.**
+#### 5-3. 금지
+
+**`obsidian://open?path=` URI 로 미등록 볼트를 여는 것을 금지한다.**
 URI 방식은 앱 상태 전환 + 등록 + 플러그인 로드를 동시 처리하여 로딩이 매우 느리다.
-이미 등록된 볼트 전환에만 `obsidian://open?vault=` URI를 사용한다.
+이미 등록된 볼트 전환에만 `obsidian://open?vault=` URI 사용.
 
-### 5. 완료 보고
+### 6. 완료 보고
 
-생성된 볼트 경로와 수행한 후속 작업을 사용자에게 보고.
+생성된 볼트 경로 + 수행한 후속 작업 + obsidian.json 등록 상태 (CLI applied / GUI 수동 / 미등록 사유) 사용자에게 보고.

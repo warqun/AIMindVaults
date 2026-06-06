@@ -1,16 +1,32 @@
 /**
- * W1 — 데이터 로딩
- * spec § 3.2: loadIndex(opts: LoadIndexOpts): Promise<IndexData>
- *           validateIndex(data: IndexData): Promise<ValidationReport>
+ * AIMindVaults Visualization — Data Loading (W1)
  *
- * 외부 의존성 0. ES Modules.
- * 브라우저(fetch) / Node(fs) 양쪽 지원.
+ * 역할:
+ *   viz 의 모든 페이지가 의존하는 데이터 진입점. master_index.json + (선택) per-vault vault_index.json
+ *   을 fetch (브라우저) 또는 fs (Node) 로 로드 + 시스템 Hub 자동 필터 + 스키마 검증.
  *
- * 시스템 Hub 필터링:
- *   master.vaults · master.notes 에서 BasicVaults 안 기본 제공 Hub/템플릿 (CoreHub,
- *   AIHubVault*, Basic*Vault) 를 제거한다. 사용자가 만든 커스텀 Hub 는 SYSTEM_HUB_IDS
- *   사전에 없으므로 자동 포함. calendar 의 /api/vault-births 는 server.js 가 raw
- *   master_index.json 을 직접 읽으므로 영향 없음 (Hub 생성 timeline 보존).
+ * 두 환경 지원:
+ *   - 브라우저: fetch + AbortSignal 지원 (router.js 가 SSE 갱신 시 호출).
+ *   - Node:    fs.readFile (테스트 + server.js 의 fallback).
+ *
+ * 시스템 Hub 필터링 (filterSystemHubsInPlace):
+ *   `SYSTEM_HUB_IDS` (lib/system-vaults.js) 사전에 등록된 vault (CoreHub / AIHubVault* / Basic*Vault) 를
+ *   master.vaults + master.notes 에서 제거 + vault_count / note_count 재계산.
+ *   사용자 커스텀 Hub 는 사전에 없으므로 자동 포함. `/api/vault-births` (server.js) 는 raw 직접 읽어 영향 X.
+ *
+ * 주요 함수:
+ *   - loadIndex(opts)        ← masterUrl/masterPath + (선택) vaultUrls/vaultPaths → IndexData
+ *   - validateIndex(data)    ← 필수 키 + 카운트 정합 검증 → { ok, errors[] }
+ *
+ * 표준 시그니처:
+ *   export async function loadIndex(opts: LoadIndexOpts): Promise<IndexData>
+ *   export async function validateIndex(data: IndexData): Promise<ValidationReport>
+ *
+ * 외부 의존성 0 (ES Modules + 자체 의존 system-vaults.js 만).
+ *
+ * 참조:
+ *   Spec:    [[20260513_시스템스펙_04_시각화]] § 5 데이터 로딩 + § 2 인덱스
+ *   영문화:  [[20260530_viz_정본_영문화_매니페스트]] § 6.lib
  */
 
 import { SYSTEM_HUB_IDS } from './system-vaults.js';

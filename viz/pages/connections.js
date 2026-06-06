@@ -1,15 +1,43 @@
 /**
- * Phase 2.9 Phase 5 — Cross-Vault Connections 페이지 (구 concepts.js)
- * 5-12 결정 (concept_map → connections, 의미 명확화) 반영.
+ * AIMindVaults Visualization — Cross-Vault Connections 페이지 (Phase 2.9 Phase 5, 구 concepts.js)
  *
- * Sankey 3-단 (owner vault → tag → user vault) + topN 슬라이더 (3~20, default 8) +
- * 검색 (tag 이름 부분 일치) + 우측 패널 (owner · tag · user 세 모드).
+ * 역할:
+ *   Sankey 3-단 다이어그램 (owner vault → tag → user vault) + 검색 + topN + 우측 패널 3 모드.
+ *   owner = vault_id 가 tag 와 정확 일치하는 vault (owned tag 정의). owner-null 자동 제외.
+ *   Connection = owner vault 의 owned tag 를 다른 vault (user) 가 사용한 케이스. 노트 수가 link width.
  *
- * 데이터 모델: master.concept_map + master.vaults + master.tag_index 로부터
- * `deriveConnections(master)` 가 `{tag, owner, users, ownedNotes, userNotes}` 도출.
- * owner = vault_id 가 tag 와 정확 일치하는 vault. owner-null 자동 제외.
+ * UI 구성:
+ *   - 상단: topN 슬라이더 (3~20, default 8, user 노트 합산 순) + 검색 (tag 이름 부분 일치) + 카테고리 swatches
+ *   - 중앙: Sankey 차트 + 볼트 색 패널 (network 와 동일 패턴, 개별 색 지정 + reset)
+ *   - 우측 패널: owner / tag / user 클릭 시 3 모드 상세 (메타 + 스탯 + 분포 리스트)
  *
- * 외부 의존성 0. ECharts 는 index.html 의 CDN 으로 window.echarts 글로벌 사용.
+ * 데이터 입력:
+ *   - data.master (router 전달) — vaults / connections / tag_index 등
+ *   - lib/buildOption.js : deriveConnections(master) → `[{tag, owner, users, ownedNotes, userNotes}]`
+ *   - lib/buildOption.js : buildOptionConnections(data, cfg) → ECharts option
+ *   - userConfig.colors  — 개별 vault 색 override (saveUserConfig + aimv:user-config-changed)
+ *
+ * 주요 함수 카탈로그:
+ *   - initPage                                  ← 진입점
+ *   - render                                    ← 검색 → topN → subset 주입 → setOption
+ *   - filterBySearch / pickTopByUserNotes       ← 검색 + 상위 N 선택 (export, 테스트 가능)
+ *   - applyOverlay                              ← Sankey label/emphasis adjacency
+ *   - renderOwnerPanel / renderTagPanel / renderUserPanel ← 3 사이드 패널 모드
+ *   - renderColorPanel / broadcastUserConfig    ← 볼트 색 패널 (network 와 동일)
+ *
+ * 비자명 패턴:
+ *   - buildOptionConnections 자체 topNConcepts 절단 우회 — 검색·topN 사전 적용 결과를
+ *     master.connections 로 주입 (Array.isArray 우선 분기 활용).
+ *
+ * 표준 시그니처:
+ *   export async function initPage(container, data, userConfig): Promise<PageContext>
+ *
+ * 외부 의존성: ECharts (CDN, window.echarts) + lib/buildOption.js + lib/user-config.js
+ *
+ * 참조:
+ *   Spec:    [[20260513_시스템스펙_04_시각화]] § 4 Sankey 3-단 (Connections)
+ *   5-12:    concept_map → connections 의미 명확화 결정
+ *   영문화:  [[20260530_viz_정본_영문화_매니페스트]] § 6.4
  *
  * @typedef {import('../lib/loadIndex.js').IndexData} IndexData
  * @typedef {Object} UserConfig — viz/lib/buildOption.js DEFAULT_USER_CONFIG 와 동일 구조
@@ -108,12 +136,14 @@ function categoryGroupColor(category) {
   return cssVar(categoryGroupVar(category));
 }
 
+/** connections 에서 tag 이름 부분 일치 (case-insensitive). 빈 검색어면 그대로. */
 export function filterBySearch(connections, searchQ) {
   const q = (searchQ || '').trim().toLowerCase();
   if (!q) return connections;
   return connections.filter((c) => String(c.tag).toLowerCase().includes(q));
 }
 
+/** user 노트 합산 큰 순으로 상위 N. tie-break = totalCount (owner+user 합산). */
 export function pickTopByUserNotes(connections, n) {
   const limit = Math.max(0, Number.isFinite(n) ? n : 0);
   return [...connections]
@@ -126,6 +156,7 @@ export function pickTopByUserNotes(connections, n) {
     .slice(0, limit);
 }
 
+/** Sankey series 위에 label (text-2 색, Inter 11px) + emphasis (focus adjacency, opacity 0.85) overlay. */
 function applyOverlay(option) {
   if (!option || !Array.isArray(option.series) || !option.series[0]) return option;
   const series = option.series[0];
@@ -147,6 +178,7 @@ function applyOverlay(option) {
   return option;
 }
 
+/** Owner 노드 클릭 시 사이드 패널 — owner vault 메타 + Owned/User Notes 스탯 + user 볼트 분포 리스트. */
 function renderOwnerPanel(side, data, ownerId, conn) {
   const masterIn = (data && data.master) || {};
   const vaultsObj = masterIn.vaults || {};
@@ -173,6 +205,7 @@ function renderOwnerPanel(side, data, ownerId, conn) {
     </div>`;
 }
 
+/** Tag 노드 클릭 시 사이드 패널 — tag 메타 (owner + user 수) + 분포 리스트 (user 별 노트 수). */
 function renderTagPanel(side, conn) {
   const userSum = (conn?.userNotes || []).reduce((s, x) => s + x.count, 0);
   const userItems = (conn?.userNotes || [])
@@ -194,6 +227,7 @@ function renderTagPanel(side, conn) {
     </div>`;
 }
 
+/** User 노드 클릭 시 사이드 패널 — user vault 메타 + 참조 owned tag 수 + top 8 owned tag 리스트. */
 function renderUserPanel(side, data, userId, connections) {
   const masterIn = (data && data.master) || {};
   const vaultsObj = masterIn.vaults || {};
@@ -223,7 +257,18 @@ function renderUserPanel(side, data, userId, connections) {
 }
 
 /**
- * spec § 5.1 표준 시그니처.
+ * Connections 페이지 진입점. Sankey + 사이드 패널 3 모드 + 볼트 색 패널 + theme observer.
+ *
+ * 흐름:
+ *   1. TEMPLATE 렌더 + DOM 참조 + state (data + userConfig + topN + searchQ).
+ *   2. ECharts init + render() (deriveConnections → filterBySearch → pickTopByUserNotes → subset → setOption).
+ *   3. 노드 클릭 → name 의 prefix (owner:/tag:/user:) 분기 → 3 패널 모드.
+ *   4. topN 슬라이더 input + 검색 input + window resize + theme observer (data-theme 변경 시 재렌더).
+ *   5. 볼트 색 패널 — open/close 토글 + 색 picker + reset + saveUserConfig + broadcast.
+ *
+ * 비자명 — buildOptionConnections 우회:
+ *   master.connections 에 검색·topN 사전 적용 결과를 직접 주입 (Array.isArray 우선 분기) +
+ *   userConfig.topNConcepts 를 picked.length 로 강제 → 자체 절단 무력화.
  *
  * @param {HTMLElement} container
  * @param {IndexData} data

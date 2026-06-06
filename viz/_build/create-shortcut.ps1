@@ -1,6 +1,18 @@
-﻿# AIMindVaults Visualization — 바탕화면 바로가기 생성
-# 사용자 PC 별 1회 실행. .exe 절대 경로를 자기 위치 기준으로 추론.
-# 다시 실행하면 기존 .lnk 를 덮어씀.
+﻿# AIMindVaults Visualization — 바탕화면 바로가기 생성기
+#
+# 역할:
+#   `Generate Visualization.exe` + `viz.ico` 를 가리키는 바탕화면 .lnk 생성. 사용자 PC 별 1회 실행.
+#   .exe 절대 경로를 자기 위치 (`viz/_build/`) 기준으로 추론. 다시 실행하면 기존 .lnk 덮어씀.
+#
+# 출력:
+#   - `<Desktop>/AIMindVaults 시각화.lnk` (한국어 파일명, 영문판 빌드 시 영문 파일명으로 변경 필요)
+#   - WindowStyle = 7 (Minimized) — .exe 가 콘솔 없이 실행되어도 깜빡임 방지
+#
+# 사용자 노출 (한국어):
+#   throw 메시지 + Write-Host — "Generate Visualization.exe 가 없습니다", "viz.ico 가 없습니다",
+#   "바탕화면 바로가기 생성: ${path}" 등 — § 6.16 카탈로그 참조.
+#
+# 영문화: [[20260530_viz_정본_영문화_매니페스트]] § 6.16
 
 $ErrorActionPreference = 'Stop'
 $buildDir = Split-Path -Parent $MyInvocation.MyCommand.Path

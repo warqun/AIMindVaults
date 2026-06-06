@@ -1,16 +1,29 @@
 /**
  * AIMindVaults Visualization — Side Panel (W1)
- * Spec § 3.5 — empty 상태와 detail panel 양방향 전환.
  *
- * createSidePanel(container) → { setEmpty(hint), setPanel(detail), clear() }
+ * 역할:
+ *   여러 페이지의 우측 사이드 패널 공통 컴포넌트. empty 상태 (아이콘 + hint) 와
+ *   detail panel (kind chip + 제목 + meta + stats grid + sections h4+ul) 양방향 전환.
  *
- * detail = {
- *   kind: 'NODE'|'CONCEPT'|...,
- *   title: string,
- *   meta?: string,
- *   stats?: Array<{ label: string, value: string }>,
- *   sections?: Array<{ heading: string, items: string[] | string }>
- * }
+ * 표준 시그니처:
+ *   createSidePanel(container, opts?) → { setEmpty(hint), setPanel(detail), clear() }
+ *
+ * detail 스키마:
+ *   {
+ *     kind: 'NODE' | 'CONCEPT' | ... (대문자 chip),
+ *     title: string,                     // 큰 제목
+ *     meta?: string,                     // 작은 메타 한 줄
+ *     stats?: Array<{ label, value }>,   // 2-col grid
+ *     sections?: Array<{ heading, items: string[] | string }>  // h4 + ul
+ *   }
+ *
+ * 사용처:
+ *   네트워크/커넥션/태그 등 사이드 패널 페이지에서 자체 panel HTML 대신 본 컴포넌트 가능 (현재는
+ *   각 페이지가 자체 구현 — connections.js / network.js 의 사이드 패널과 향후 통합 후보).
+ *
+ * 참조:
+ *   Spec:    [[20260513_시스템스펙_04_시각화]] § 9 (디자인 시스템)
+ *   영문화:  [[20260530_viz_정본_영문화_매니페스트]] § 6.13
  */
 
 const EMPTY_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>`;

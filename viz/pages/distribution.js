@@ -1,13 +1,36 @@
 /**
- * W4 — 분포 분석 페이지
- * spec § 5.3 distribution + 시안 viz_design_drafts/05_distribution.html
+ * AIMindVaults Visualization — Distribution (분포 분석) 페이지 (W4)
  *
- * grid 2×2:
- *   [카테고리 도넛] [타입 도넛]
- *   [태그 top N 바] [한눈에 카드 (KPI mini + summary list)]
+ * 역할:
+ *   2×2 grid — 카테고리 도넛 + 타입 도넛 + 태그 top N 바 + 한눈에 카드 (KPI mini + summary highlights).
+ *   각 차트마다 top N 슬라이더로 표시 슬라이스 개수 조절 (카테고리/타입/태그 독립).
  *
- * 외부 의존성: ECharts 5 CDN (window.echarts).
- * 차트 옵션은 viz/lib/buildOption.js 의 buildOptionC 재사용 (= [categoryPie, typePie, tagBar]).
+ * Summary 항목 (computeSummary):
+ *   - 평균/중앙값 노트/볼트 + 평균 태그/노트 + 고유 태그 수
+ *   - 가장 많은 카테고리 (vault·note 수 + 전체 비율)
+ *   - 가장 활발한 타입 (count + 전체 비율)
+ *   - 최대 · 최소 볼트 (id + count + 상대 비율)
+ *   - 최근 ${RECENT_WINDOW_DAYS=7}일 신규 (notes + tags, vault_index mtime 필요)
+ *
+ * 데이터 입력:
+ *   - data.master.vaults / notes / tag_index — 주 집계 source
+ *   - data.vaults (vault_index per-vault) — recent 7일 mtime 분포 (없으면 fallback)
+ *   - userConfig.topNTags / topNCategories / topNTypes — 초기 슬라이더 값
+ *
+ * 주요 함수 카탈로그:
+ *   - initPage           ← 진입점, 3 차트 + summary + 3 슬라이더
+ *   - computeSummary     ← master + per-vault → summary 객체 (KPI + highlights)
+ *   - summaryHtml        ← summary → 우하단 카드 HTML
+ *   - shellHtml          ← 2×2 grid 골격
+ *   - buildMeta          ← chart-meta 문자열 + slider max
+ *   - renderAll / renderCatOnly / renderTypeOnly / renderTagOnly ← 슬라이더 input 시 부분 재렌더
+ *
+ * 외부 의존성: ECharts 5 CDN (window.echarts) + lib/buildOption.js (buildOptionC, presetColorByCategory) + lib/obsidian-uri.js
+ *
+ * 참조:
+ *   Spec:    [[20260513_시스템스펙_04_시각화]] § 5 page mapping (distribution)
+ *   시안:    viz_design_drafts/05_distribution.html
+ *   영문화:  [[20260530_viz_정본_영문화_매니페스트]] § 6.10
  *
  * @typedef {import('../lib/loadIndex.js').IndexData} IndexData
  * @typedef {import('../lib/buildOption.js').UserConfig} UserConfig
@@ -39,6 +62,10 @@ function fmtFloat(n, digits = 1) {
   return n.toFixed(digits);
 }
 
+/**
+ * master + per-vault → summary 객체 — KPI (평균/중앙값/평균 태그/노트) + highlights (top 카테고리/타입 + max/min vault + 최근 7일 신규).
+ * 최근 7일은 per-vault `vaults[vid].notes[*].mtime` 의존 (없으면 recent.available=false).
+ */
 function computeSummary(data) {
   const master = data && data.master ? data.master : {};
   const vaults = master.vaults || {};
@@ -126,6 +153,10 @@ function computeSummary(data) {
   };
 }
 
+/**
+ * Summary 객체 → 우하단 "하이라이트" 카드 HTML. KPI 2 + highlights 4 (top 카테고리/타입/max·min/최근 7일).
+ * 각 highlight 는 색 bar + 메타 텍스트. recent 가 미available 이면 "mtime 데이터 없음" 표시.
+ */
 function summaryHtml(s) {
   const topCatPct = s.totalNotes > 0 ? Math.round((s.topCategory.notes / s.totalNotes) * 100) : 0;
   const topTypePct = Number(s.topType.pct) || 0;
@@ -201,6 +232,7 @@ function summaryHtml(s) {
   `;
 }
 
+/** 2×2 grid 골격 — 4 카드 (카테고리·타입·태그·하이라이트) + 각 차트 헤더 (제목 + topN 슬라이더 + meta). */
 function shellHtml(meta) {
   return `
     <section class="page page-distribution">
@@ -244,6 +276,7 @@ function shellHtml(meta) {
   `;
 }
 
+/** 3 차트의 chart-meta 문자열 (top N of M) + slider max (실제 카테고리/타입 수). */
 function buildMeta(data, summary, topN, topNCat, topNType) {
   const tagsSize = Object.keys((data && data.master && data.master.tag_index) || {}).length;
   const types = new Set();
@@ -267,6 +300,15 @@ function buildMeta(data, summary, topN, topNCat, topNType) {
 }
 
 /**
+ * Distribution 페이지 진입점. 3 ECharts 차트 (cat/type/tag) + summary HTML + 3 슬라이더.
+ *
+ * 흐름:
+ *   1. cfg 의 topNTags/topNCategories/topNTypes 초기값 (clamp 적용).
+ *   2. shellHtml 렌더 + 3 chart init + summary 렌더.
+ *   3. 슬라이더 input 시 부분 재렌더 (renderCatOnly / renderTypeOnly / renderTagOnly — buildOptionC 호출).
+ *   4. vault-pill (max/min vault) 클릭 → Obsidian 열기 (delegated capture).
+ *   5. refresh(newData) — currentData 갱신 + summary 재계산 + slider max 조정 + renderAll.
+ *
  * @param {HTMLElement} container
  * @param {IndexData} data
  * @param {UserConfig} userConfig

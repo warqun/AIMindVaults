@@ -1,8 +1,40 @@
-﻿# AIMindVaults Visualization Launcher
-# ps2exe 로 .exe 컴파일 대상. .vbs/.bat 런처를 PS 한 곳으로 통합.
-#   - Node.js 18+ 존재 체크 → 부재 시 MessageBox 안내 + nodejs.org 열기
-#   - server.js 를 foreground 로 실행 (앱 창 닫히면 idle 자동 종료)
-#   - Chrome --app 또는 Edge --app 으로 별도 창. 부재 시 기본 브라우저 fallback.
+﻿# AIMindVaults Visualization — Main Launcher (R146 + R149 + R132)
+#
+# 역할:
+#   `Generate Visualization.exe` (ps2exe 컴파일 대상) 의 본체. .vbs/.bat 런처를 PS 한 곳으로 통합.
+#   사용자가 .exe 더블클릭 시 본 스크립트가 실행됨.
+#
+# 흐름:
+#   1. Node.js 18+ 존재 체크 (부재 시 MessageBox + nodejs.org 안내)
+#   2. server.js 위치 검증 + 환경 변수 기본값 설정 (PORT/IDLE/AUTO_PULL/AUTO_SYNC)
+#   3. 포트 결정 (R132 다중 클론 격리) — 8765 부터 순회:
+#      - free port → 자기 인스턴스 시작
+#      - listening + X-AIMV-Root 일치 → 기존 인스턴스 활성화 (chrome 만 열고 종료)
+#      - listening + 다른 클론 → 다음 port 순회 (최대 20 시도)
+#   4. R149 백그라운드 sync — 별도 hidden PS 프로세스 spawn:
+#      - .vault_data/.sync-status.json 갱신 (running/done/failed)
+#      - git pull --ff-only origin main (변동 감지)
+#      - 변동 있으면 sync-all --skip-npm (CoreHub cli.js), 없으면 skip (R149.2)
+#      - viz SPA sync-banner.js 가 /api/sync-status polling
+#   5. R133 master_index 자동 빌드 (sync-all 미실행 사용자 대응 안전망)
+#   6. R149.1 chrome --app port polling 후 즉시 실행 (이전 4s 고정 대기 → 1-2s)
+#   7. server.js 를 hidden 프로세스 spawn (stdout/stderr 임시 파일 격리)
+#   8. .exe 본체 즉시 종료 — server.js 의 idle 자동 종료 (AIMV_VIZ_IDLE_MS) 가 정리
+#
+# 환경 변수:
+#   - AIMV_VIZ_PORT (기본 8765)
+#   - AIMV_VIZ_IDLE_MS (기본 15000)
+#   - AIMV_VIZ_BOOT_GRACE_MS (기본 90000)
+#   - AIMV_VIZ_AUTO_PULL (기본 true) — R146 git pull 자동
+#   - AIMV_VIZ_AUTO_SYNC (기본 true) — R146 sync-all 자동
+#
+# 사용자 노출 (MessageBox + sync-status message):
+#   "server.js 를 찾을 수 없습니다", "Node.js 가 필요합니다", "port 를 찾을 수 없습니다",
+#   "master_index 자동 빌드 실패", "동기화 시작 중", "동기화 완료" 등 — § 6.16 카탈로그 참조.
+#
+# 참조:
+#   룰: `.claude/rules/core/viz-device-sync.md` (R146 + R149 누적)
+#   영문화: [[20260530_viz_정본_영문화_매니페스트]] § 6.16
 
 $ErrorActionPreference = 'Stop'
 

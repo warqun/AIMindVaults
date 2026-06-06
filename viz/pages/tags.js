@@ -1,15 +1,46 @@
 /**
- * W4-R126 — 태그 탐색기 (구 태그 순위 페이지 폐기, 태그 전용 뷰로 재설계)
+ * AIMindVaults Visualization — Tag Explorer 페이지 (W4-R126)
  *
- * 좌측: 태그 리스트 (검색·필터·정렬) — owned/unowned 시각 구분
- *   - owned: owner 카테고리 색 dot + 볼트 chip
- *   - unowned: 회색 dot + "unowned" 점선 chip
- * 우측: 선택 태그 detail
- *   - 헤더: 태그 이름 + owner badge + 통계 pill
- *   - 본문: 그 태그 가진 노트를 카테고리(볼트 귀속)별 섹션으로 그룹
- *   - 각 카테고리 섹션 헤더 ▾/▸ 클릭 시 접기/펼치기
- *   - toolbar 의 "모두 접기/펼치기" 버튼이 카테고리 섹션 전체 토글
- *   - 새 태그 선택 시 collapse 상태 자동 리셋 (모두 펼침)
+ * 역할:
+ *   태그 전용 뷰 (구 태그 순위 페이지 폐기, R126 재설계).
+ *   좌측: 태그 리스트 (검색·필터·정렬) — owned/unowned 시각 구분.
+ *   우측: 선택 태그 detail — 헤더 (이름 + owner + 통계) + 본문 (카테고리별 노트 섹션, ▾/▸ 접기).
+ *
+ * 좌측 태그 리스트:
+ *   - owned   : owner 카테고리 색 dot + 볼트 chip (배경 = owner 카테고리 색)
+ *   - unowned : 회색 dot + "unowned" 점선 chip
+ *   - 정렬:    count (default) / name / recent (mtime 최신) / owner (owned 먼저 + 알파벳)
+ *   - 필터:    all / owned / unowned
+ *
+ * 우측 detail:
+ *   - 헤더: #${태그명} + owner badge + 통계 pill (노트 수 / 볼트 수 / 최근 일자)
+ *   - 본문: 그 태그 가진 노트 → categoryOf(vault) 그룹 (볼트 귀속별) → 노트 카드.
+ *   - 각 섹션 헤더 ▾/▸ 클릭 시 접기/펼치기 (collapsedCategories Set 으로 state 관리).
+ *   - toolbar "모두 접기/펼치기" 버튼이 전체 토글.
+ *   - 새 태그 선택 시 collapse 상태 자동 리셋 (모두 펼침).
+ *
+ * 데이터 입력:
+ *   - data.master.tag_index   — 태그별 ref 배열 (`"${vault}:${path}"`).
+ *   - data.master.tag_owners  — 태그별 owner vault (vault_id 정확 일치).
+ *   - data.master.notes       — 노트 mtime 분포 (lastMtime 계산).
+ *   - data.master.vaults      — vault → 카테고리 매핑.
+ *
+ * 주요 함수 카탈로그:
+ *   - initPage                                 ← 진입점
+ *   - buildTagList                             ← tag_index → 정렬용 객체 배열 + lastMtime 계산
+ *   - applyFilters                             ← 검색 + 필터 + 정렬 (4 정렬 모드)
+ *   - tagRowHtml                               ← 좌측 행 (dot + 이름 + owner chip + count)
+ *   - groupNotesByCategory                     ← 우측 노트 → 카테고리 그룹 정렬
+ *   - noteCardHtml / categorySectionHtml / detailHtml ← 우측 카드 + 섹션 + 헤더
+ *   - shellHtml                                ← toolbar + main (tagList + tagDetail)
+ *
+ * 표준 시그니처:
+ *   export async function initPage(container, data, userConfig): Promise<PageContext>
+ *
+ * 참조:
+ *   Spec:    [[20260513_시스템스펙_04_시각화]] § 5 page mapping
+ *   R126:    태그 탐색기 재설계 (2026-05-19)
+ *   영문화:  [[20260530_viz_정본_영문화_매니페스트]] § 6.6
  */
 
 import { presetColorByCategory } from '../lib/buildOption.js';
@@ -44,6 +75,10 @@ function dateFromStamp(stamp) {
   return m ? m[1] : '—';
 }
 
+/**
+ * master.tag_index → 정렬·표시용 객체 배열. 각 태그의 노트 수 + vault 수 + owner + ownerColor + lastMtime.
+ * master.notes 순회로 각 태그의 lastMtime 계산 (mtime 최댓값).
+ */
 function buildTagList(data, vaultCatMap) {
   const master = data?.master || {};
   const tagIndex = master.tag_index || {};
@@ -85,6 +120,13 @@ function buildTagList(data, vaultCatMap) {
   return list;
 }
 
+/**
+ * 태그 리스트 필터링 + 정렬. 4 정렬 모드:
+ *   - count  (default) : 노트 수 큰 순
+ *   - name             : 알파벳 순 (locale)
+ *   - recent           : lastMtime 최신 순
+ *   - owner            : owned 먼저 (owner 알파벳) → 같은 owner 안 count 순 → unowned 마지막
+ */
 function applyFilters(list, { searchQ, filter, sortBy }) {
   const q = (searchQ || '').trim().toLowerCase();
   let arr = q ? list.filter((t) => t.name.toLowerCase().includes(q)) : list.slice();
@@ -209,6 +251,10 @@ function detailHtml(tag, notes, vaultCatMap, collapsedCategories) {
   `;
 }
 
+/**
+ * 페이지 골격 HTML — toolbar (검색 + 필터 + 정렬 + 모두 접기/펼치기 + 카운트) + main (tagList + tagDetail).
+ * filter / sort 세그먼트는 FILTER_OPTIONS / SORT_OPTIONS 배열 기반 동적 생성.
+ */
 function shellHtml(state) {
   const filterSegHtml = FILTER_OPTIONS.map((f) =>
     `<button data-filter="${f}" class="${f === state.filter ? 'on' : ''}">${escapeHtml(FILTER_LABELS[f])}</button>`
@@ -247,6 +293,10 @@ function shellHtml(state) {
   `;
 }
 
+/**
+ * Tag Explorer 페이지 진입점. state (검색·필터·정렬·선택태그·collapsed) + 좌측 리스트 + 우측 detail + 핸들러.
+ * 새 태그 선택 시 collapsedCategories 자동 클리어 (이전 태그의 접힘 상태 누적 방지).
+ */
 export async function initPage(container, data /*, userConfig */) {
   if (!container) throw new Error('tags.initPage: container 필수');
 

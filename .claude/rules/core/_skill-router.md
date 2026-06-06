@@ -17,7 +17,7 @@
 |---------|-------------|---------------|
 | 배포·Git push, sync 기능 수정 | 배포, SellingVault, git push, 동기화 배포, 영문 배포, distribute, deploy, cli.js sync, pre-sync, _WORKSPACE_VERSION, sync-version, pre-sync 트램펄린 | `/distribute` Skill |
 | Multi-Hub | Core Hub, Preset Hub, CoreHub, core-sync, core-sync-all, hub-source.json, hub-marker.json, multi-hub, 코어 허브, bump-version --broadcast, hubId, hubType, hub-resolver | `Vaults/Projects_Infra/Project_AIMindVaults/Contents/Project/plan/architecture/20260419_Multi_Hub_아키텍처_설계.md` + `20260420_Multi_Hub_Phase1_구현_결과.md` Read |
-| 새 볼트 생성 (위성) | 볼트 생성, create-vault, 새 볼트, 볼트 분리 | `/create-vault` Skill + `.agents/rules/custom/CreateVault/vault-individualization.md` Read |
+| 새 볼트 생성 (위성) | 볼트 생성, create-vault, 새 볼트, 볼트 분리 | `/create-vault` Skill (R160 core 격상) — `vault-individualization.md` 는 core 상시 주입 (R160) 이므로 명시 Read 불필요 |
 | 새 Preset Hub 생성 | Preset Hub 생성, 프리셋 허브 만들기, create-preset-hub, create-hub, 신규 Hub, AIHubVault_ 생성, Hub 파생 | `/create-preset-hub` Skill |
 | 대량 편집 · 인코딩 | 대량 수정, 일괄 변경, 인코딩, mojibake, 한글 깨짐, bulk rewrite | `.claude/rules/core/encoding-safety.md` + `.claude/rules/core/temp-file-management.md` (core 주입됨) |
 | 스크립트 생성 | 스크립트 생성, .ps1, .py 신규, 자동화 스크립트 | `.claude/rules/core/script-creation-approval.md` + `.claude/rules/core/script-management.md` (core 주입됨) |

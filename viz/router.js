@@ -1,21 +1,48 @@
 /**
  * AIMindVaults Visualization — Router (W1)
- * Spec § 4 — vanilla JS hashchange + dynamic import + EventSource SSE.
  *
- * 페이지 매핑 (§ 4.2):
- *   #home / (빈)   → pages/home.js
- *   #connections   → pages/connections.js (Phase 5, 구 concepts)
- *   #concepts      → #connections 자동 redirect (1세대 북마크 호환)
- *   #network       → pages/network.js    (W3)
- *   #distribution  → pages/distribution.js (W4)
- *   #tags          → pages/tags.js       (W4)
- *   #explorer      → pages/explorer.js   (W5)
- *   #rules         → pages/rules.js      (W5)
- *   #settings      → pages/settings.js   (W5)
+ * 역할:
+ *   vanilla JS hash 기반 SPA 라우터. 페이지 동적 import + 헤더 mount + 데이터 1회 로드 + SSE 연결 +
+ *   페이지 lifecycle (destroy → init → refresh) 관리.
  *
- * 페이지 모듈 표준:
+ * 페이지 매핑 (VALID_PAGES, PAGE_TITLES):
+ *   - #home / (빈)   → pages/home.js
+ *   - #connections   → pages/connections.js (Phase 5, 구 concepts)
+ *   - #concepts      → #connections 자동 redirect (1세대 북마크 호환)
+ *   - #network       → pages/network.js (W3)
+ *   - #distribution  → pages/distribution.js (W4)
+ *   - #tags          → pages/tags.js (W4)
+ *   - #explorer      → pages/explorer.js (W5)
+ *   - #rules         → pages/rules.js (W5)
+ *   - #settings      → pages/settings.js (W5)
+ *   - #calendar      → pages/calendar.js (R126)
+ *   - #additions     → pages/additions.js (R116)
+ *
+ * 페이지 모듈 표준 시그니처:
  *   export async function initPage(container, data, userConfig): Promise<PageContext>
  *   PageContext = { destroy(), refresh?(data) }
+ *
+ * SSE 흐름 (attachSSE):
+ *   - /sse EventSource → hello / heartbeat / data-changed 이벤트.
+ *   - data-changed 수신 시 loadIndex 재호출 → setBuilt + 현재 페이지 refresh.
+ *   - open / error 시 headerCtl.setLiveState 업데이트.
+ *
+ * 부트 (init):
+ *   1. initTheme (레거시 흡수 + applyTheme).
+ *   2. loadUserConfig + applyLayout.
+ *   3. aimv:user-config-changed 리스너 (settings 변경 즉시 반영).
+ *   4. mountHeader + 데이터 1회 로드 (loadIndex) + validateIndex.
+ *   5. attachSSE + hashchange + 첫 페이지 진입.
+ *   6. window.__aimv_router 디버깅 핸들.
+ *
+ * PAGE_TITLES 한국어:
+ *   header.js PAGE_TITLES_LOCAL 와 동기 필요 (두 파일 동일 매핑 유지).
+ *
+ * 사용자 노출 메시지:
+ *   loading placeholder, "미구현", "initPage 실패", "master_index.json 로드 실패" 등 — § 6.14 카탈로그.
+ *
+ * Spec:    [[20260513_시스템스펙_04_시각화]] § 5 router / SSE
+ * 영문화:  [[20260530_viz_정본_영문화_매니페스트]] § 6.14
  */
 
 import { loadIndex, validateIndex } from './lib/loadIndex.js';
@@ -88,6 +115,11 @@ function showError(message) {
   state.pageRoot.innerHTML = `<div class="page-error">${escapeHtml(message)}</div>`;
 }
 
+/**
+ * 페이지 전환 — 이전 페이지 destroy → 새 페이지 dynamic import → initPage.
+ * 같은 pageId 면 destroy/init 스킵 (페이지 내부 hash 쿼리 변경은 페이지 자체 hashchange 리스너 처리).
+ * 실패 시 placeholder / error 표시.
+ */
 async function activatePage(pageId) {
   // 같은 페이지면 destroy/init 스킵 — 페이지 내부 hash 쿼리 변경 (예: #additions?date=...) 은 페이지 자체 hashchange 리스너가 처리
   if (state.currentPage === pageId && state.currentContext) return;
@@ -129,6 +161,10 @@ async function activatePage(pageId) {
 }
 
 /* ───────────── SSE — data-changed → reload + refresh ───────────── */
+/**
+ * /sse EventSource 연결 — data-changed 수신 시 loadIndex 재호출 + 현재 페이지 refresh.
+ * hello/heartbeat 는 디버그 로그만. open/error 는 headerCtl.setLiveState.
+ */
 function attachSSE() {
   let es;
   try {

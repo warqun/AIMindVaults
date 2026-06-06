@@ -1,18 +1,44 @@
 /**
- * W-cal — 캘린더 작업량 페이지 (Phase 2.5 + R126 일별 작업 임베드)
+ * AIMindVaults Visualization — Calendar (작업량 heatmap) 페이지 (W-cal, R126)
  *
- * GitHub-style heatmap (ECharts calendar coord + heatmap series).
- * - lookback toggle (3개월·6개월·1년·2년·5년·전체·custom)
- * - basis toggle (갱신일·생성일)
- * - 셀 hover → ECharts tooltip
- * - 셀 클릭 → 하단 일별 작업 영역 즉시 갱신 (카테고리 그룹화 + 시간순 카드 그리드)
- * - 캘린더 ↔ 일별 영역 사이 드래그 리사이저 (localStorage 비율 저장)
+ * 역할:
+ *   GitHub-style 일별 작업량 heatmap (ECharts calendar coord + heatmap series) +
+ *   셀 클릭 시 하단에 그 날 작업 노트 카드 그리드 (카테고리 그룹화 + 시간순).
+ *   캘린더 ↔ 일별 영역 사이 드래그 리사이저 (localStorage 비율 저장).
  *
- * 데이터:
- *   GET /api/all-notes        — heatmap 일자별 집계 (전 노트 mtime/created)
- *   GET /api/vault-births     — vault 생성 일자 (셀 핀 + 헤더 표기)
- *   GET /api/additions?date=  — 셀 클릭 시 그 날 노트 리스트
- *   data.master.vaults        — vault → category 매핑 (router 전달)
+ * 토글:
+ *   - lookback : 3개월·6개월·1년·2년·5년·전체·사용자 정의 일 수
+ *   - basis    : 갱신일 (mtime) / 생성일 (created)
+ *   - 셀 hover : ECharts tooltip (날짜 + count + vault 추가 + 클릭 안내)
+ *   - 셀 click : selectedDate → fetchDailyNotes → renderDayArea
+ *
+ * 데이터 입력:
+ *   - GET /api/all-notes        — heatmap 일자별 집계 (전 노트 mtime/created)
+ *   - GET /api/vault-births     — vault 생성 일자 (셀 pin 마커 + 헤더 + 일별 표기)
+ *   - GET /api/additions?date=  — 셀 클릭 시 그 날 노트 리스트
+ *   - data.master.vaults        — vault → category 매핑 (router 전달)
+ *
+ * 주요 함수 카탈로그:
+ *   - initPage                                  ← 진입점, ECharts mount + 핸들러 + resizer
+ *   - shellHtml                                 ← toolbar + cal-stack (heatmap + resizer + day area)
+ *   - buildHeatmapOption                        ← ECharts option (R135 visualMax P95 + vault pin scatter)
+ *   - aggregateByDate / totalsInRange           ← 노트 → 일자별 집계 + 범위 합계
+ *   - computeRange / computeMinDate             ← lookback → 시작·끝 일자
+ *   - groupNotesByCategory                      ← 그 날 노트 → 카테고리 그룹 정렬
+ *   - dayCardHtml / dayCatSectionHtml / dayAreaHtml ← 일별 영역 카드 + 섹션 + 헤더
+ *   - fetchAndRender / fetchDailyNotes          ← 데이터 로드 (전체 / 일별)
+ *   - applySplitRatio / loadSplitRatio / saveSplitRatio ← split resizer 비율 (localStorage)
+ *
+ * 표준 시그니처:
+ *   export async function initPage(container, data, userConfig): Promise<PageContext>
+ *
+ * 외부 의존성: ECharts (CDN, window.echarts) + lib/buildOption.js (presetColorByCategory) + lib/obsidian-uri.js + lib/system-vaults.js
+ *
+ * 참조:
+ *   Spec:    [[20260513_시스템스펙_04_시각화]] § 5 page mapping
+ *   R126:    일별 작업 임베드 + 카테고리 그룹화 (2026-05-19)
+ *   R135:    visualMax P95 (outlier 셀 농도 압도 회피)
+ *   영문화:  [[20260530_viz_정본_영문화_매니페스트]] § 6.3
  */
 
 import { presetColorByCategory } from '../lib/buildOption.js';
@@ -155,6 +181,18 @@ function totalsInRange(byDate, range) {
   return { total, max, activeDays };
 }
 
+/**
+ * ECharts option 빌드 — calendar coord + heatmap series + vault 추가 일 pin scatter.
+ *
+ * 색 농도:
+ *   - R135 — visualMax 를 P95 로 (positive count 의 95th percentile). outlier 셀 하나가
+ *     다른 셀 농도를 압도하는 문제 회피. min=1, gradient 5단계 (accent 33→ff).
+ * Pin scatter:
+ *   - vaultsByDate 에 등록된 일자에 accent 색 pin 표시 (vault 추가 일).
+ * 한국어 라벨:
+ *   - tooltip: "노트 생성/갱신", "+ ${vault} 볼트 추가", "클릭 → 하단에 노트 펼치기"
+ *   - calendar nameMap: 월 12개 (1월~12월) + 요일 7개 (일~토)
+ */
 function buildHeatmapOption(state) {
   const [start, end] = state.range;
   const data = [];
@@ -362,6 +400,11 @@ function dayAreaHtml(date, entry, addedVaults, basis, notes, vaultCatMap, loadin
 
 /* ───────────── Shell ───────────── */
 
+/**
+ * 페이지 골격 HTML — toolbar (basis / lookback / 사용자 정의 / 범위 / 총합) +
+ * cal-stack (heatmap chart + drag resizer + 일별 영역). split 비율은 localStorage 영속.
+ * resizer 는 pointer drag + 키보드 (ArrowUp/Down ±2%, Shift±10%) + dblclick reset.
+ */
 function shellHtml(state) {
   const segHtml = LOOKBACK_OPTIONS.map((o) =>
     `<button data-lookback="${o.key}" class="${o.key === state.lookback ? 'on' : ''}">${escapeHtml(o.label)}</button>`
@@ -434,9 +477,24 @@ function setBasisInHash(basis) {
 }
 
 /**
+ * Calendar 페이지 진입점. ECharts heatmap mount + 일별 영역 + split resizer + 핸들러.
+ *
+ * 흐름:
+ *   1. lookback 기본 (6m) + basis (hash 파싱) + splitRatio (localStorage) state 초기화.
+ *   2. shellHtml 렌더 + DOM 참조 + ECharts init.
+ *   3. fetchAndRender — /api/all-notes + /api/vault-births 병렬 → byDate / vaultsByDate / dataMinDate.
+ *   4. 셀 click → selectedDate → fetchDailyNotes → renderDayArea.
+ *   5. lookback / basis / customDays / resizer / Obsidian open / theme observer 핸들러.
+ *
+ * 비자명 포인트:
+ *   - basis 변경 시 byDate 재집계 + dataMinDate 재계산 + 'all' lookback 인 경우 range 재계산.
+ *   - selectedDate 가 있고 basis 변경 시 fetchDailyNotes 재호출 (basis 별 일별 노트 다름).
+ *   - applySplitRatio: CSS 변수 + flex-basis 이중 안전망 + chart.resize().
+ *   - themeObserver: data-theme 속성 변경 시 50ms 후 renderChart 재호출 (테마 색 반영).
+ *
  * @param {HTMLElement} container
- * @param {object} data — router 가 전달 (master.vaults 사용)
- * @param {object} userConfig
+ * @param {object} data       router 가 전달 (master.vaults 사용)
+ * @param {object} userConfig (현재 미사용 — 표준 시그니처)
  */
 export async function initPage(container, data /* , userConfig */) {
   if (!container) throw new Error('calendar.initPage: container 필수');
@@ -528,6 +586,10 @@ export async function initPage(container, data /* , userConfig */) {
     }
   }
 
+  /**
+   * /api/all-notes + /api/vault-births 병렬 fetch → byDate / vaultsByDate / dataMinDate 갱신 → renderChart.
+   * 'all' lookback 인 경우 dataMinDate 기반으로 range 재계산. births 응답 실패해도 notes 만으로 진행.
+   */
   async function fetchAndRender() {
     try {
       const [notesRes, birthsRes] = await Promise.all([
@@ -625,6 +687,7 @@ export async function initPage(container, data /* , userConfig */) {
   let dragging = false;
   let stackRect = null;
 
+  /** split 비율 적용 — CSS 변수 + flex-basis 이중 안전망 + chart.resize. SPLIT_MIN/MAX 범위. */
   function applySplitRatio(ratio) {
     state.splitRatio = ratio;
     const pct = `${(ratio * 100).toFixed(2)}%`;

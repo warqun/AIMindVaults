@@ -1,15 +1,34 @@
 /**
- * sync-banner.js — R149
- * viz `.exe` 실행 시 백그라운드 git pull + sync-all 진행 상황을 floating banner 로 표시.
+ * AIMindVaults Visualization — Sync Banner (R149)
  *
- * - GET /api/sync-status 5s polling
- * - 상태: idle / running / done / failed
- * - running: spinner + step + message
- * - done: ✓ 완료 메시지 + reload 안내 + 5s 후 fade
- * - failed: ✗ 에러 메시지 + 사용자 클릭 시 상세
+ * 역할:
+ *   viz `.exe` 실행 시 백그라운드 git pull + sync-all 진행 상황을 floating banner 로 표시 (우상단).
+ *   `/api/sync-status` 를 3s 간격 polling — done / failed 도달 시 polling 중단.
  *
- * Start-Visualization.ps1 (R149) 가 `.vault_data/.sync-status.json` 갱신.
- * server.js (R149) 의 /api/sync-status endpoint 가 그 파일 노출.
+ * 상태별 표시:
+ *   - idle    : 표시 안 함
+ *   - running : spinner + `[step]` + message (accent 테두리)
+ *   - done    : 직전 running 이었던 경우만 표시 → ✓ + 메시지 + reload 링크 (녹색 테두리, 5s 후 fade)
+ *   - failed  : ✗ + 에러 메시지 (80자 ellipsis + title 에 full err, 빨강 테두리, fade 없음)
+ *
+ * Polling 흐름:
+ *   - 페이지 진입 시 즉시 1회 polling → setInterval (3s).
+ *   - done / failed 수신 시 clearInterval (idempotent — 사용자 reload 시 자연 재시작).
+ *
+ * 데이터 소스 체인:
+ *   Start-Visualization.ps1 (R149) → `.vault_data/.sync-status.json` 갱신 →
+ *   server.js `/api/sync-status` endpoint → sync-banner.js polling.
+ *
+ * 자동 시작:
+ *   `if (typeof window !== 'undefined')` — DOMContentLoaded 또는 즉시 startSyncBanner 호출.
+ *
+ * 사용자 노출 메시지 (UI):
+ *   "동기화 중", "동기화 완료", "동기화 실패", "알 수 없는 오류" — § 6.12 카탈로그 참조.
+ *
+ * 참조:
+ *   Spec:    [[20260513_시스템스펙_04_시각화]] § 6 SSE / sync
+ *   룰:      `.claude/rules/core/viz-device-sync.md` (R146 + R149 누적)
+ *   영문화:  [[20260530_viz_정본_영문화_매니페스트]] § 6.12
  */
 
 const POLL_INTERVAL_MS = 3000;

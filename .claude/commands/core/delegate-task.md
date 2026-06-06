@@ -248,9 +248,9 @@ _AGENT_COMMS/to_claude 스캔하고 open 큐 처리
 
 **병렬 spawn**:
 ```
-/spawn-claude "<볼트A> 볼트 index build -i"
-/spawn-claude "<볼트B> 볼트 index build -i"
-/spawn-claude "<볼트C> 볼트 index build -i"
+/spawn-claude "Cooking 볼트 index build -i"
+/spawn-claude "MachineAssembly 볼트 index build -i"
+/spawn-claude "Discord 볼트 index build -i"
 ```
 
 각 워커 독립 작업 → 본 세션은 master-index-build 만 처리.

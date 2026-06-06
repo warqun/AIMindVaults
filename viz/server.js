@@ -1,7 +1,52 @@
 #!/usr/bin/env node
-// AIMindVaults Visualization Server (W3, Phase 2)
-// HTTP + SSE + fs.watch debounced. External deps: 0 (Node.js built-in only).
-// Spec: Vaults/Projects_Infra/Project_AIMindVaults/Contents/Project/spec/20260506_시각화_데이터모델_인터페이스명세.md § 3.4
+/**
+ * AIMindVaults Visualization Server (W3, Phase 2)
+ *
+ * 역할:
+ *   viz/ 정적 파일 + master_index.json + per-vault vault_index.json + 노트 raw + 9 API endpoints +
+ *   SSE (data-changed 브로드캐스트) + fs.watch (master_index + timeseries) + idle 자동 종료.
+ *
+ * 외부 의존성 0 — Node.js built-in (http / fs / path / url) 만.
+ *
+ * 포트 결정:
+ *   `AIMV_VIZ_PORT` env (기본 8765) → 8766 → 8767 fallback (EADDRINUSE).
+ *
+ * Idle 자동 종료 (R149):
+ *   - `AIMV_VIZ_IDLE_MS` env (기본 15s) — 마지막 SSE 클라이언트 끊긴 후 N ms 후 종료.
+ *   - `AIMV_VIZ_BOOT_GRACE_MS` env (기본 90s) — 부팅 후 첫 연결까지 유예 (좀비 프로세스 방지).
+ *   - 0 으로 비활성화 가능 (콘솔에서 Ctrl+C 종료하던 기존 동작).
+ *
+ * SSE 브로드캐스트:
+ *   - hello       : 클라이언트 연결 시 1회.
+ *   - heartbeat   : 30s 간격.
+ *   - data-changed: master_index.json / timeseries.json 변경 시 (500ms debounce).
+ *
+ * API endpoints (9):
+ *   - /api/rules         — .claude/.codex 룰·스킬·후크 평탄 list
+ *   - /api/note          — 노트 raw text (vault + path safe-join)
+ *   - /api/activity      — 홈 최근 7일 + recent 8 (vault_index mtime 집계)
+ *   - /api/all-notes     — 모든 vault 노트 mtime + created (캘린더 일자별 집계용)
+ *   - /api/additions     — 특정 일자 (date + basis) 추가/편집 노트 리스트
+ *   - /api/timeseries    — timeseries.json snapshots
+ *   - /api/vault-births  — vault 생성 일자 (R136: vault_index 의 가장 오래된 노트 created 우선 + fs.statSync birthtime fallback)
+ *   - /api/sync-status   — .vault_data/.sync-status.json (R149 백그라운드 sync 상태)
+ *   - /sse               — Server-Sent Events
+ *
+ * 정적 파일:
+ *   - /, /index.html, /router.js, /static/*, /lib/*, /pages/*, /components/*, /styles/*
+ *   - /data/master_index.json (정본 노출)
+ *   - X-AIMV-Root 헤더 — 런처가 다른 AIMindVaults 클론과 구별 (R132 다중 클론 격리)
+ *
+ * 안전:
+ *   - safeJoin — path traversal 차단 (.. + sep boundary 검증)
+ *   - GET 만 허용 (Method Not Allowed 405)
+ *   - notePath / vault 에 .. 포함 시 403 Forbidden
+ *
+ * Spec:    [[20260506_시각화_데이터모델_인터페이스명세]] § 3.4 (API)
+ * Spec:    [[20260513_시스템스펙_04_시각화]] § 6 SSE / § 7 API
+ * 룰:      `.claude/rules/core/viz-device-sync.md` (R149 + idle shutdown + sync-status)
+ * 영문화:  [[20260530_viz_정본_영문화_매니페스트]] § 6.15
+ */
 
 import { createServer } from 'node:http';
 import { readFile, stat, readdir } from 'node:fs/promises';

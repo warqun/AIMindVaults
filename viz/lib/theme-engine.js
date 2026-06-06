@@ -1,12 +1,34 @@
 /**
  * AIMindVaults Visualization — 시맨틱 테마 엔진 (Phase 1)
- * Spec: Contents/Project/spec/20260525_viz_테마_엔진_설계.md
  *
- * data-theme(base) 위에 사용자 색 오버라이드 레이어를 setProperty 로 얹는다.
- * 인라인 스타일이 :root[data-theme=..] CSS 변수보다 우선하므로 즉시 반영된다.
+ * 역할:
+ *   `data-theme` (base) attribute + 사용자 색 override layer 합성. `:root[data-theme=..]` CSS 변수가
+ *   기본값, 인라인 `style.setProperty('--var', val)` 가 override → 인라인이 우선이라 즉시 반영.
  *
- * Phase 1 = 핵심 4그룹 (surface/text/accent/border, 12 변수).
- * category/rules 색은 Phase 4 에서 확장. 기존 코드 영향 0 인 독립 모듈.
+ * 두 레이어:
+ *   - base: `data-theme="light|dark|<내장id>"` (또는 auto → prefers-color-scheme 해석).
+ *   - override: `themeOverrides[resolvedTheme][varName] = value` (UI 색 편집기 결과).
+ *
+ * Phase 1 변수 (THEME_VAR_GROUPS, 12 변수, 4 그룹):
+ *   - surface (--bg / --surface / --surface-2 / --surface-hover)
+ *   - text    (--text / --text-2 / --text-3)
+ *   - accent  (--accent / --accent-bg / --accent-fg)
+ *   - border  (--border / --border-strong)
+ *   category / rules 색은 Phase 4 확장 예정.
+ *
+ * 사용자 노출 (UI 라벨):
+ *   THEME_VAR_GROUPS 의 group/var label (한국어: 표면/텍스트/액센트/보더 + 배경/본문/보조/흐림 등) 가
+ *   Settings 페이지 외관 편집기에서 표시. § 6.lib 카탈로그 참조.
+ *
+ * 주요 export:
+ *   - THEME_VAR_GROUPS / THEME_VAR_NAMES / BUILTIN_BASES / isBuiltinBase
+ *   - applyBase / resolvedTheme         ← data-theme attribute
+ *   - baseValue(name)                   ← override 임시 제거 후 computed base 값 (편집기 reset 표시)
+ *   - applyOverrides / setOverride / clearOverride / clearAllOverrides
+ *   - applyTheme(base, overrides)       ← 통합 적용 (settings + bootstrap 진입점)
+ *
+ * Spec: [[20260525_viz_테마_엔진_설계]]
+ * 영문화: [[20260530_viz_정본_영문화_매니페스트]] § 6.lib
  */
 
 /** 커스텀 노출 대상 변수 — 그룹별 메타 (UI 색 편집기가 사용). */

@@ -49,11 +49,11 @@ node "{볼트경로}/.sync/_tools/cli-node/bin/cli.js" index build -r "{볼트�
 ```
 === 볼트 리인덱스 결과 ===
 AIHubVault    : 114 notes, 0.12s (incremental, 2 updated)
-<볼트A>       : 183 notes, 0.21s (incremental, 0 updated)
-<볼트B>       :  32 notes, 0.08s (incremental, 5 new)
-<볼트C>       : skipped (no indexer script)
+Unity         : 183 notes, 0.21s (incremental, 0 updated)
+JissouGame    : 32 notes, 0.08s (incremental, 5 new)
+Search        : skipped (no indexer script)
 ...
-전체: N 볼트, M 스킵, K 실패, 총 X.Xs
+전체: 15 볼트, 1 스킵, 0 실패, 총 1.2s
 ```
 
 ## 참조

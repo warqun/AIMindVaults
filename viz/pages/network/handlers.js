@@ -1,13 +1,16 @@
 /**
- * Phase 2.7 W1 — viz/pages/network/handlers.js
- * spec § 2.1 (단일 진리원 20260508_그래프뷰_안정화_인터페이스_명세)
+ * AIMindVaults Visualization — Network Handlers 모듈 (Phase 2.7 W1)
  *
  * 책임 3종:
- *  - setupConditionalFreeze: force 수렴 후 layout='none' + x,y 박제. unfreeze + 1초 debounce 재freeze.
- *  - setupDragLock: graphdragend 시 노드 fixed=true.
- *  - setupThemeObserver: data-theme 변경 → chart.resize() (ECharts bug#18174 회피).
+ *   - setupConditionalFreeze: force 수렴 후 layout='none' + 노드 x,y 박제 (hub 제외).
+ *     unfreezeAndScheduleRefreeze(forcePartial) → layout='force' 복귀 + 1초 debounce 재freeze.
+ *   - setupDragLock          : graphdragend 시 노드 fixed=true → force 재실행에도 위치 보호.
+ *   - setupThemeObserver     : data-theme 변경 → chart.resize() (ECharts bug#18174 회피).
  *
  * 외부 의존성: ECharts CDN (window.echarts) 만 — 직접 import X.
+ *
+ * Spec:    [[20260508_그래프뷰_안정화_인터페이스_명세]] § 2.1
+ * 영문화:  [[20260530_viz_정본_영문화_매니페스트]] § 6.5
  *
  * @typedef {Object} ForcePartial
  * @property {number} [gravity]

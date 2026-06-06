@@ -1,6 +1,18 @@
-﻿# AIMindVaults Visualization — 아이콘 자체 생성기
-# System.Drawing 으로 256x256 PNG 그린 뒤 ICO 컨테이너에 박는다.
-# 외부 도구·라이선스 의존 0.
+﻿# AIMindVaults Visualization — viz.ico 자체 생성기
+#
+# 역할:
+#   System.Drawing 으로 256x256 PNG 그린 뒤 ICO 컨테이너 (PNG embedded, Vista+) 에 박아 viz.ico 출력.
+#   외부 도구·라이선스 의존 0 — 디자인 변경 시 본 스크립트 수정 + 재실행.
+#
+# 그래픽 구성:
+#   - 중앙 1 노드 (짙은 회색) + 모서리 4 노드 (빨강/파랑/초록/보라, viz 카테고리 톤)
+#   - 중앙 → 각 노드 엣지 (반투명 회색)
+#   - 모든 노드 외곽 흰 테두리 6px (가독성)
+#   - tokens.css 색감과 대응
+#
+# 출력: `viz/viz.ico` (PNG-embedded ICO)
+#
+# 영문화: [[20260530_viz_정본_영문화_매니페스트]] § 6.16
 
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.Drawing

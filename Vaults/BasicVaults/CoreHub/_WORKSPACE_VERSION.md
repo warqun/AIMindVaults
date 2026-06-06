@@ -3,7 +3,7 @@ type: workspace-version
 tags:
   - CoreHub
   - Multi-Hub
-updated: 2026-05-27
+updated: 2026-05-31
 ---
 
 # CoreHub Workspace Version
@@ -14,6 +14,7 @@ updated: 2026-05-27
 
 | 버전 | 변경 내용 |
 | ---- | -------- |
+| 202605310001 | R156 translate-to-en.js 등록 (viz 한국어→영문 자동 변환 스크립트) |
 | 202605270003 | R140 — Script_Registry 등록 (Viz-Snapshot.ps1 디바이스 간 점검 공유 자동화) |
 | 202605270002 | R139 — core-sync-all 이 Preset Hub _WORKSPACE_VERSION bump (위성 sync version skip 버그 fix). R138 위성 미전파 잔여 해소. |
 | 202605270001 | R138 — index-build.js created fallback 강화 (fmCreated \|\| fmUpdated \|\| birthtime). NTFS ctime 응축 회피. |

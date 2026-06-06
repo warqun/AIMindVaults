@@ -1,7 +1,41 @@
-// AIMindVaults Visualization — Settings 페이지 (W5)
-// Spec: Phase 2.5 § 5.3 settings · 시안 viz_design_drafts/09_settings.html · Phase 1 spec § 4 UserConfig
-// Interface: export async function initPage(container, data, userConfig): Promise<PageContext>
-// localStorage 키: aimv_viz_user_config (단일, Phase 1 spec § 4 정합)
+/**
+ * AIMindVaults Visualization — Settings 페이지 (W5)
+ *
+ * 역할:
+ *   UserConfig (theme / 외관 색 / 차트 두께 / 토글 / 홈 섹션 표시) 편집 화면.
+ *   4 패널 캐러셀 (외관·UI / 그래프·차트 / 프리셋·입출력 / 커스텀=홈 표시 토글) — 무한 순환 슬라이드.
+ *   변경 즉시 localStorage 저장 + `aimv:user-config-changed` 이벤트 → 다른 페이지 (home 등) 실시간 반영.
+ *
+ * 데이터 입력:
+ *   - userConfig (initPage 인자)      — defaults 와 deep merge 후 cfg state 로 보유.
+ *   - lib/user-config.js              — SCHEMA_VERSION, defaultUserConfig, load/save/normalize.
+ *   - lib/theme-engine.js             — THEME_VAR_GROUPS (시맨틱 변수 묶음), baseValue/setOverride/clearOverride, applyTheme, resolvedTheme.
+ *
+ * localStorage 키 2개:
+ *   - `aimv_viz_user_config`          — UserConfig 정본 (lib/user-config.js 책임)
+ *   - `aimv_viz_presets`              — 명명 프리셋 슬롯 (`{ name: configSnapshot }`)
+ *
+ * 주요 함수 카탈로그:
+ *   - initPage                         ← 진입점, cfg state + 4 패널 + 핸들러 부착
+ *   - renderHTML / renderAll           ← 4 패널 HTML 골격 + 통합 렌더
+ *   - renderPresets                    ← 프리셋 목록 (패널 2)
+ *   - renderAppearance                 ← THEME_VAR_GROUPS 시맨틱 색 input 그룹
+ *   - attachHandlers                   ← 모든 이벤트 (탭/슬라이더/토글/테마/Export-Import/프리셋/리셋/외관 색)
+ *   - buildClones                      ← 앞뒤 패널 클론 (무한 순환 + 양끝 peek)
+ *   - setGroup / slideRelative         ← 그룹 전환 (직접 / 클론 거침)
+ *   - applyTrack / updateHeight / updateTabs ← 캐러셀 상태 동기
+ *   - applyTheme / applyLayout / broadcastChange / showToast ← 부수 헬퍼
+ *
+ * 표준 시그니처:
+ *   export async function initPage(container, data, userConfig): Promise<PageContext>
+ *   PageContext = { destroy(), refresh(newData) }
+ *
+ * 참조:
+ *   시안:    viz_design_drafts/09_settings.html
+ *   Spec:    [[20260513_시스템스펙_04_시각화]] § 8 Settings (UserConfig)
+ *   테마:    [[20260525_viz_테마_엔진_설계]]
+ *   영문화:  [[20260530_viz_정본_영문화_매니페스트]] § 6.9
+ */
 
 import {
   SCHEMA_VERSION,
@@ -14,7 +48,7 @@ import {
 
 const PRESETS_KEY = 'aimv_viz_presets';
 
-// 명명 프리셋 슬롯 — 여러 테마 설정을 이름 붙여 저장/전환. { name: configSnapshot }
+/** 명명 프리셋 슬롯 — `{ name: configSnapshot }` 형태로 localStorage 에 영속. cfg 전체 deep clone 저장. */
 export function loadPresets() {
   try { return JSON.parse(localStorage.getItem(PRESETS_KEY)) || {}; } catch { return {}; }
 }
@@ -38,6 +72,7 @@ function broadcastChange(cfg) {
   window.dispatchEvent(new CustomEvent('aimv:user-config-changed', { detail: { config: cfg } }));
 }
 
+/** 우하단 토스트 한 줄 (ms 후 fade out). 같은 인스턴스 재사용 + setTimeout 재설정. */
 function showToast(text, ms = 2200) {
   let el = document.getElementById('settings-toast');
   if (!el) {
@@ -52,6 +87,16 @@ function showToast(text, ms = 2200) {
   showToast._t = setTimeout(() => { el.style.opacity = '0'; }, ms);
 }
 
+/**
+ * Settings 페이지 HTML 골격. 4 패널 (캐러셀 그룹):
+ *   0. 외관 / UI       — 테마 토글 + 시맨틱 색 override + 레이아웃 (wide)
+ *   1. 그래프 / 차트   — 노드/엣지 multiplier + autoScale
+ *   2. 프리셋 / 입출력 — 명명 프리셋 + Export/Import JSON + PNG 스냅샷 + Reset
+ *   3. 커스텀          — 홈 표시 토글 (kpiHero/recentActivity/vizCards/exploreCards)
+ *
+ * 사용자 노출 텍스트: 탭 라벨 4, 섹션 제목 8, 라벨 + sub + desc 다수.
+ * 영문화 매핑 [[20260530_viz_정본_영문화_매니페스트]] § 6.9 참조.
+ */
 function renderHTML(state) {
   const cfg = state.cfg;
   const gi = state.groupIndex || 0;
@@ -184,6 +229,21 @@ function renderPresets(state) {
     </div>`).join('');
 }
 
+/**
+ * 모든 사용자 인터랙션 핸들러 부착 — 한 곳에 모음 (이벤트 위임 + 직접 바인딩 혼합).
+ *
+ * 핸들러 그룹:
+ *   - 그룹 prev/next/tab 클릭 → setGroup / slideRelative (무한 순환)
+ *   - 슬라이더 (nodeMul, edgeMul) → cfg 갱신 + persist
+ *   - 토글 (autoScale, wideLayout, homeToggles) — 이벤트 위임으로 한 리스너에서 분기
+ *   - 테마 세그먼트 (light/dark/auto) → applyTheme + 외관 재렌더
+ *   - Export (JSON) / Import (JSON, 형식·버전 검증) / Snapshot (PNG, ECharts getDataURL)
+ *   - 프리셋 (save/apply/delete) — `aimv_viz_presets` localStorage
+ *   - Reset (confirm) → defaultUserConfig
+ *   - 외관 색 input → setOverride (현재 테마의 themeOverrides), reset 버튼 → clearOverride
+ *
+ * 사용자 노출 메시지: showToast / confirm (§ 6.9 카탈로그 토스트·Confirm 그룹 참조).
+ */
 function attachHandlers(state) {
   const cfg = state.cfg;
   const c = state.container;
@@ -399,6 +459,11 @@ function toColorInput(v) {
   return '#000000';
 }
 
+/**
+ * 외관 (테마 색) 영역 렌더. `THEME_VAR_GROUPS` (시맨틱 변수 묶음) 를 그룹별로 펼쳐 색 input 표시.
+ * 각 변수: 색 picker + 변수 라벨 + override 표시 (●) + 변수별 reset (↺).
+ * 색은 현재 resolvedTheme 의 override 우선, 없으면 base 값. 변경 시 themeOverrides[theme][name] 저장.
+ */
 function renderAppearance(state) {
   const wrap = state.container.querySelector('#set-appearance');
   if (!wrap) return;
@@ -467,7 +532,11 @@ function updateHeight(state) {
   if (vp && p) vp.style.height = p.offsetHeight + 'px';
 }
 
-// 실제 패널 렌더 후 앞뒤에 클론 삽입 (무한 순환 + 양끝 연속 peek). 클론은 id/상호작용 제거.
+/**
+ * 실제 4 패널 양 끝에 클론 1 개씩 삽입 (앞에 마지막 panel 클론, 뒤에 첫 panel 클론).
+ * slideRelative 이 첫·마지막 패널을 넘어 연속 슬라이드 직후 transition 없이 실제 위치로 점프 → 무한 순환.
+ * 클론은 id/상호작용 (`disabled` + `tabIndex=-1` + `pointer-events:none`) 모두 제거 — 시각만.
+ */
 function buildClones(state) {
   const track = state.container.querySelector('#set-track');
   if (!track) return;
@@ -487,7 +556,7 @@ function buildClones(state) {
   track.appendChild(makeClone(panels[0]));
 }
 
-// 탭/초기 — 클론 거치지 않고 logical idx 로 직접 이동.
+/** 탭 클릭 / 초기 진입 시 그룹 직접 전환 (클론 거치지 않음). logical idx 를 modulo GROUP_COUNT 로 정규화. */
 function setGroup(state, idx, animate = true) {
   idx = ((idx % GROUP_COUNT) + GROUP_COUNT) % GROUP_COUNT;
   state.groupIndex = idx;
@@ -496,7 +565,10 @@ function setGroup(state, idx, animate = true) {
   updateHeight(state);
 }
 
-// prev/next — 앞뒤 클론을 거쳐 무한 순환. 클론 도달 시 transition 없이 실제 위치로 점프.
+/**
+ * prev/next 버튼 시 앞·뒤 클론을 거쳐 슬라이드 → transitionend 후 실제 위치로 점프 (transition 끄고).
+ * state.animating 으로 중복 호출 방지 + 420ms timeout fallback (transitionend 미발화 대비).
+ */
 function slideRelative(state, dir) {
   if (state.animating) return;
   const track = state.container.querySelector('#set-track');

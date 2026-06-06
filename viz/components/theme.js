@@ -1,9 +1,27 @@
 /**
- * AIMindVaults Visualization — Theme toggle component
- * 정본 = user_config(themeBase + themeOverrides). theme-engine 으로 base+override 적용.
+ * AIMindVaults Visualization — Theme Toggle Component
  *
- * 구 aimv_viz_theme 별도 키는 initTheme 에서 1회 흡수 후 제거(레거시 마이그레이션).
- * 헤더 토글은 base 만 light↔dark 전환하고 현재 테마의 override 는 유지한다.
+ * 역할:
+ *   헤더의 ☀/☾ 토글 버튼 동작 + 부트 시점 1회 테마 적용 (initTheme).
+ *   정본 = `user_config.themeBase` (light/dark/auto) + `themeOverrides[theme][var]` (시맨틱 색 override).
+ *   theme-engine 이 base + override 합성해 CSS 변수 주입.
+ *
+ * 헤더 토글 동작:
+ *   - 클릭 시 base 만 light ↔ dark 전환 (auto 는 토글 무시 — 다음 토글 시 resolvedTheme 의 반대).
+ *   - 현재 테마의 themeOverrides 는 유지 (예: dark 에서 빨강 강조색 설정 → dark 다시 진입 시 빨강 유지).
+ *   - `aimv:theme-changed` + `aimv:user-config-changed` 이벤트 dispatch — Settings 페이지 / 라우터 동기화.
+ *
+ * 레거시 마이그레이션:
+ *   구 `aimv_viz_theme` localStorage 키 (단일 light/dark) 가 있으면 initTheme 에서 1회 흡수 →
+ *   user_config.themeBase 에 복사 + 레거시 키 제거. 다음 부트 부터는 단일 정본.
+ *
+ * 주요 함수:
+ *   - attachThemeButton(btn) → detach()    ← 헤더 토글 버튼 이벤트 부착 (호출자가 unmount 시 detach)
+ *   - initTheme() → resolvedTheme           ← 부트 시 1회 — 레거시 흡수 + applyThemeEngine + setLabel
+ *
+ * 참조:
+ *   Spec:    [[20260525_viz_테마_엔진_설계]]
+ *   영문화:  [[20260530_viz_정본_영문화_매니페스트]] § 6.13
  */
 
 import { loadUserConfig, saveUserConfig } from '../lib/user-config.js';

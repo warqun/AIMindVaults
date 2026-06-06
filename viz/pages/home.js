@@ -1,11 +1,37 @@
 /**
- * AIMindVaults Visualization — 홈 페이지 (W1)
- * 시안: viz_design_drafts/02_compact_v3.html
- * Spec § 5.3 home — KPI 4 + 최근 활동 (mtime 기반 7일) + 시각화 4 카드 + 탐색 2 카드.
+ * AIMindVaults Visualization — Home 페이지 (W1)
+ *
+ * 역할:
+ *   사용자가 `viz/index.html` 첫 진입 시 보는 홈 페이지. KPI 카드 4 + 최근 활동 (weekly bar + recent list)
+ *   + 시각화 카드 4 (connections/network/distribution/tags) + 탐색 카드 2 (explorer/rules).
+ *
+ * 데이터 입력:
+ *   - master_index.json (`data.master`)         — vault_count / note_count / connections / tag_index 등.
+ *   - /api/timeseries                            — KPI sparkline 시계열 (R148 이후 노트 기반 derive 가 우선).
+ *   - /api/vault-births                          — Vaults 카드 fallback (vault 폴더 birthtime 정확).
+ *   - /api/all-notes                             — Notes/Connected/Tags 카드의 노트 기반 derive 입력.
+ *   - /api/activity                              — 최근 활동 영역 (weekly + recent).
+ *   - userConfig.homeToggles                     — 섹션별 표시 토글.
+ *
+ * 주요 함수 카탈로그:
+ *   - initPage(container, data, userConfig)        ← 진입점, PageContext 반환
+ *   - renderShell / applyHomeToggles               ← 골격 + 토글 반영
+ *   - renderKpi                                    ← KPI 카드 4 렌더 (R142.5/R148/R152/R153 누적)
+ *   - computeLatestNote                            ← Notes 카드 (basis 별 최근 일자 + 노트 수)
+ *   - computeVaultsFromBirths                      ← Vaults 카드 fallback
+ *   - computeTagsRecentFromNotes                   ← R148 — Tags 카드 노트 기반 derive
+ *   - computeConnectionsNewPairs/NewNotes          ← R153 — Connected 카드 2 지표
+ *   - renderCards / cardHtml                       ← 시각화/탐색 카드 그리드
+ *   - renderActivity / renderActivityError         ← 최근 활동 영역
  *
  * 표준 시그니처:
  *   export async function initPage(container, data, userConfig): Promise<PageContext>
  *   PageContext = { destroy(), refresh(data) }
+ *
+ * 참조:
+ *   시안:    viz_design_drafts/02_compact_v3.html
+ *   Spec:    [[20260513_시스템스펙_04_시각화]] § 5.3 home
+ *   영문화:  [[20260530_viz_정본_영문화_매니페스트]] § 6.1
  */
 
 import { isSystemVault, filterVisibleNotes, filterUserVaultsMap } from '../lib/system-vaults.js';
@@ -123,6 +149,11 @@ export async function initPage(container, data, userConfig) {
 }
 
 /* ───────────── Render — shell ───────────── */
+/**
+ * Home 페이지 HTML 골격 1회 렌더. KPI 영역 (kpi-row) + 최근 활동 (weekly + recent) + 시각화 4 카드 + 탐색 2 카드.
+ * 미니 카드 "view all →" 클릭 시 라우터 navigate (weekly → #calendar, recent → #additions).
+ * KPI/카드는 비동기 fetch 도착 시 renderKpi / renderCards 가 in-place 재렌더.
+ */
 function renderShell(root, data, snapshots, vaultBirths, allNotes) {
   root.innerHTML = `
     <section class="kpi-row" data-slot="kpi-row" data-home-section="kpiHero"></section>
@@ -152,6 +183,11 @@ function renderShell(root, data, snapshots, vaultBirths, allNotes) {
 }
 
 /* ───────────── 표시 토글 (Settings homeToggles 반영) ───────────── */
+/**
+ * Settings 의 `homeToggles` 에서 false 인 섹션은 display: none 처리. 4 섹션:
+ *   kpiHero (KPI 카드 4), recentActivity (최근 활동 미니 카드 2), vizCards (시각화 4), exploreCards (탐색 2).
+ * Settings 페이지에서 토글 변경 시 `aimv:user-config-changed` 이벤트 → initPage 에서 재호출.
+ */
 function applyHomeToggles(root, userConfig) {
   const ht = (userConfig && userConfig.homeToggles) || {};
   for (const key of ['kpiHero', 'recentActivity', 'vizCards', 'exploreCards']) {
@@ -165,6 +201,23 @@ function applyHomeToggles(root, userConfig) {
 /* ───────────── Render — KPI ───────────── */
 const SPARK_LENGTH = 7;
 
+/**
+ * KPI 카드 4 렌더 (Vaults / Notes / Connected / Tags). master_index 와 비동기 fetch 데이터 (timeseries/births/notes)
+ * 도착 시점에 따라 여러 번 호출되어 in-place 갱신.
+ *
+ * 누적 컨텍스트:
+ *   - R142.5 — visible filter (시스템 Hub 제외) 적용된 notes 기반 derive (master raw 와 다른 카운트 회피).
+ *   - R148   — Tags/Connections change 를 timeseries snapshot 이 아닌 노트 mtime/created 분포 기반 (디바이스 무관).
+ *   - R152   — change 없어도 view 있으면 `#<view>` 직진 (Connected 카드 진입 동선 fix).
+ *   - R153   — Connected 카드 multi sub-link: (1) 신규 owner-user-tag 쌍 (2) 기존 connection 의 새 노트.
+ *
+ * 카드 종류:
+ *   - 단일 카드 (Vaults/Tags) — change 1 sub-link.
+ *   - multi 카드 (Notes/Connected) — sub-link 2 (Notes: 생성/갱신, Connected: 연결/노트).
+ *
+ * 사용자 노출 텍스트: 카드 label, sub-link 라벨 ("생성"/"갱신"/"연결"/"노트"), 에러 메시지.
+ * 영문화 매핑은 [[20260530_viz_정본_영문화_매니페스트]] § 6.1 참조.
+ */
 function renderKpi(root, data, snapshots, vaultBirths, allNotes) {
   const slot = root.querySelector('[data-slot="kpi-row"]');
   if (!slot) return;
@@ -226,6 +279,7 @@ function renderKpi(root, data, snapshots, vaultBirths, allNotes) {
   }).join('');
 }
 
+/** Notes 카드 (생성/갱신) sub-link 한 줄. delta <= 0 또는 date 없으면 라벨 + — 표시. additions 페이지 직진. */
 function notesSubLink(change, basis, label) {
   if (!change || !change.date || change.delta <= 0) {
     return `<div class="change"><span class="vault-label">${escapeHtml(label)}</span><span class="date">—</span></div>`;
@@ -236,6 +290,7 @@ function notesSubLink(change, basis, label) {
   </a>`;
 }
 
+/** Connected 카드 (연결/노트) sub-link 한 줄. delta <= 0 또는 date 없으면 라벨 + — 표시. 둘 다 `#connections` 직진. */
 function connectionsSubLink(change, label) {
   if (!change || !change.date || change.delta <= 0) {
     return `<div class="change"><span class="vault-label">${escapeHtml(label)}</span><span class="date">—</span></div>`;
@@ -325,6 +380,7 @@ export function computeTagsRecentFromNotes(notes) {
   return { delta: byDate.get(last).size, date: last };
 }
 
+/** master.connections 가 객체 / 배열 / null 어느 형태든 `[{ tag, owner, users }, ...]` 배열로 정규화. */
 function normalizeConnections(connections) {
   if (!connections) return [];
   if (Array.isArray(connections)) return connections;
@@ -334,6 +390,10 @@ function normalizeConnections(connections) {
   return [];
 }
 
+/**
+ * 각 (vault_id, tag) 쌍이 처음 등장한 created 일자 Map (`"vault::tag" → "YYYY-MM-DD"`) 빌드.
+ * tagFilter Set 이 있으면 그 태그만 트래킹. computeConnectionsNewPairs/NewNotes 공통 헬퍼.
+ */
 function buildFirstSeen(notes, tagFilter) {
   const firstSeen = new Map();
   for (const n of notes) {
@@ -517,6 +577,11 @@ function cardHtml(c, data) {
 }
 
 /* ───────────── Render — Activity ───────────── */
+/**
+ * /api/activity 응답을 받아 "최근 활동" 영역 렌더 (weekly 막대 7개 + recent 노트 리스트 최대 6개).
+ * weekly: 일별 변경 수 막대 (max 대비 % 높이). recent: 최신일 대비 ageDays 비례 width 막대.
+ * KIND_COLOR 매핑으로 노트 종류별 색 구분 (VAULT/CONCEPT/TAG/NOTE).
+ */
 function renderActivity(root, act) {
   const grid = root.querySelector('[data-slot="activity-grid"]');
   const summary = root.querySelector('[data-slot="act-summary"]');
@@ -534,9 +599,12 @@ function renderActivity(root, act) {
   summary.textContent = `이번 주 합계 ${total} 노트 갱신`;
 
   const recent = Array.isArray(act?.recent) ? act.recent : [];
+  const recentCard = root.querySelector('[data-slot="recent-items"]');
   if (recent.length === 0) {
-    list.innerHTML = '<div class="page-placeholder" style="min-height:80px;">데이터 없음</div>';
+    // 최근 추가 항목이 없으면 안내 텍스트 대신 카드 자체를 숨김 (빈 상태 비표시)
+    if (recentCard) recentCard.style.display = 'none';
   } else {
+    if (recentCard) recentCard.style.display = '';
     const maxAge = recent.reduce((m, r) => Math.max(m, r.ageDays || 0), 0) || 1;
     list.innerHTML = recent.slice(0, 6).map((r) => {
       const widthPct = Math.max(40, Math.round(100 - (r.ageDays / maxAge) * 60));

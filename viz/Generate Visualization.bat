@@ -1,4 +1,6 @@
 @echo off
+REM AIMindVaults Visualization — Windows .bat 진입 (콘솔 표시 모드, .vbs 가 콘솔 숨김 wrapper)
+REM Chrome/Edge --app 백그라운드 + node server.js foreground. 영문화: 매니페스트 § 6.16.
 chcp 65001 >nul
 title AIMindVaults Visualization
 cd /d "%~dp0"

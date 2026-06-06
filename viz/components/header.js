@@ -1,8 +1,34 @@
 /**
  * AIMindVaults Visualization — Common Header (W1)
- * Spec § 3.1 — brand 모드 (홈) / crumb-back 모드 (다른 페이지) + meta + theme/settings 버튼.
  *
- * mountHeader(container, opts) → { update(opts), destroy() }
+ * 역할:
+ *   모든 페이지 상단에 mount 되는 공통 헤더. 홈에서는 brand 모드 (로고 + 타이틀), 다른 페이지에서는
+ *   crumb-back 모드 (← 홈 / 부모 페이지 / 현재 페이지) + 우측 meta (built / live 인디케이터) +
+ *   theme 토글 버튼 + Settings 진입 버튼.
+ *
+ * 두 모드:
+ *   - 홈 (pageId === 'home') : brand 모드 — "AIMindVaults Visualization"
+ *   - 외 페이지              : crumb-back 모드 — `← 홈 / [부모…] / 현재 페이지`
+ *
+ * Nested crumb:
+ *   PAGE_PARENTS 가 페이지 → 부모 매핑 정의 (예: additions ← calendar). 부모 chain 거슬러 표시.
+ *
+ * Live indicator:
+ *   setLiveState('open' | 'error' | 'connecting') — router.js SSE 상태 반영.
+ *
+ * 주요 함수:
+ *   - mountHeader(container, opts)  ← 진입점, render + 반환 { update, setBuilt, setLiveState, destroy }
+ *   - buildCrumbHtml                ← nested crumb chain HTML
+ *
+ * PAGE_TITLES_LOCAL:
+ *   router.js 의 PAGE_TITLES 와 동기 필요 — 페이지 추가 시 양쪽 갱신.
+ *
+ * 표준 시그니처:
+ *   export function mountHeader(container, opts): { update(opts), setBuilt(s), setLiveState(s), destroy() }
+ *
+ * 참조:
+ *   Spec:    [[20260513_시스템스펙_04_시각화]] § 5 / Phase 2.5 § 3.1
+ *   영문화:  [[20260530_viz_정본_영문화_매니페스트]] § 6.11
  */
 
 import { attachThemeButton } from './theme.js';
@@ -31,6 +57,7 @@ const PAGE_TITLES_LOCAL = {
   additions: '날짜별 추가 항목',
 };
 
+/** PAGE_PARENTS 체인을 거슬러 nested crumb HTML 빌드 — `← 홈 / [부모…] / 현재`. */
 function buildCrumbHtml(pageId, pageTitle) {
   // parent chain 거슬러 빌드
   const chain = [];
@@ -49,6 +76,9 @@ function buildCrumbHtml(pageId, pageTitle) {
 }
 
 /**
+ * 헤더 컨테이너에 mount. opts.pageId === 'home' 이면 brand 모드, 외 페이지면 crumb 모드.
+ * theme 버튼 + Settings 버튼 자동 부착. 반환 객체로 update/setBuilt/setLiveState/destroy 제공.
+ *
  * @param {HTMLElement} container
  * @param {{ pageId: string, pageTitle?: string, built?: string }} opts
  */

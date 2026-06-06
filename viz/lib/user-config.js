@@ -1,9 +1,29 @@
 /**
  * AIMindVaults Visualization — UserConfig 정본 (단일 소스)
- * 테마(base+override) · 색 팔레트 · 두께 · 토글 · 레이아웃을 한 localStorage 키로 관리.
- * settings.js(UI) · router.js(부트) · theme.js(헤더 토글) 가 공통 의존한다.
  *
- * Schema v2 (2026-05-25): theme → themeBase, themeOverrides 신설 (시맨틱 테마 엔진).
+ * 역할:
+ *   UI 토글 + 색 + 두께 + 테마 + 레이아웃 등 사용자 설정 단일 localStorage 키 (`aimv_viz_user_config`).
+ *   settings.js (편집 UI) · router.js (부트 + applyTheme) · theme.js (헤더 토글) · 페이지들이 공통 의존.
+ *
+ * Schema v2 (2026-05-25):
+ *   - v1 → v2 마이그레이션: `theme` (단일 문자열) → `themeBase` + `themeOverrides` 분리 (시맨틱 테마 엔진).
+ *   - 미지의 미래 버전 (v > 2) 은 migrate 가 null 반환 → loadUserConfig 가 defaultUserConfig 로 fallback.
+ *
+ * Default 필드:
+ *   - colors / customPalette (PRESET_PALETTE 20색 builtin)
+ *   - thicknessMultiplier / nodeMul / edgeMul / autoScale
+ *   - toggles (chartA/B/C/kpiRow) / homeToggles (kpiHero/recentActivity/vizCards/exploreCards)
+ *   - themeBase (light/dark/auto) / themeOverrides ({themeId: {var: value}})
+ *   - wideLayout / topNTags / topNConcepts
+ *
+ * 주요 export:
+ *   - STORAGE_KEY / SCHEMA_VERSION / PRESET_PALETTE  ← 상수
+ *   - defaultUserConfig()             ← 기본값 (loadUserConfig 의 fallback)
+ *   - loadUserConfig()                ← localStorage 읽기 + migrate + mergeWithDefaults
+ *   - saveUserConfig(cfg)             ← JSON.stringify + localStorage.setItem
+ *   - normalizeUserConfig(obj)        ← 외부 객체 (Import 파일) → 호환 cfg (실패 시 null)
+ *
+ * 영문화: [[20260530_viz_정본_영문화_매니페스트]] § 6.lib
  */
 
 export const STORAGE_KEY = 'aimv_viz_user_config';

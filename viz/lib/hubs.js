@@ -1,6 +1,24 @@
 /**
- * 카테고리 hub 노드/엣지 생성. force-directed 그래프에서 invisible hub 가
- * 같은 카테고리 노드들을 끌어당겨 군집 형성.
+ * AIMindVaults Visualization — Category Hub Nodes (Phase 2.7 W3)
+ *
+ * 역할:
+ *   network 페이지 force-directed graph 에서 카테고리당 invisible hub 노드 1 개 + 같은 카테고리
+ *   노드 → hub invisible link 생성. hub 가 끌어당겨 같은 카테고리 노드들이 군집을 형성.
+ *
+ * Hub 특성:
+ *   - id    : `__hub_${categoryName}` (HUB_ID_PREFIX 시작)
+ *   - 시각  : symbolSize 0 + itemStyle.opacity 0 (보이지 않음)
+ *   - 라벨  : label.show=true (카테고리명 표시, fontSize 14, opacity 0.6)
+ *   - 링크  : 모든 같은 카테고리 노드와 invisible link (lineStyle.opacity 0)
+ *
+ * 주요 export:
+ *   - HUB_ID_PREFIX                 ← `__hub_` 상수 (다른 모듈에서 hub 필터 시 사용)
+ *   - addCategoryHubs(input)         ← {nodes, links, categories} → hub 추가된 신규 객체
+ *   - isHubNode(idOrNode)            ← id 또는 노드 객체가 hub 인지
+ *   - filterRealNodes(nodes)         ← hub 제외 (KPI 카운트·검색 등)
+ *
+ * Spec: [[20260508_그래프뷰_안정화_인터페이스_명세]] § 2.3
+ * 영문화: [[20260530_viz_정본_영문화_매니페스트]] § 6.lib
  *
  * @typedef {import('./loadIndex.js').IndexData} IndexData
  *

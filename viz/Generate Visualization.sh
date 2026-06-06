@@ -1,4 +1,7 @@
 #!/bin/bash
+# AIMindVaults Visualization — Linux .sh 진입 (터미널 실행)
+# google-chrome / chromium / microsoft-edge --app 백그라운드 (4s 후) → fallback xdg-open. node server.js foreground.
+# 영문화: 매니페스트 § 6.16.
 cd "$(dirname "$0")"
 URL="http://localhost:8765"
 

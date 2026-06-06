@@ -66,11 +66,26 @@ Claude 는 자동 주입 메커니즘이 있고, Codex 는 없으므로 세션 �
 1. 명시적 볼트 지정 우선
 2. 키워드 추론:
    - "AI 워크플로우", "에이전트", "_Standards" → AIHubVault
-   - "콘텐츠", "노트 작성" → BasicContentsVault
-   - `<도메인 키워드>` → `<대응 볼트 ID>`
-
-   > 사용자가 자기 환경 (Unity·게임 기획·요리·운동 등) 에 맞춰 키워드 매핑을 추가한다.
-   > 실제 등록 볼트 목록은 `_STATUS.md` 의 볼트 레지스트리 섹션 참조 (사용자 환경별 다름).
+   - "Unity", "유니티 엔진" → Unity
+   - "Unreal", "Unreal Engine", "언리얼", "언리얼 엔진", "UE5", "Blueprint", "블루프린트" → UnrealEngine
+   - "CapCut", "영상편집" → CapCut
+   - "YouTube", "유튜브", "채널 운영", "콘텐츠 제작", "콘텐츠 도메인", "쇼츠", "Shorts", "썸네일", "제목", "스크립트", "채널 성장" → ContentCreation
+   - "Notion", "노션 운영" → Notion
+   - "Obsidian 플러그인", "플러그인 개발" → ObsidianDev
+   - "전투 시스템", "CombatToolKit", "스킬 시스템", "이펙트 패키지", "뱀서" → CombatToolKit
+   - "타일맵", "TileMap", "맵 생성", "청크", "절차적 생성" → TileMapToolKit
+   - "JissouGame", "지쏘우", "jissou" → JissouGame
+   - "게임 기획", "게임 디자인" → GameDesign
+   - "Git", "버전관리" → Git
+   - "개발 기초", "컴퓨터구조", "운영체제", "네트워크", "HTTP", "DB", "데이터베이스", "인증", "JWT", "클라우드 기초", "인프라 기초" → DevFoundation
+   - "Blender", "3D" → Blender
+   - "AI 에셋", "생성형 AI" → AI_Gen4Game
+   - "공장 자동화", "자동화 기계 조립", "기계 조립", "공작현장", "렌치볼트", "육각렌치볼트", "체결부품", "공구", "토크", "공차" → MachineAssembly
+   - "PLC", "시퀀스 제어", "래더", "Ladder", "FBD", "Structured Text", "IEC 61131", "HMI", "SCADA", "Motion Control", "서보", "인버터", "필드버스", "Fieldbus", "Profinet", "EtherCAT", "Modbus", "CC-Link", "OPC UA", "Safety PLC", "자동화 설비 제어", "산업 자동화", "FA", "공장 PLC", "Siemens TIA", "Mitsubishi GX", "Studio 5000", "LS XG5000" → IndustrialControl
+   - "빛과 색", "색채학", "명암", "색온도", "필름룩", "RAW", "LOG" → LightAndColor
+   - "아트 인사이트", "미적 감각", "안목", "취향", "유행과 트렌드", "올드와 클래식", "상황과 감정" → ArtInsight
+   - "운동", "헬스", "피트니스", "근력운동", "유산소", "스트레칭", "가동성", "루틴", "회복", "부상 예방" → Exercise
+   - "학습법", "공부법", "메타러닝", "기억법", "암기", "복습", "학습 시스템", "노트법", "스페이스드 리피티션", "deliberate practice" → Learning
 3. 파일 경로 포함 시 → 경로에서 볼트 추출
 4. 루트 파일만 대상이면 → 루트에서 작업
 5. 모호하면 → 사용자에게 확인

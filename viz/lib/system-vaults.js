@@ -1,13 +1,34 @@
 /**
- * 시스템 Hub 식별 — 시각화 표시 필터링 전용.
+ * AIMindVaults Visualization — System Hub + Meta Note Filters (R134 + R141)
  *
- * BasicVaults 폴더에 기본 제공되는 시스템 Hub 와 템플릿 볼트는
- * vault 레지스트리에는 등록되지만 콘텐츠 시각화 (노트·태그·그래프) 에서는 제외한다.
- * 사용자가 `/create-preset-hub` 등으로 만든 커스텀 Hub 는 ID 사전에 없으므로
- * 자동으로 사용자 Hub 로 분류되어 시각화에 포함된다.
+ * 역할:
+ *   시각화 표시에서 제외할 시스템 Hub vault + 메타 노트 type/path 식별. home/additions/calendar/tags 등의
+ *   visible filter 단일 진입점 (filterVisibleNotes).
  *
- * 예외: calendar 의 `/api/vault-births` (Hub 생성 timeline) 은 시스템 Hub 도
- * 표시한다 — Hub 가 언제 추가됐는지 메타 정보는 시각화 가치가 있다.
+ * SYSTEM_HUB_IDS (12 vault):
+ *   `Vaults/BasicVaults/` 폴더의 기본 제공 Hub + 템플릿 — CoreHub, AIHubVault* (6 종), Basic*Vault (5 종).
+ *   vault 레지스트리에는 등록되지만 콘텐츠 시각화 (노트·태그·그래프) 에서는 제외.
+ *   사용자가 `/create-preset-hub` 등으로 만든 커스텀 Hub 는 사전에 없으므로 자동 포함.
+ *   예외: calendar 의 `/api/vault-births` (Hub 생성 timeline) 은 시스템 Hub 도 표시 — Hub 추가 일자는 시각화 가치 있음.
+ *
+ * META_NOTE_TYPES + META_NOTE_PATH_PATTERNS (R141 옵션 b, 2026-05-27):
+ *   folder-index (Project.md / Domain.md) + standard (CONTENTS_*.md) + Juggl 시드 등 메타 노트 제외.
+ *   사용자 결정 "데이터 수집방식 변경 무리, 시각화 측 필터" 따라 시각화 단에서 처리.
+ *
+ * 주요 export:
+ *   - isSystemVault(id)                ← SYSTEM_HUB_IDS Set 에 있는지
+ *   - filterUserVaults(ids)            ← 시스템 Hub 제외 vault id 배열
+ *   - filterUserNotes(notes)           ← 시스템 Hub 노트 제외 (vault/vaultId/vault_id 필드 모두 지원)
+ *   - filterUserVaultsMap(map)         ← master.vaults 객체에서 시스템 Hub 제외
+ *   - isMetaNote(note)                 ← type 또는 path 패턴이 메타인지
+ *   - filterMetaNotes(notes)           ← 메타 노트 제외
+ *   - filterVisibleNotes(notes)        ← 표준 진입점 — 시스템 Hub + 메타 둘 다 제외
+ *
+ * 참조:
+ *   Spec:    [[20260513_시스템스펙_04_시각화]] § 5 visible filter
+ *   R134:    filterUserNotes vault_id 핫픽스 (노트 0→1339, 2026-05-27)
+ *   R141:    META 노트 type/path 필터 (옵션 b, 2026-05-27)
+ *   영문화:  [[20260530_viz_정본_영문화_매니페스트]] § 6.lib
  */
 
 export const SYSTEM_HUB_IDS = new Set([

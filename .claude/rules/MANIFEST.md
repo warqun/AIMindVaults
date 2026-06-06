@@ -29,6 +29,7 @@
 | `shell-redirect-safety.md` | 셸별 NUL 리다이렉트 구문 안전 (Bash `2>/dev/null` · PowerShell `2>$null` · CMD `2>nul` 구분) |
 | `temp-file-management.md` | 임시 파일 관리 |
 | `user-guidance.md` | 유저 가이드 (D안 슬림판: 고위험 6섹션 인라인 유지, 저위험은 Skill Router 위임) |
+| `vault-individualization.md` | 볼트 개별화 규칙 (생성 시 필수 결정 항목 + 후속 작업 5단계 — workspace 동기화 / 루트 레지스트리 등록 / CLAUDE.md 키워드 / 초기 인덱스 빌드 / obsidian.json 자동 등록. R160 으로 custom/CreateVault → core/ 격상) |
 | `viz-device-sync.md` | viz 디바이스 간 동기화 워크플로우 (R146/R149 자동 동기화, R141 viz_snapshots, R148 KPI 노트 기반 derive, _AGENT_COMMS 큐 패턴) |
 
 ## custom/ — 사용자 규칙 (동기화 미대상)
@@ -85,13 +86,11 @@
 | `distribution-deploy.md` | 배포, SellingVault, git push | `/distribute` |
 | `sync-version-priority.md` | cli.js sync, pre-sync, _WORKSPACE_VERSION | `/distribute` |
 
-### Phase 3: 참조 문서 이관 (2026-04-18)
+### Phase 3: 참조 문서 이관 (2026-04-18, R160 으로 비움)
 
 자주 쓰이지 않는 참조성 규칙을 archive로 이관하고 Skill 호출 시 Read.
 
-| 파일명 | 트리거 조건 | Skill |
-|--------|-----------|-------|
-| `vault-individualization.md` | 볼트 생성, create-vault, 새 볼트 | `/create-vault` |
+- `vault-individualization.md` 는 R125 (2026-05-18) 로 `.agents/rules/custom/CreateVault/` 이동 후, **R160 (2026-06-06) 으로 `.agents/rules/core/` 격상** — 모든 사용자 대상 일반 인프라로 상시 주입. core/ 표 참조.
 
 ### Phase 2-A bulk-edit-safe 최종 결론 (2026-04-18)
 

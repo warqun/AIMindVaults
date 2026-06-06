@@ -1,20 +1,48 @@
 /**
- * W-add — 날짜 컨텍스트 4-모드 페이지 (R116, 2026-05-13)
- * 한 날짜 기준 noteS / vaults / tags / connections 4 뷰 토글.
+ * AIMindVaults Visualization — Additions (날짜 컨텍스트 4-모드) 페이지 (W-add, R116)
+ *
+ * 역할:
+ *   한 날짜 (기본 = 가장 최근) 기준 그 날 추가/갱신된 데이터를 4 view 로 토글:
+ *     - notes        — 그 날 mtime/created 인 노트 리스트 + frontmatter/body preview
+ *     - vaults       — 그 날 birthtime 인 vault 카드 그리드
+ *     - tags         — 그 날 노트가 가진 태그 빈도 막대 (TOP 40, owner 표시)
+ *     - connections  — 그 날 노트로 발생한 cross-vault connection 행 리스트
  *
  * URL 매개변수:
  *   #additions?date=YYYY-MM-DD&basis=mtime|created&view=notes|vaults|tags|connections
+ *   - date    : 대상 일자. 미지정 시 server 가 가장 최근 자동 선택.
+ *   - basis   : notes·tags·connections 의 일자 기준 (기본 mtime). vaults 는 항상 vault birthtime.
+ *   - view    : 4 모드 토글 (기본 notes).
  *
- * - date    : 대상 일자. 미지정 시 server 가 가장 최근 자동 선택.
- * - basis   : notes·tags·connections 의 일자 기준 (기본 mtime). vaults 는 항상 vault birthtime.
- * - view    : 4 모드 토글 (기본 notes).
+ * 데이터 입력:
+ *   - GET /api/additions?date=&basis=  → { date, basis, count, notes: [{...,mtime,created}] }
+ *   - GET /api/vault-births            → { vaults: [{vaultId, path, birthtime, note_count}] }
+ *   - data.master                       → tag_owners, connections, vaults (router 가 전달)
  *
- * 데이터:
- *   GET /api/additions?date=&basis=  →  { date, basis, count, notes: [{...,mtime,created}] }
- *   GET /api/vault-births            →  { vaults: [{vaultId, path, birthtime, note_count}] }
- *   data.master                       →  tag_owners, connections, vaults (router 가 전달)
+ * 주요 함수 카탈로그:
+ *   - initPage                                       ← 진입점, state + 4 view 동시 mount + 핸들러
+ *   - parseQueryFromHash / buildHash                 ← URL 해시 ↔ state 매핑
+ *   - fetchAdditions / fetchVaultBirths / fetchNote  ← API 3
+ *   - shellHtml / viewSegHtml / basisSegHtml         ← 골격 + 토글
+ *   - noteCardHtml / vaultCardHtml                   ← notes / vaults view 카드
+ *   - tagBarHtml / connectionRowHtml                 ← tags / connections view 행
+ *   - renderNotePreview                              ← 노트 preview (frontmatter highlight + body markdown)
+ *   - aggregateTags / aggregateConnections           ← notes → 태그 빈도 / cross-vault connection 집계
+ *   - renderNotesView / renderVaultsView / renderTagsView / renderConnectionsView ← 4 view 렌더
+ *   - load                                           ← 데이터 로드 (gen counter race 회피)
  *
- * 외부 의존성 0 — fetch + DOM + lib/markdown.js + lib/buildOption.js.
+ * 표준 시그니처:
+ *   export async function initPage(container, data, userConfig): Promise<PageContext>
+ *   PageContext = { destroy(), refresh(newData) }
+ *
+ * 외부 의존성:
+ *   lib/markdown.js (frontmatter/body 분리 + 미니 파서) · lib/buildOption.js (presetColorByCategory)
+ *   · lib/obsidian-uri.js · lib/system-vaults.js
+ *
+ * 참조:
+ *   Spec:    [[20260513_시스템스펙_04_시각화]] § 5 page mapping
+ *   R116:    날짜 컨텍스트 4 모드 + 생성일 캘린더 + KPI 라우팅 재배치 (2026-05-13)
+ *   영문화:  [[20260530_viz_정본_영문화_매니페스트]] § 6.2
  */
 
 import { renderMarkdown, splitFrontmatter } from '../lib/markdown.js';
@@ -109,6 +137,7 @@ async function fetchNote(vaultId, notePath) {
 
 /* ───────────── Shell HTML ───────────── */
 
+/** 4 view 세그먼트 (notes/vaults/tags/connections) 토글 버튼 HTML. */
 function viewSegHtml(activeView) {
   return VIEWS.map((v) => {
     const on = v === activeView ? ' on' : '';
@@ -123,6 +152,11 @@ function basisSegHtml(activeBasis) {
   }).join('');
 }
 
+/**
+ * 페이지 골격 HTML. 상단 toolbar (date / basis / view / 검색 / 카테고리 필터 / meta) +
+ * main 영역에 4 view-pane (notes + preview, vaults grid, tags bars, connections list) 동시 mount.
+ * 활성 view 만 display: ''. state.view 변경 시 applyViewVisibility 가 토글.
+ */
 function shellHtml(state) {
   return `
     <section class="page page-additions">
@@ -179,6 +213,7 @@ function emptyPreviewHtml() {
   `;
 }
 
+/** 노트 카드 한 줄 — vault 칩 + type 칩 + 시각 + 제목 + path + 태그 (최대 6). Obsidian 열기 버튼 포함. */
 function noteCardHtml(n, catColor, basis) {
   const tags = (n.tags || []).slice(0, 6).map((t) => `<span class="tag">${escapeHtml(t)}</span>`).join('');
   const stamp = basis === 'created' ? (n.created || n.mtime) : (n.mtime || n.created);
@@ -203,6 +238,7 @@ function noteCardHtml(n, catColor, basis) {
   `;
 }
 
+/** Vault 카드 (그 날 birthtime 인 vault) — vault 칩 + 카테고리 + birthtime + path + note count. 클릭 시 Obsidian. */
 function vaultCardHtml(v, catColor, cat) {
   const noteCount = typeof v.note_count === 'number' ? v.note_count : 0;
   const time = timeFromMtime(v.birthtime);
@@ -223,6 +259,7 @@ function vaultCardHtml(v, catColor, cat) {
   `;
 }
 
+/** 태그 막대 한 줄 — owner vault 칩 + 태그명 + 빈도 막대 (max 대비 %, 최소 6%). owner 카테고리 색 적용. unowned 는 회색. */
 function tagBarHtml({ tag, count, ownerVault, ownerCat, isOwned }, maxCount) {
   const pct = Math.max(6, Math.round((count / maxCount) * 100));
   const ownerColor = ownerCat ? presetColorByCategory(ownerCat) : 'var(--text-3)';
@@ -236,6 +273,7 @@ function tagBarHtml({ tag, count, ownerVault, ownerCat, isOwned }, maxCount) {
   `;
 }
 
+/** Cross-vault 커넥션 행 — owner vault → 태그 → user vault → 빈도. 양 vault 클릭 시 Obsidian. */
 function connectionRowHtml({ tag, ownerVault, ownerCat, userVault, userCat, count }) {
   const ownerColor = presetColorByCategory(ownerCat);
   const userColor = presetColorByCategory(userCat);
@@ -259,6 +297,10 @@ function buildCategoryFilterHtml(catSet, activeCats) {
   }).join('');
 }
 
+/**
+ * 노트 raw 텍스트 → preview 영역 렌더. frontmatter 키:값 highlight + body 마크다운 미니 파싱.
+ * H1 (`# 제목`) 이 있으면 별도 .ptitle 로, 본문에서 그 줄 제거.
+ */
 function renderNotePreview(previewEl, vaultId, notePath, raw) {
   const { frontmatter, body } = splitFrontmatter(raw);
   const titleMatch = body.match(/^#\s+(.+)$/m);
@@ -336,9 +378,21 @@ function aggregateConnections(notes, master, vaultCatMap) {
 /* ───────────── initPage ───────────── */
 
 /**
+ * Additions 페이지 진입점. state 단일 객체 + DOM 참조 + 4 view 동시 mount + 이벤트 핸들러 부착.
+ *
+ * 흐름:
+ *   1. URL 해시 파싱 → state (date/basis/view).
+ *   2. shellHtml 렌더 + DOM 참조 캐싱.
+ *   3. load() — /api/additions + /api/vault-births 병렬 fetch.
+ *   4. applyViewVisibility + rebuildCatSet + renderCategoryFilter + renderCurrentView + renderMeta.
+ *   5. 이벤트 (date/basis/view/search/cat/note click/hashchange/Obsidian open) 부착.
+ *
+ * 상태 race 회피: state.loadGen counter — 직전 fetch 가 다음 fetch 후 도착하면 무시.
+ * URL 동기화: setHashFromState({skipReload:true}) — hashchange 핸들러 우회 (state 이미 갱신됨).
+ *
  * @param {HTMLElement} container
- * @param {object} data router 가 전달한 IndexData (master + per-vault)
- * @param {object} userConfig
+ * @param {object} data        router 가 전달한 IndexData (master + per-vault)
+ * @param {object} userConfig  (현재 미사용 — 표준 시그니처)
  */
 export async function initPage(container, data /* , userConfig */) {
   if (!container) throw new Error('additions.initPage: container 필수');
@@ -515,6 +569,11 @@ export async function initPage(container, data /* , userConfig */) {
   }
 
   /* ───────── 데이터 로드 ───────── */
+  /**
+   * /api/additions + /api/vault-births 병렬 fetch + state 갱신 + 4 view 재렌더.
+   * gen counter 로 race 회피 (직전 호출이 늦게 도착하면 결과 무시).
+   * 실패 시 placeholder 에 에러 메시지 표시.
+   */
   async function load() {
     const gen = ++state.loadGen;
     notesListEl.innerHTML = '<div class="page-placeholder" style="min-height:120px;">로드 중…</div>';
@@ -617,6 +676,10 @@ export async function initPage(container, data /* , userConfig */) {
       previewEl.innerHTML = `<div class="add-empty"><div class="hint">불러오기 실패: ${escapeHtml(err.message)}</div></div>`;
     }
   }
+  /**
+   * hashchange 이벤트 — 외부 진입 (브라우저 back/forward, KPI 클릭 등) 시 처리.
+   * state._suppressHashReload 플래그가 켜져 있으면 fetch 생략 (내부 토글이 hash 만 갱신한 경우).
+   */
   function onHashChange() {
     const q = parseQueryFromHash();
     const dateChanged = q.date && q.date !== state.date;
