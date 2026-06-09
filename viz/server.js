@@ -21,7 +21,7 @@
  *   - heartbeat   : 30s 간격.
  *   - data-changed: master_index.json / timeseries.json 변경 시 (500ms debounce).
  *
- * API endpoints (9):
+ * API endpoints (11):
  *   - /api/rules         — .claude/.codex 룰·스킬·후크 평탄 list
  *   - /api/note          — 노트 raw text (vault + path safe-join)
  *   - /api/activity      — 홈 최근 7일 + recent 8 (vault_index mtime 집계)
@@ -30,6 +30,8 @@
  *   - /api/timeseries    — timeseries.json snapshots
  *   - /api/vault-births  — vault 생성 일자 (R136: vault_index 의 가장 오래된 노트 created 우선 + fs.statSync birthtime fallback)
  *   - /api/sync-status   — .vault_data/.sync-status.json (R149 백그라운드 sync 상태)
+ *   - /api/viz-prefs     — GET/POST .vault_data/viz-prefs.json (R163 디바이스별 viz 동작 토글 — gitAutoSync 등)
+ *   - /api/viz-sync-now  — POST 수동 git pull + sync-all 트리거 (R163, 자동 동기화 off 시에도 호출 가능)
  *   - /sse               — Server-Sent Events
  *
  * 정적 파일:
@@ -39,7 +41,8 @@
  *
  * 안전:
  *   - safeJoin — path traversal 차단 (.. + sep boundary 검증)
- *   - GET 만 허용 (Method Not Allowed 405)
+ *   - server 가 127.0.0.1 만 바인딩 (외부 접근 X) — POST 는 /api/viz-prefs · /api/viz-sync-now 두 경로만 허용
+ *   - 그 외 method 또는 미허용 경로 POST 는 405 Method Not Allowed
  *   - notePath / vault 에 .. 포함 시 403 Forbidden
  *
  * Spec:    [[20260506_시각화_데이터모델_인터페이스명세]] § 3.4 (API)
@@ -49,10 +52,12 @@
  */
 
 import { createServer } from 'node:http';
-import { readFile, stat, readdir } from 'node:fs/promises';
+import { readFile, stat, readdir, mkdir, writeFile } from 'node:fs/promises';
 import { watch } from 'node:fs';
+import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve, extname, sep, basename } from 'node:path';
+import { defaultsFromFeatures, featureIdSet } from './lib/custom-features.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const VIZ_DIR = dirname(__filename);
@@ -60,6 +65,8 @@ const ROOT_DIR = resolve(VIZ_DIR, '..');
 const MASTER_INDEX_PATH = join(ROOT_DIR, '.vault_data', 'master_index.json');
 const TIMESERIES_PATH = join(ROOT_DIR, '.vault_data', 'timeseries.json');
 const SYNC_STATUS_PATH = join(ROOT_DIR, '.vault_data', '.sync-status.json');
+const VIZ_PREFS_PATH = join(ROOT_DIR, '.vault_data', 'viz-prefs.json');
+const CORE_CLI_PATH = join(ROOT_DIR, 'Vaults', 'BasicVaults', 'CoreHub', '.sync', '_tools', 'cli-node', 'bin', 'cli.js');
 
 const DEFAULT_PORT = parseInt(process.env.AIMV_VIZ_PORT ?? '8765', 10);
 const PORT_FALLBACKS = [DEFAULT_PORT, DEFAULT_PORT + 1, DEFAULT_PORT + 2];
@@ -520,15 +527,178 @@ async function handleApiSyncStatus(res) {
   res.end(JSON.stringify(payload));
 }
 
+/* ───────────── /api/viz-prefs (R163) ─────────────
+ * `.vault_data/viz-prefs.json` — 디바이스별 viz 동작 토글 (gitAutoSync 등).
+ * GET → 현재 값 (파일 부재 시 default). POST → whitelist 키만 머지 + 저장.
+ * Start-Visualization.ps1 이 시작 시 이 파일 읽어 AIMV_VIZ_AUTO_PULL/SYNC env var 적용.
+ * 시스템 env var 명시값 > viz-prefs.json > default(true) 우선순위.
+ */
+// R164 — 기본값은 custom-features.js registry 로부터 자동 구성. 새 feature 추가 시 server.js 무수정.
+const FEATURE_IDS = featureIdSet();
+const DEFAULT_VIZ_PREFS = Object.freeze({
+  schemaVersion: 1,
+  ...defaultsFromFeatures(),
+  updatedAt: null,
+});
+
+async function readVizPrefs() {
+  try {
+    const raw = await readFile(VIZ_PREFS_PATH, 'utf-8');
+    const parsed = JSON.parse(raw);
+    return { ...DEFAULT_VIZ_PREFS, ...parsed };
+  } catch {
+    return { ...DEFAULT_VIZ_PREFS };
+  }
+}
+
+async function readRequestBody(req, maxBytes = 64 * 1024) {
+  const chunks = [];
+  let total = 0;
+  for await (const c of req) {
+    total += c.length;
+    if (total > maxBytes) throw new Error(`body too large (>${maxBytes}B)`);
+    chunks.push(c);
+  }
+  return Buffer.concat(chunks).toString('utf-8');
+}
+
+async function handleApiVizPrefs(req, res) {
+  if (req.method === 'GET') {
+    const prefs = await readVizPrefs();
+    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-cache' });
+    res.end(JSON.stringify(prefs));
+    return;
+  }
+  // POST — body 파싱 + whitelist 머지 + 저장
+  let body;
+  try {
+    const raw = await readRequestBody(req);
+    body = raw ? JSON.parse(raw) : {};
+  } catch (err) {
+    res.writeHead(400, { 'Content-Type': 'text/plain; charset=utf-8' });
+    res.end(`Bad Request: ${err.message}`);
+    return;
+  }
+  // R164 — whitelist 는 custom-features registry 의 id set 으로 자동 구성. boolean 만 허용.
+  const next = { ...(await readVizPrefs()) };
+  for (const [k, v] of Object.entries(body)) {
+    if (FEATURE_IDS.has(k) && typeof v === 'boolean') next[k] = v;
+  }
+  next.updatedAt = new Date().toISOString();
+  try {
+    await mkdir(dirname(VIZ_PREFS_PATH), { recursive: true });
+    await writeFile(VIZ_PREFS_PATH, JSON.stringify(next, null, 2), 'utf-8');
+  } catch (err) {
+    res.writeHead(500, { 'Content-Type': 'text/plain; charset=utf-8' });
+    res.end(`Write failed: ${err.message}`);
+    return;
+  }
+  res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+  res.end(JSON.stringify(next));
+}
+
+/* ───────────── /api/viz-sync-now (R163) ─────────────
+ * 수동 git pull + sync-all 트리거. 자동 동기화 off 상태에서도 호출 가능.
+ * 백그라운드 spawn → .sync-status.json 갱신 → sync-banner 가 polling 으로 표시.
+ * 단일 실행 보장: syncInFlight flag 로 중복 호출 차단 (409 반환).
+ */
+let syncInFlight = false;
+
+async function writeSyncStatus(payload) {
+  try {
+    await mkdir(dirname(SYNC_STATUS_PATH), { recursive: true });
+    await writeFile(SYNC_STATUS_PATH, JSON.stringify(payload), 'utf-8');
+  } catch (err) {
+    console.warn(`[/api/viz-sync-now] status write failed: ${err.message}`);
+  }
+}
+
+function runProcess(cmd, args, opts = {}) {
+  return new Promise((ok, fail) => {
+    const p = spawn(cmd, args, { shell: false, ...opts });
+    let stdout = '';
+    let stderr = '';
+    p.stdout?.on('data', (d) => { stdout += d.toString(); });
+    p.stderr?.on('data', (d) => { stderr += d.toString(); });
+    p.on('error', fail);
+    p.on('close', (code) => ok({ code, stdout, stderr }));
+  });
+}
+
+async function handleApiVizSyncNow(req, res) {
+  if (syncInFlight) {
+    res.writeHead(409, { 'Content-Type': 'application/json; charset=utf-8' });
+    res.end(JSON.stringify({ ok: false, error: '이미 동기화 진행 중' }));
+    return;
+  }
+  syncInFlight = true;
+  const startedAt = new Date().toISOString();
+  await writeSyncStatus({
+    status: 'running', started_at: startedAt, completed_at: null,
+    step: 'git_pull', message: 'git pull --ff-only origin main (수동 트리거)', error: null,
+  });
+  res.writeHead(202, { 'Content-Type': 'application/json; charset=utf-8' });
+  res.end(JSON.stringify({ ok: true, message: '동기화 시작' }));
+
+  (async () => {
+    let pullChanged = false;
+    try {
+      const r = await runProcess('git', ['-C', ROOT_DIR, 'pull', '--ff-only', 'origin', 'main']);
+      if (r.code === 0 && !/Already up to date/i.test(r.stdout)) pullChanged = true;
+    } catch {
+      // git 미설치 또는 spawn 실패 — sync-all 까지 진행
+    }
+    if (!pullChanged) {
+      await writeSyncStatus({
+        status: 'done', started_at: startedAt, completed_at: new Date().toISOString(),
+        step: 'done', message: '이미 최신 (git pull 변동 없음 → sync 건너뜀)', error: null,
+      });
+      syncInFlight = false;
+      return;
+    }
+    await writeSyncStatus({
+      status: 'running', started_at: startedAt, completed_at: null,
+      step: 'sync_all', message: 'sync-all --skip-npm (vault 인덱싱 + master 빌드)', error: null,
+    });
+    try {
+      const r = await runProcess(process.execPath, [CORE_CLI_PATH, 'sync-all', '--skip-npm'], { cwd: ROOT_DIR });
+      if (r.code !== 0) throw new Error(`sync-all exit ${r.code}: ${r.stderr.slice(0, 200)}`);
+      await writeSyncStatus({
+        status: 'done', started_at: startedAt, completed_at: new Date().toISOString(),
+        step: 'done', message: '동기화 완료 — 새 데이터 보려면 reload', error: null,
+      });
+    } catch (err) {
+      await writeSyncStatus({
+        status: 'failed', started_at: startedAt, completed_at: new Date().toISOString(),
+        step: 'sync_all', message: '동기화 실패', error: err.message,
+      });
+    } finally {
+      syncInFlight = false;
+    }
+  })().catch((err) => {
+    console.error('[/api/viz-sync-now] bg error:', err.message);
+    syncInFlight = false;
+  });
+}
+
 async function handleRequest(req, res) {
   // 정체성 헤더 — 런처가 다른 AIMindVaults 클론과 구별할 때 사용 (X-AIMV-Root 비교).
   res.setHeader('X-AIMV-Root', ROOT_DIR);
+  const pathname = new URL(req.url, `http://${req.headers.host}`).pathname;
+
+  // POST 는 viz-prefs / viz-sync-now 두 경로만 허용 (R163, 127.0.0.1 바인딩 전제).
+  if (req.method === 'POST') {
+    if (pathname === '/api/viz-prefs') return handleApiVizPrefs(req, res);
+    if (pathname === '/api/viz-sync-now') return handleApiVizSyncNow(req, res);
+    res.writeHead(405, { 'Content-Type': 'text/plain; charset=utf-8' });
+    res.end('Method Not Allowed');
+    return;
+  }
   if (req.method !== 'GET') {
     res.writeHead(405, { 'Content-Type': 'text/plain; charset=utf-8' });
     res.end('Method Not Allowed');
     return;
   }
-  const pathname = new URL(req.url, `http://${req.headers.host}`).pathname;
 
   if (pathname === '/' || pathname === '/index.html') {
     return serveFile(join(VIZ_DIR, 'index.html'), res, 'text/html; charset=utf-8');
@@ -551,6 +721,7 @@ async function handleRequest(req, res) {
   if (pathname === '/api/timeseries') return handleApiTimeseries(res);
   if (pathname === '/api/vault-births') return handleApiVaultBirths(res);
   if (pathname === '/api/sync-status') return handleApiSyncStatus(res);
+  if (pathname === '/api/viz-prefs') return handleApiVizPrefs(req, res);
   if (pathname === '/router.js') return serveFile(join(VIZ_DIR, 'router.js'), res);
   if (pathname.startsWith('/static/') || pathname.startsWith('/lib/') || pathname.startsWith('/pages/') || pathname.startsWith('/components/') || pathname.startsWith('/styles/')) {
     let sub;

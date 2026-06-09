@@ -45,6 +45,10 @@ import {
   THEME_VAR_GROUPS, baseValue, setOverride, clearOverride, clearAllOverrides, resolvedTheme,
   applyTheme as applyThemeEngine,
 } from '../lib/theme-engine.js';
+import {
+  renderSettingsSection as renderCustomFeaturesSection,
+  attachSettingsHandlers as attachCustomFeaturesHandlers,
+} from '../lib/custom-features-settings.js';
 
 const PRESETS_KEY = 'aimv_viz_presets';
 
@@ -206,6 +210,7 @@ function renderHTML(state) {
               <div class="row"><div class="label">시각화 카드 (4종)</div><div class="ctrl"><div class="toggle ${cfg.homeToggles.vizCards ? 'on' : ''}" data-home-toggle="vizCards"></div></div></div>
               <div class="row"><div class="label">탐색 카드 (Vault 트리 + 룰뷰어)</div><div class="ctrl"><div class="toggle ${cfg.homeToggles.exploreCards ? 'on' : ''}" data-home-toggle="exploreCards"></div></div></div>
             </div>
+            ${renderCustomFeaturesSection(state.vizPrefs)}
           </div>
 
         </div>
@@ -276,7 +281,7 @@ function attachHandlers(state) {
     persist();
   });
 
-  // Toggles (autoScale + wideLayout + homeToggles)
+  // Toggles (autoScale + wideLayout + homeToggles). 커스텀 기능 토글/액션은 adapter 가 위임 처리.
   c.addEventListener('click', (ev) => {
     const t = ev.target.closest('.toggle');
     if (!t) return;
@@ -296,6 +301,7 @@ function attachHandlers(state) {
       t.classList.toggle('on', cfg.homeToggles[k]);
       persist();
     }
+    // data-feature-toggle / data-feature-action 은 attachCustomFeaturesHandlers 가 처리
   });
 
   // Theme segment
@@ -449,6 +455,14 @@ function attachHandlers(state) {
     broadcastChange(cfg);
     renderAppearance(state);
     showToast('이 테마 색을 기본값으로 복원');
+  });
+
+  // R164 — 커스텀 기능 (data-feature-toggle / data-feature-action) 위임 핸들러.
+  // adapter 가 idempotent 라 renderAll 매번 호출돼도 한 번만 부착됨.
+  attachCustomFeaturesHandlers({
+    container: c,
+    vizPrefs: state.vizPrefs,
+    showToast,
   });
 }
 
@@ -613,7 +627,13 @@ export async function initPage(container, data, userConfig) {
         homeToggles: { ...def.homeToggles, ...(userConfig.homeToggles || {}) },
       }
     : loadUserConfig();
-  const state = { container, cfg, data, groupIndex: 0 };
+  // R163 — viz-prefs.json (디바이스별 viz 동작 토글). 진입 시 한 번 fetch, 렌더 전에 await.
+  let vizPrefs = { schemaVersion: 1, gitAutoSync: true };
+  try {
+    const r = await fetch('/api/viz-prefs', { cache: 'no-cache' });
+    if (r.ok) vizPrefs = { ...vizPrefs, ...await r.json() };
+  } catch { /* server 응답 실패 — default 유지 */ }
+  const state = { container, cfg, data, groupIndex: 0, vizPrefs };
   applyTheme(cfg);
   renderAll(state);
   const onResize = () => { applyTrack(state, (state.groupIndex || 0) + 1, false); updateHeight(state); };

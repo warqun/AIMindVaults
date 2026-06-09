@@ -78,7 +78,27 @@ if (-not $nodeCmd) {
 if (-not $env:AIMV_VIZ_PORT)            { $env:AIMV_VIZ_PORT = '8765' }
 if (-not $env:AIMV_VIZ_IDLE_MS)         { $env:AIMV_VIZ_IDLE_MS = '15000' }
 if (-not $env:AIMV_VIZ_BOOT_GRACE_MS)   { $env:AIMV_VIZ_BOOT_GRACE_MS = '90000' }
-# R146 — viz 시작 시 디바이스 자동 동기화 (기본 on, env var 으로 off 가능)
+
+# R163 — viz-prefs.json (디바이스별 viz Settings UI 토글) 읽어 자동 동기화 env var 적용.
+# 우선순위: 시스템 env var (사용자 명시) > viz-prefs.json (UI 토글) > default(true).
+$myRoot = Split-Path -Parent $exeDir
+$vizPrefsPath = Join-Path $myRoot '.vault_data\viz-prefs.json'
+$autoPullExplicit = ($null -ne $env:AIMV_VIZ_AUTO_PULL -and $env:AIMV_VIZ_AUTO_PULL -ne '')
+$autoSyncExplicit = ($null -ne $env:AIMV_VIZ_AUTO_SYNC -and $env:AIMV_VIZ_AUTO_SYNC -ne '')
+if (((-not $autoPullExplicit) -or (-not $autoSyncExplicit)) -and (Test-Path $vizPrefsPath)) {
+    try {
+        $prefs = Get-Content $vizPrefsPath -Raw -Encoding utf8 | ConvertFrom-Json
+        if ($prefs.PSObject.Properties.Match('gitAutoSync').Count -gt 0) {
+            $val = if ($prefs.gitAutoSync) { 'true' } else { 'false' }
+            if (-not $autoPullExplicit) { $env:AIMV_VIZ_AUTO_PULL = $val }
+            if (-not $autoSyncExplicit) { $env:AIMV_VIZ_AUTO_SYNC = $val }
+        }
+    } catch {
+        # 파일 파싱 실패 — 아래 default 로 fallback
+    }
+}
+
+# R146 — viz 시작 시 디바이스 자동 동기화 (기본 on, viz Settings UI 토글 또는 env var 으로 off)
 if (-not $env:AIMV_VIZ_AUTO_PULL)        { $env:AIMV_VIZ_AUTO_PULL = 'true' }
 if (-not $env:AIMV_VIZ_AUTO_SYNC)        { $env:AIMV_VIZ_AUTO_SYNC = 'true' }
 
