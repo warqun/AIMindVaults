@@ -96,7 +96,7 @@ AIHubVault가 유일한 원본입니다. 규칙, 도구, 표준 문서는 **여�
 
 Obsidian 자동 sync가 실패했거나 새 디바이스에서 먼저 작업환경을 맞추고 싶을 때는 루트의 `Sync All Vaults.bat`을 더블클릭합니다. macOS는 `Sync All Vaults.command`, Linux는 `Sync All Vaults.sh`를 사용합니다.
 
-각 볼트 루트에는 sync 후 `Sync This Vault.bat` / `.command` / `.sh`가 설치됩니다. 해당 볼트 하나만 수동으로 동기화할 때 사용하세요. 실행 결과는 루트 또는 볼트의 `sync.log`에 누적됩니다.
+각 볼트의 `.sync/` 폴더에는 sync 후 `Sync This Vault.bat` / `.command` / `.sh`가 설치됩니다 (볼트 루트가 아닙니다 — Obsidian 노트 목록에 유틸 파일이 섞이지 않게 하기 위해서입니다). 해당 볼트 하나만 수동으로 동기화할 때 사용하세요. 실행 결과는 루트 또는 볼트의 `sync.log`에 누적됩니다.
 
 ### 볼트 시각화 (viz)
 

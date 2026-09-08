@@ -5,7 +5,7 @@ tags:
   - Standards
   - AIMindVault
   - script-management
-updated: 2026-04-24
+updated: 2026-06-01
 agent: codex
 ---
 
@@ -70,6 +70,7 @@ CLI 도구 외 프로젝트 단위 영구 스크립트.
 | 스크립트 | 경로 | 용도 | 생성자 | 도입 |
 |---------|------|------|--------|------|
 | `Viz-Snapshot.ps1` | `Vaults/Projects_Infra/Project_AIMindVaults/Contents/Project/scripts/viz_snapshot/Viz-Snapshot.ps1` | viz 디바이스 간 점검 공유 — 화면 캡처 + master_index 메타 dump → 표준 폴더 PNG+MD | claude | 2026-05-27 (R141) |
+| `translate-to-en.js` | `Vaults/Projects_Infra/Project_AIMindVaults/Contents/Project/scripts/viz_i18n/translate-to-en.js` | 정본 `viz/` (한국어) → English SellingVault `viz/` (영문) 일괄 변환 — 매니페스트 § 6 카탈로그 기반 KO→EN 매핑 적용. 재실행 가능 (카탈로그 갱신 후) | claude | 2026-06-01 (R156) |
 
 ---
 

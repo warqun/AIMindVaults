@@ -67,7 +67,7 @@ node <CoreHub>/.sync/_tools/cli-node/bin/cli.js register-vaults --apply
 1. "Obsidian 실행 → vault switcher 에 모든 볼트 표시 확인"
 2. "각 볼트 최초 열기 시 Trust author 클릭 필요"
 3. "Shell Commands 가 `on-layout-ready` 로 자동 sync 실행 — 플러그인 복원 확인"
-4. 실패 시: `Sync This Vault.bat` (볼트 루트) 또는 `Sync All Vaults.bat` (루트) 수동 실행 가능
+4. 실패 시: `Sync This Vault.bat` (볼트의 `.sync/` 안 — Obsidian 노트 목록에 유틸 파일이 섞이지 않게 거기 둔다) 또는 `Sync All Vaults.bat` (멀티볼트 루트) 수동 실행 가능
 
 ## 옵션
 
