@@ -4,7 +4,9 @@
 
 ## 배경 (Incident)
 
-`AGENT_ONBOARDING.md § 2 볼트 구성` 표에 사용자 개인 볼트명 (JissouGame, CombatToolKit, TileMapToolKit, Unity_Documentation, Diary, GameDesign, GameArt, LightAndColor, AppFlowy, Funding 등) 이 그대로 카테고리 예시로 들어가 있어 SellingVault 로 배포 시 **새 사용자가 받는 문서에 작성자 개인 사정 노출** 됐을 가능성. 새 사용자 입장에선 본인이 만들지도 않은 볼트 이름이 카테고리 예시로 나와 혼란.
+`AGENT_ONBOARDING.md § 2 볼트 구성` 표에 **제작자가 자기 환경에서 만든 볼트 이름**이 그대로 카테고리 예시로 들어가 있었다. 배포하면 새 사용자가 받는 문서에 작성자 개인 사정이 노출되고, 받는 쪽에선 **본인이 만들지도 않은 볼트 이름이 예시로 나와** 혼란스럽다.
+
+**이 룰 자신도 같은 규칙을 지킨다** — 아래 표는 실제 이름 대신 형태만 적는다.
 
 ## 규칙
 
@@ -12,12 +14,12 @@
 
 다음 자산을 **배포 대상 문서** 본문·예시·테이블·코드 블록에 포함 금지:
 
-| 금지 자산 | 예시 (실제 사용자 등록 자산) |
-|----------|------------------------|
-| 사용자 추가 볼트명 | JissouGame, CombatToolKit, TileMapToolKit, MachineAssembly, CookingLab 등 |
-| 사용자 추가 카테고리 | Domains_Manufacturing, Lab_Game, Projects_Game 등 사용자가 만든 카테고리 |
-| 외부 readonly 자료 이름 | Unity_Documentation 등 사용자가 다운받은 자료 |
-| 개인 프로젝트명 | Project_MyVaults 등 사용자 운영용 |
+| 금지 자산 | 형태 |
+|----------|------|
+| 사용자 추가 볼트명 | 기본 동봉 볼트 (`AIHubVault` · `BasicContentsVault` · `Basic*Vault` · `CoreHub`) 외의 모든 볼트 이름 |
+| 사용자 추가 카테고리 | `Domains_<영역>` · `Lab_<영역>` · `Projects_<영역>` 중 **사용자가 실제로 만든** 것 |
+| 외부 readonly 자료 이름 | 사용자가 받아 둔 문서·SDK 볼트 이름 |
+| 개인 프로젝트명 | 사용자 운영용 프로젝트 볼트 이름 |
 | 개인 hostname / 사용자명 / 디바이스명 | (절대 인용 금지) |
 
 ### 배포 대상 문서 (식별)
