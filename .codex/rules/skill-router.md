@@ -22,7 +22,7 @@
 | Discord 운영 | Discord, 디스코드, 디코, 봇, AIMindVaults Admin Bot, 채널, Forum, Community, allowed_mentions | `.agents/rules/custom/Discord/discord-bot.md` |
 | Notion 기록 | Notion, 노션, 작업 관리 DB, 개발 현황 공유, Notion 기록 | `.agents/rules/custom/Notion/notion-sync.md` |
 | 배포·Git push, sync 기능 수정 | 배포, SellingVault, git push, 동기화 배포, 영문 배포, distribute, deploy, cli.js sync, pre-sync, _WORKSPACE_VERSION, sync-version | `.agents/rules/custom/Distribution/distribution-deploy.md` + `sync-version-priority.md` |
-| Multi-Hub | Core Hub, Preset Hub, CoreHub, core-sync, core-sync-all, hub-source.json, hub-marker.json, multi-hub, 코어 허브, bump-version --broadcast, hubId, hubType, hub-resolver | `Vaults/Projects_Infra/Project_AIMindVaults/Contents/Project/plan/architecture/20260419_Multi_Hub_아키텍처_설계.md` + `20260420_Multi_Hub_Phase1_구현_결과.md` |
+| Multi-Hub | Core Hub, Preset Hub, CoreHub, core-sync, core-sync-all, hub-source.json, hub-marker.json, multi-hub, 코어 허브, bump-version --broadcast, hubId, hubType, hub-resolver | `{프로젝트 볼트}/Contents/Project/plan/architecture/20260419_Multi_Hub_아키텍처_설계.md` + `20260420_Multi_Hub_Phase1_구현_결과.md` |
 | 새 볼트 생성 | 볼트 생성, create-vault, 새 볼트, 볼트 분리, 신규 볼트 | `.codex/skills/create-aimind-vault/SKILL.md` + `.codex/rules/create-vault-safety.md` + `.agents/rules/custom/CreateVault/vault-individualization.md` |
 | 노트 작성 세부 | 노트 타입 목록, 태그 규칙, H1 예시, frontmatter 세부 | `.claude/rules-archive/note-writing.md` |
 | 볼트 라우팅 세부 | 라우팅 상세, 키워드 매핑 원본 | `.claude/rules-archive/vault-routing.md` |

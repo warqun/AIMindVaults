@@ -15,9 +15,8 @@
 
 | 작업 유형 | 트리거 키워드 | 호출 대상 |
 |---------|-------------|---------------|
-| 배포·Git push, sync 기능 수정 | 배포, SellingVault, git push, 동기화 배포, 영문 배포, distribute, deploy, cli.js sync, pre-sync, _WORKSPACE_VERSION, sync-version, pre-sync 트램펄린 | `/distribute` Skill |
-| Multi-Hub | Core Hub, Preset Hub, CoreHub, core-sync, core-sync-all, hub-source.json, hub-marker.json, multi-hub, 코어 허브, bump-version --broadcast, hubId, hubType, hub-resolver | `Vaults/Projects_Infra/Project_AIMindVaults/Contents/Project/plan/architecture/20260419_Multi_Hub_아키텍처_설계.md` + `20260420_Multi_Hub_Phase1_구현_결과.md` Read |
-| 새 볼트 생성 (위성) | 볼트 생성, create-vault, 새 볼트, 볼트 분리 | `/create-vault` Skill + `.agents/rules/custom/CreateVault/vault-individualization.md` Read |
+| Multi-Hub | Core Hub, Preset Hub, CoreHub, core-sync, core-sync-all, hub-source.json, hub-marker.json, multi-hub, 코어 허브, bump-version --broadcast, hubId, hubType, hub-resolver | `{프로젝트 볼트}/Contents/Project/plan/architecture/20260419_Multi_Hub_아키텍처_설계.md` + `20260420_Multi_Hub_Phase1_구현_결과.md` Read |
+| 새 볼트 생성 (위성) | 볼트 생성, create-vault, 새 볼트, 볼트 분리 | `/create-vault` Skill (R160 core 격상) — `vault-individualization.md` 는 core 상시 주입 (R160) 이므로 명시 Read 불필요 |
 | 새 Preset Hub 생성 | Preset Hub 생성, 프리셋 허브 만들기, create-preset-hub, create-hub, 신규 Hub, AIHubVault_ 생성, Hub 파생 | `/create-preset-hub` Skill |
 | 대량 편집 · 인코딩 | 대량 수정, 일괄 변경, 인코딩, mojibake, 한글 깨짐, bulk rewrite | `.claude/rules/core/encoding-safety.md` + `.claude/rules/core/temp-file-management.md` (core 주입됨) |
 | 스크립트 생성 | 스크립트 생성, .ps1, .py 신규, 자동화 스크립트 | `.claude/rules/core/script-creation-approval.md` + `.claude/rules/core/script-management.md` (core 주입됨) |
@@ -37,14 +36,17 @@
 - 필요한 규칙이 있을 것 같은데 테이블에 없음 → 사용자에게 "이 작업에 적용할 규칙이 있는지" 확인 후 진행.
 - 새로운 작업 유형이 자주 발생 → 사용자 승인 후 이 테이블에 추가.
 
-## Phase 2-A 완료 (2026-04-18)
+## 도메인 Skill 은 사용자가 등록한다
 
-도메인 규칙들을 Skill 로 전환 완료. 일반 인프라 Skill 매핑:
+이 라우터에는 **모든 사용자에게 공통인 인프라 행만** 실려 있다. 본인 환경의 도메인
+(게임 엔진, 3D 도구, 외부 API, 메시징 봇 등) Skill 을 `.agents/commands/custom/` 에
+추가했다면 위 트리거 매핑 테이블에 **직접 한 행을 넣는다.**
 
-| Skill | 통합된 archive 규칙 |
-|-------|-------------------|
-| `/distribute` | distribution-deploy + sync-version-priority |
+**넣지 않으면 스킬이 있어도 키워드로 안 걸린다** — 슬래시 명령을 직접 쳐야만 발동하고,
+`custom/` 의 룰 파일은 상시 주입이 아니라서 작업 중 한 번도 안 읽힌다.
 
-도메인별 Skill 매핑은 사용자 환경에 따라 다르므로 본 라우터에 기본 등록하지 않는다. 사용자가 본인 환경 (Unity, Blender, 외부 API, 메시징 봇 등) 의 도메인 Skill 을 추가할 때 위 트리거 매핑 테이블에 직접 등록.
+```
+| <작업 유형> | <트리거 키워드 쉼표 나열> | `/<스킬명>` Skill + `<Read 할 룰 경로>` |
+```
 
 custom/에 유지된 규칙 (상시 주입): `agent-ownership.md`, `multivault-personalization.md`

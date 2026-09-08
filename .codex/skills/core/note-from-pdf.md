@@ -58,7 +58,7 @@ tags:
 source: [파일경로 또는 URL]
 source_title: [문서 제목]
 source_author: [저자]
-created: YYYY-MM-DD
+created: YYYY-MM-DDTHH:MM:SS   # 생성 시각까지 (로컬). 한 번 쓰면 수정 금지 — R189
 agent: claude
 ---
 ```

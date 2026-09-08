@@ -1,0 +1,33 @@
+# 줄끝 고정 — 없으면 Windows 에서 클론할 때 core.autocrlf 가 셸 스크립트를 CRLF 로
+# 바꿔 macOS·Linux 에서 실행이 깨진다 (2026-09-08 클린 클론 실측: 런처가 실행 도중
+# 다시 쓰이면서 종료 직전 syntax error).
+
+* text=auto eol=lf
+
+# Windows 전용 스크립트는 CRLF 유지
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+Sync All Vaults.bat text eol=crlf
+Sync All Vaults.command text eol=lf
+Sync All Vaults.sh text eol=lf
+
+**/Sync This Vault.bat text eol=crlf
+**/Sync This Vault.command text eol=lf
+**/Sync This Vault.sh text eol=lf
+
+**/.sync/_tools/launchers/**/*.bat text eol=crlf
+**/.sync/_tools/launchers/**/*.command text eol=lf
+**/.sync/_tools/launchers/**/*.sh text eol=lf
+
+# 바이너리 — 변환 안 함
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.exe binary
+*.dll binary
+*.wasm binary
+*.pdf binary

@@ -14,6 +14,11 @@
 - Use only UTF-8 fixed .NET I/O for full-file edits.
 - Prefer line-local patch edits; avoid full file rewrite.
 - If mojibake appears, stop immediately, restore from Obsidian snapshot, then retry with safe method.
+- On Windows PowerShell, never pipe Korean source text or here-strings into another process while `$OutputEncoding` is ASCII. This corrupts Hangul into literal `?` before the child process receives it. Unsafe examples: `@' ...한글... '@ | python -`, `echo 한글 | node`, and any `Out-File`/redirect path without explicit UTF-8.
+- If a pipe to `python -`, `node -`, or another process is unavoidable, keep the piped program text ASCII-only or first set `$OutputEncoding = [System.Text.UTF8Encoding]::new($false)` and verify with a small Hangul sample. Prefer `apply_patch` or UTF-8 fixed scripts over piping generated Korean content.
+- After writing Korean notes, verify both that Hangul still exists and that repeated literal question marks were not introduced:
+  - `Korean chars > 0` for files expected to contain Korean.
+  - `\?{3,}` count = 0.
 
 ## Incident Rule: Bulk Replace Safety (Mandatory)
 

@@ -31,11 +31,14 @@ AIMindVaults/                        ← AI 에이전트 프로젝트 루트
 │   ├── BasicVaults/                 ← 작업환경 허브
 │   │   ├── AIHubVault/              ← 규칙/도구/표준 원본 (Hub)
 │   │   └── BasicContentsVault/      ← 범용 콘텐츠 저장소
-│   ├── Domains_*/                   ← 도메인 지식 볼트 (지식 축적 전용)
-│   ├── Lab_*/                       ← Lab 볼트 (지식 축적 + 실제 개발)
-│   └── Projects_*/                  ← 프로젝트 볼트 (실행 전용)
-└── References/                      ← 참조 전용 자료
+│   ├── Domains_*/                   ← 도메인 지식 볼트 (지식 축적 전용)   ※ 직접 추가
+│   ├── Lab_*/                       ← Lab 볼트 (지식 축적 + 실제 개발)   ※ 직접 추가
+│   └── Projects_*/                  ← 프로젝트 볼트 (실행 전용)          ※ 직접 추가
+└── viz/                             ← 볼트 시각화 도구 (아래 § 볼트 시각화)
 ```
+
+`Domains_*` · `Lab_*` · `Projects_*` 는 **처음엔 비어 있습니다.** 주제가 생길 때 `/create-vault` 로 만들어 채웁니다.
+
 
 ### 볼트 유형
 
@@ -45,7 +48,7 @@ AIMindVaults/                        ← AI 에이전트 프로젝트 루트
 | **Domain** | `Domains_*/` | 특정 주제의 지식 축적 전용 |
 | **Lab** | `Lab_*/` | 지식 축적 + 실제 개발이 함께 이루어지는 복합 볼트 |
 | **Project** | `Projects_*/` | 실전 프로젝트 실행 전용 |
-| **Reference** | `References/` | 외부 자료 조회 전용 (읽기 전용) |
+| **Reference** | `References/` | 외부 자료 조회 전용 (읽기 전용). 필요하면 직접 만듭니다 |
 
 ---
 
@@ -61,6 +64,11 @@ Obsidian에서 **Open folder as vault**로 아래 두 폴더를 각각 볼트로
 
 - `Vaults/BasicVaults/AIHubVault/` — 작업환경 원본 (Hub)
 - `Vaults/BasicVaults/BasicContentsVault/` — 범용 콘텐츠 저장소
+
+나머지 동봉 볼트는 **복제용 템플릿**이라 지금 등록하지 않아도 됩니다 — `BasicDomainVault` ·
+`BasicLabVault` · `BasicProjectVault` · `BasicDiaryVault` (볼트 유형별 템플릿),
+`AIHubVault_*` (유형별 Preset Hub), `CoreHub` (도구·표준 원본).
+`/create-vault` 가 이것들을 복제해 새 볼트를 만듭니다.
 
 플러그인 설정은 이미 포함되어 있으므로 별도 설정이 필요 없습니다. 첫 실행 시 **Turn on community plugins**만 클릭하면 됩니다.
 
@@ -90,6 +98,17 @@ Obsidian 자동 sync가 실패했거나 새 디바이스에서 먼저 작업환�
 
 각 볼트 루트에는 sync 후 `Sync This Vault.bat` / `.command` / `.sh`가 설치됩니다. 해당 볼트 하나만 수동으로 동기화할 때 사용하세요. 실행 결과는 루트 또는 볼트의 `sync.log`에 누적됩니다.
 
+### 볼트 시각화 (viz)
+
+루트 `viz/Generate Visualization.exe` 를 더블클릭하면 (macOS `.command`, Linux `.sh`)
+브라우저에 볼트 현황이 뜹니다 — 노트·태그·볼트 수 KPI, 태그 그래프, 작성 캘린더,
+규칙 뷰어, 설정.
+
+- 처음 실행하면 **인덱스를 스스로 빌드**합니다 (새 디바이스면 npm 설치까지). 수 분 걸릴 수 있고
+  화면 우상단 배너가 진행 상황을 표시합니다
+- 인덱스 파일 (`.vault_data/`) 은 git 추적 대상이 아닙니다. **디바이스마다 각자 빌드**하며,
+  그래서 업데이트를 받을 때 충돌이 나지 않습니다
+
 ### 편집 모드 분리
 
 볼트 안에서의 편집은 두 종류로 나뉩니다:
@@ -111,11 +130,11 @@ AI 에이전트가 따르는 규칙은 3단계입니다:
 
 | 단계 | 위치 | 뭘 하는 건지 |
 |------|------|-------------|
-| 공통 규칙 | `.claude/rules/` (11개) | 전 볼트 자동 적용. 인코딩 안전, 편집 모드, 스크립트 관리 등 |
+| 공통 규칙 | `.claude/rules/core/` (14개) + `custom/` (4개) | 전 볼트 자동 적용. 인코딩 안전, 편집 모드, 스크립트 관리 등 |
 | 볼트 규칙 | 각 볼트 `CLAUDE.md` | 볼트별 역할, 진입 절차, 편집 범위 |
 | 운용 규칙 | 각 볼트 `_WORKFLOW.md` | 상태 공유, 태그, CLI 사용법 등 상세 절차 |
 
-공통 규칙 11개의 상세 내용은 볼트 안에서 확인:
+공통 규칙의 상세 내용은 볼트 안에서 확인:
 → `Vaults/BasicVaults/AIHubVault/_Standards/Core/AI_Rules_Index.md`
 
 ---

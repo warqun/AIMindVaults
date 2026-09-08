@@ -147,6 +147,15 @@ Obsidian CLI 우선: 조회/검색/히스토리 복구는 `node cli.js bridge` �
 - 필수: `type`, `tags`, `updated` 또는 `created`.
 - `agent`: 작업 에이전트 **누적** 기록 (최신만 X). 복수는 `[claude, codex]`.
 
+#### `created` — 생성 시각까지 기록 (강제, R189)
+
+- 신규 노트는 `created: YYYY-MM-DDTHH:MM:SS` (**로컬 시각**) 로 쓴다. 날짜만 쓰지 않는다.
+  - 예: `created: 2026-08-08T17:23:15`
+- **한 번 쓰면 이후 절대 수정하지 않는다.** 편집으로 갱신되는 값은 `updated` 다.
+- 시각을 확정할 수 없으면 날짜만 (`YYYY-MM-DD`) 써도 되지만, 인덱서가 `T00:00:00` 으로 채워 "자정 생성" 처럼 보이므로 가능하면 피한다.
+
+배경: 파일시스템 birthtime 은 파일을 통째로 다시 쓸 때마다 리셋되고 (편집 도구 대부분이 temp + rename), git clone·pull 로도 초기화되므로 생성 시각의 근거가 될 수 없다. 프론트매터에 생성 시점에 기록해 고정하는 것이 유일하게 디바이스·이력 무관하게 보존되는 방법이다. 기존 노트는 2026-08-08 에 birthtime 날짜가 프론트매터 날짜와 일치하는 943건만 시각을 보강했다 (R189).
+
 ### `type` 규칙
 
 - **kebab-case**, **단수형**, **`-note` 접미사 금지** (`knowledge` O / `knowledge-note` X).
@@ -168,7 +177,7 @@ Obsidian CLI 우선: 조회/검색/히스토리 복구는 `node cli.js bridge` �
 | 단어 결합 (영어) | 단어마다 첫 대문자 | `SkillSystem`, `PluginDev`, `KnowledgeGraph` |
 | 약어 단독 | 전체 대문자 | `MCP`, `API`, `JSON`, `ESTA`, `URL`, `KPI`, `URP` |
 | 약어 + 단어 결합 | **약어 보존 PascalCase** | `JSONParser`, `XMLSchema`, `APIGateway`, `URLEncoder` |
-| vault 이름 (언더스코어 포함) | 그대로 유지 | `AI_Coding`, `Project_AIMindVaults`, `AI_Gen4Game` |
+| vault 이름 (언더스코어 포함) | 그대로 유지 | `AI_Coding`, `Project_MyApp`, `Web_Frontend` |
 | **다국어 (한국어/일본어/중국어 등)** | **그대로 유지** (강제 영어 정규화 X) | `보안`, `에이전트`, `조리도구`, `채소_과일`, `G식백과` |
 | 숫자 포함 | 그대로 유지 | `Unity6`, `USA_2026`, `Gen4Game`, `3D`, `2D` |
 

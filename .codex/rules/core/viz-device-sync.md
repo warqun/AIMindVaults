@@ -17,8 +17,11 @@
 ```
 viz `.exe` 더블클릭
 ├─ 메인 PS1: .vault_data/.sync-status.json 'running' write
-├─ 메인 PS1: 별도 PowerShell hidden 프로세스 spawn
-│   └─ 백그라운드: git pull → sync-all → done/failed 상태 갱신
+├─ 메인 PS1: 별도 PowerShell hidden 프로세스 spawn (-ExecutionPolicy Bypass, R169)
+│   └─ 백그라운드: (cold start 시 CoreHub npm install, R170) → git pull → sync-all → done/failed 상태 갱신
+│       cold start = CoreHub node_modules 또는 master_index 부재 (fresh clone 시그니처).
+│       sync-all 은 --skip-npm 없이 실행 — 볼트 로컬 node_modules 자동 설치 (존재 시 즉시 skip).
+│       exit code != 0 은 failed 로 정직 보고 (R170).
 ├─ 메인 PS1: chrome --app port polling 후 즉시 (200ms 간격, 최대 6s)
 └─ 메인 PS1: server.js 백그라운드 실행 → exit 0
 
@@ -33,12 +36,14 @@ viz SPA (브라우저):
 
 git pull 결과 'Already up to date' 면 sync-all 자체 skip → banner 즉시 done. 사용자 자주 viz 띄울 때 부담 없음.
 
+예외 (R170): **cold start (fresh clone) 는 skip 을 무시하고 무조건 sync-all** — 새 디바이스에서 exe 더블클릭 한 번으로 npm install + 볼트 인덱스 + master 빌드 자동 완주. banner 가 "새 디바이스 초기화 (수 분 소요 가능)" 표시. R133 동기 fallback 은 AUTO_SYNC off 전용 안전망으로 강등.
+
 ### 환경 변수
 
 ```powershell
 # 기본값 (자동 활성)
 $env:AIMV_VIZ_AUTO_PULL = 'true'   # git pull --ff-only origin main
-$env:AIMV_VIZ_AUTO_SYNC = 'true'   # node cli.js sync-all --skip-npm
+$env:AIMV_VIZ_AUTO_SYNC = 'true'   # node cli.js sync-all (R170 — --skip-npm 제거, cold start 자동 부트스트랩)
 
 # off 시
 $env:AIMV_VIZ_AUTO_PULL = 'false'

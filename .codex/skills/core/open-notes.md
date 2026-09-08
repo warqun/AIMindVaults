@@ -49,12 +49,12 @@ AIMindVaults 루트 기준 경로를 **활성 볼트 기준 상대경로**로 �
 
 ```python
 # 예: AIMindVaults 루트 기준
-full_path = 'Vaults/Projects_<영역>/<볼트명>/Contents/Project/02-design/<폴더>/파일.md'
+full_path = 'Vaults/Projects_Dev/MyProject/Contents/Project/02-design/개체/파일.md'
 
-# 활성 볼트가 해당 볼트이면 → 볼트 경로 접두사 제거
-vault_prefix = 'Vaults/Projects_<영역>/<볼트명>/'
+# 활성 볼트가 MyProject 면 → 볼트 경로 접두사 제거
+vault_prefix = 'Vaults/Projects_Dev/MyProject/'
 vault_relative = full_path.removeprefix(vault_prefix)
-# 결과: 'Contents/Project/02-design/<폴더>/파일.md'
+# 결과: 'Contents/Project/02-design/개체/파일.md'
 ```
 
 **변환 규칙:**
@@ -148,7 +148,7 @@ start "" "obsidian://open?vault=볼트명"
 ## 사용 예시
 
 ```
-/open-notes <볼트명> <노트A_파일명>, <노트B_파일명>
+/open-notes MyProject 설계노트_A, 설계노트_B
 /open-notes AIHubVault _STATUS, _WORKSPACE_VERSION
 ```
 

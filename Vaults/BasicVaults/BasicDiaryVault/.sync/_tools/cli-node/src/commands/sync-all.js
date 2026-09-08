@@ -50,6 +50,25 @@ function resolveCommand(command) {
 }
 
 function runCommand(command, args, cwd) {
+  // Windows 에서 `npm.cmd` 는 shell 을 거쳐야 한다. Node 가 CVE-2024-27980 패치 이후
+  // `.cmd`/`.bat` 직접 spawn 을 EINVAL 로 거부해서 (18.20.2+ · 20.12.2+ · 21.7.3+),
+  // shell:false 로 부르면 npm install 이 통째로 실패한다. 기존 설치에는 node_modules 가
+  // 이미 있어 SKIP 으로 빠지므로 안 드러나고, **새 사용자의 첫 sync 에서만 터진다**
+  // (2026-09-08 배포본 클린 클론에서 Preset Hub 5개 실패로 실측).
+  // 인자는 정적 플래그뿐이라 shell 이 붙어도 안전하고, `node` 계열은 shell:false 를
+  // 유지해 공백 포함 경로가 안 깨진다.
+  // 인자를 따로 넘기지 않고 한 줄로 합쳐 부른다 — shell:true 에 args 를 같이 주면
+  // Node 가 DEP0190 경고를 찍고, 그게 사용자의 **첫 설치 화면**에 그대로 뜬다.
+  const useShell = process.platform === 'win32' && command.toLowerCase() === 'npm';
+  if (useShell) {
+    return spawnSync([resolveCommand(command), ...args].join(' '), [], {
+      cwd,
+      encoding: 'utf8',
+      maxBuffer: 20 * 1024 * 1024,
+      shell: true,
+      windowsHide: true,
+    });
+  }
   return spawnSync(resolveCommand(command), args, {
     cwd,
     encoding: 'utf8',

@@ -81,7 +81,7 @@ cross-platform CLI 통합 가능한 hook 만. Claude `.claude/hooks/` 의 9 파�
   - `.agents/commands/custom/Meshy/meshy-3d-agent/`
   - `.agents/commands/custom/Meshy/meshy-3d-generation/`
   - `.agents/commands/custom/Meshy/meshy-3d-printing/`
-- 도메인 볼트: `Vaults/Domains_AI_Asset/AI_Gen4Game/` (Meshy 부분)
+- 도메인 볼트: 해당 도메인 볼트 (사용자 환경별)
 
 ### Discord
 
@@ -132,13 +132,13 @@ cross-platform CLI 통합 가능한 hook 만. Claude `.claude/hooks/` 의 9 파�
 - 정본 룰: `.agents/rules/custom/Canvas/canvas-design.md`
 - 정본 스킬: `.agents/commands/custom/Canvas/canvas-create.md`
 - 도메인 볼트: 없음 (인프라 도메인 — 모든 볼트에서 적용 가능)
-- 참조 캔버스: `Vaults/Lab_Infra/ObsidianDev/Contents/Domain/reference/advanced_canvas/AdvancedCanvas_아키텍처.canvas`
+- 참조 캔버스: `{플러그인 볼트}/Contents/Domain/reference/advanced_canvas/AdvancedCanvas_아키텍처.canvas`
 
 ## 향후 도메인 볼트 추가 시
 
 새 도메인 볼트 (`Vaults/Domains_*/X` 또는 `Vaults/Domain_*/X`) 생성 시 대응 카테고리 폴더 `.agents/{rules,commands}/custom/X/` 자동 생성 정책 (Phase 2 또는 별 트랙 자동화).
 
-현재 룰/스킬 없는 도메인 볼트 (GameDesign, CapCut, Git, GameArt, CICD, Search, AI, AppFlowy, Cooking, Overseas, Exercise, MachineAssembly, LightAndColor, ArtInsight, Funding, Python, AI_Coding, JavaScript, DevFoundation 등) 는 카테고리 폴더 없음. 룰/스킬 신설 시 카테고리 동시 생성.
+룰·스킬이 없는 도메인 볼트는 카테고리 폴더를 두지 않는다. 룰·스킬을 신설할 때 카테고리를 함께 만든다.
 
 ## 에이전트별 sync 매트릭스
 

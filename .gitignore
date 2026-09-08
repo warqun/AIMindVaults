@@ -37,3 +37,11 @@ nul
 
 # npm 의존성 (사용자가 npm install 또는 Setup New Device 로 받음)
 **/node_modules/
+
+# 인덱스·상태 — 각 디바이스가 스스로 빌드한다 (추적하면 매 업데이트마다 충돌)
+**/.vault_data/
+_collections.json
+
+# sync 실행 로그 (사용자 로컬)
+sync.log
+**/sync.log

@@ -17,8 +17,11 @@
 ```
 viz `.exe` 더블클릭
 ├─ 메인 PS1: .vault_data/.sync-status.json 'running' write
-├─ 메인 PS1: 별도 PowerShell hidden 프로세스 spawn
-│   └─ 백그라운드: git pull → sync-all → done/failed 상태 갱신
+├─ 메인 PS1: 별도 PowerShell hidden 프로세스 spawn (-ExecutionPolicy Bypass, R169)
+│   └─ 백그라운드: (cold start 시 CoreHub npm install, R170) → git pull → sync-all → done/failed 상태 갱신
+│       cold start = CoreHub node_modules 또는 master_index 부재 (fresh clone 시그니처).
+│       sync-all 은 --skip-npm 없이 실행 — 볼트 로컬 node_modules 자동 설치 (존재 시 즉시 skip).
+│       exit code != 0 은 failed 로 정직 보고 (R170).
 ├─ 메인 PS1: chrome --app port polling 후 즉시 (200ms 간격, 최대 6s)
 └─ 메인 PS1: server.js 백그라운드 실행 → exit 0
 
@@ -33,49 +36,21 @@ viz SPA (브라우저):
 
 git pull 결과 'Already up to date' 면 sync-all 자체 skip → banner 즉시 done. 사용자 자주 viz 띄울 때 부담 없음.
 
-### viz Settings UI 토글 (R163, 권장 — 디바이스별)
+예외 (R170): **cold start (fresh clone) 는 skip 을 무시하고 무조건 sync-all** — 새 디바이스에서 exe 더블클릭 한 번으로 npm install + 볼트 인덱스 + master 빌드 자동 완주. banner 가 "새 디바이스 초기화 (수 분 소요 가능)" 표시. R133 동기 fallback 은 AUTO_SYNC off 전용 안전망으로 강등.
 
-viz `Settings → 커스텀 → 커스텀 기능 → Git 자동 동기화` 토글로 on/off. 변경 즉시 `.vault_data/viz-prefs.json` 갱신되고 **다음 viz 실행부터 적용** (현재 인스턴스 미반영).
-
-같은 섹션의 `지금 한 번 동기화 ▶ 실행` 버튼은 자동 동기화 off 상태에서도 수동 트리거 가능. POST `/api/viz-sync-now` → server.js 가 백그라운드로 git pull + sync-all → sync-banner 가 polling 으로 진행 표시.
-
-`viz-prefs.json` 스키마:
-
-```json
-{
-  "schemaVersion": 1,
-  "gitAutoSync": true,
-  "updatedAt": "2026-06-09T..."
-}
-```
-
-- 경로: `<멀티볼트 루트>/.vault_data/viz-prefs.json`
-- `.gitignore` 적용 — 디바이스별 독립 (메인 PC on / 노트북 off 같은 운용 가능)
-- Start-Visualization.ps1 시작 시 읽어 `AIMV_VIZ_AUTO_PULL / AUTO_SYNC` env var 설정
-
-### 환경 변수 (시스템 레벨 — 우선순위 최상위)
+### 환경 변수
 
 ```powershell
 # 기본값 (자동 활성)
 $env:AIMV_VIZ_AUTO_PULL = 'true'   # git pull --ff-only origin main
-$env:AIMV_VIZ_AUTO_SYNC = 'true'   # node cli.js sync-all --skip-npm
+$env:AIMV_VIZ_AUTO_SYNC = 'true'   # node cli.js sync-all (R170 — --skip-npm 제거, cold start 자동 부트스트랩)
 
 # off 시
 $env:AIMV_VIZ_AUTO_PULL = 'false'
 $env:AIMV_VIZ_AUTO_SYNC = 'false'
 ```
 
-### 우선순위 (R163)
-
-```
-시스템 env var (사용자 명시) > viz-prefs.json (UI 토글) > default(true)
-```
-
-- 시스템 env var 가 set 되어 있으면 viz-prefs.json 의 값은 무시됨 — CI/디버깅 강제 override 용도.
-- viz Settings UI 에서 변경한 값을 보고 싶으면 시스템 env var 를 unset.
-- 둘 다 미설정 시 default = 자동 활성.
-
-자동 동기화 off 시 sync-banner 는 'idle' (표시 안 됨), `지금 한 번 동기화` 버튼이 유일한 트리거 수단.
+env var off 시 banner 'idle' (표시 안 됨), 자동 동기화 X.
 
 ### fail-safe
 
@@ -194,9 +169,8 @@ node Vaults/BasicVaults/CoreHub/.sync/_tools/cli-node/bin/cli.js index master-bu
 - R148: KPI "+N today" 노트 기반 derive (`viz/pages/home.js computeTagsRecentFromNotes`)
 - R141: Viz-Snapshot.ps1 + viz_snapshots/ 표준
 - R142: viz 측 메타 노트 type/path 필터 (`viz/lib/system-vaults.js filterVisibleNotes`)
-- **R163**: viz Settings UI 토글로 자동 동기화 on/off (`viz/pages/settings.js` 커스텀 기능 섹션, `viz/server.js /api/viz-prefs`, `/api/viz-sync-now`, `.vault_data/viz-prefs.json`). 기존 env var 강제 → 디바이스별 UI 토글 + 수동 동기화 버튼.
 - agent-ownership.md (core/): _AGENT_COMMS 큐 1:1 통신 규약 (디바이스 간 동일 적용)
 
 ## 트리거 키워드 (skill-router 호환)
 
-viz / sync / 동기화 / git pull / sync-all / viz `.exe` / 디바이스 정합 / 메인 PC 노트북 비교 / KPI 불일치 / master_index / vault_index / 캘린더 헤더 / sync-banner / viz-prefs / 자동 동기화 토글 / 지금 한 번 동기화
+viz / sync / 동기화 / git pull / sync-all / viz `.exe` / 디바이스 정합 / 메인 PC 노트북 비교 / KPI 불일치 / master_index / vault_index / 캘린더 헤더 / sync-banner

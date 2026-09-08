@@ -16,6 +16,7 @@
 ## 2. 셸 식별 기준 (에이전트 자기 교정용)
 
 - **Claude Code Bash tool** → Git Bash 환경 (MSYS2 런타임). **Bash 구문만** 사용.
+- **Claude Code hook 커맨드 문자열 (settings.json 의 `hooks.*.command`)** → 역시 **sh (Git Bash) 로 실행**된다. CMD 구문 금지 + **MSYS 경로 변환** 적용 대상 — `/F` 같은 슬래시 인자가 `F:/` 로 바뀐다. Windows 도구 인자는 `//F //IM` 처럼 이중 슬래시로 이스케이프. **PreToolUse Bash 훅은 이 문자열을 검사하지 못한다** (Bash 도구 호출이 아니므로) — 훅 커맨드는 작성 시점에 사람이 검증해야 한다.
 - **Codex Bash tool** → 동일 (주의: Windows native Codex hooks 현재 비활성)
 - `powershell -Command` · `pwsh -Command` → PowerShell 구문
 - `cmd /c` · `.bat` · `.cmd` → CMD 구문
@@ -64,6 +65,18 @@ Bash 도구 호출 직전 명령 문자열을 검사해 `2>nul`·`>nul` 패턴 �
 **템플릿**: `.claude/templates/ci/vault-watcher.js`
 
 Node `fs.watch` 로 볼트 루트 감시. 초기 full scan + 실시간 감시. Obsidian Shell Commands startup 이벤트 · PM2 · systemd 로 백그라운드 실행.
+
+## 5.9 Incident 종결: 2026-08-05 재발 원인 = 전역 Stop 훅 (해결)
+
+세션 중 `nul` 이 반복 재생성된 사건의 원인을 특정·해결했다.
+
+- **원인**: `~/.claude/settings.json` 전역 Stop 훅 `taskkill /F /IM serena.exe 2>nul || true`
+  - 훅 커맨드는 sh (Git Bash) 로 실행 → MSYS 가 `/F` → `F:/` 변환 → taskkill 이 "잘못된 인수/옵션 - 'F:/'" 에러 → `2>nul` 이 그 에러를 **literal `nul` 파일로 기록**
+  - **매 턴 종료마다 발화** — 세션 내 어떤 명령 배제 테스트로도 안 잡힌 이유. 파일 위치가 옮겨 다닌 것은 훅 CWD 가 지속 셸의 마지막 cwd 를 따라갔기 때문
+  - 이 리스크는 2026-04-23 교차검증 노트에 이미 기재돼 있었으나 방치됨
+- **결정적 단서**: 재발분이 0 bytes 가 아니라 **80 bytes** — 내용을 CP949 로 읽으니 taskkill 에러 문구가 그대로 있었다. **빈 파일이 아니면 내용이 작성자를 지목한다**
+- **수정**: `taskkill //F //IM serena.exe 2>/dev/null || true` (이중 슬래시 + bash 리다이렉트). 재현 테스트로 무해 확인
+- **교훈**: (1) 훅 커맨드 문자열은 PreToolUse 검사 밖 — 별도 감사 대상. (2) 주기적 재발은 주기적 트리거 (훅·스케줄러) 를 먼저 의심. (3) 발견된 파일은 지우기 전에 **크기·타임스탬프·내용**을 먼저 읽는다
 
 ## 6. Incident Rule: Bash `2>nul` Creates Orphan Files (Mandatory)
 

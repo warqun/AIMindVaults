@@ -122,6 +122,25 @@ _AGENT_COMMS/to_claude 스캔하고 open 큐 처리
 
 ### 5. 완료 처리
 
+
+**파일 경로가 바뀐 작업이었으면 — 인덱싱은 여기서 (R194)**
+
+워커가 노트를 이동·리네임·삭제했다면 **인덱싱을 워커에게 시키지 않고 오케스트레이터가 마지막에 한 번** 돌린다.
+`index build` 는 실행 시점 파일시스템을 walk 하므로, 이동 중에 돌면 죽은 경로가 인덱스에 박히고 viz 의
+`obsidian://` 링크가 깨진다 (2026-06-12 실사고).
+
+```bash
+# 1) 영향 볼트별
+node "{볼트경로}/.sync/_tools/cli-node/bin/cli.js" index build -r "{볼트경로}" -i
+# 2) 마지막 1회
+node "Vaults/BasicVaults/CoreHub/.sync/_tools/cli-node/bin/cli.js" index master-build -r .
+# 3) 대조 — STALE_TOTAL=0 이어야 한다
+node -e "const fs=require('fs'),path=require('path');const j=require('./.vault_data/master_index.json');let bad=0;for(const n of j.notes){const v=j.vaults[n.vault_id];if(!v||!fs.existsSync(path.join(v.path,n.path)))bad++;}console.log('STALE_TOTAL='+bad);"
+```
+
+경로를 바꾸지 않는 편집만 했다면 워커의 `review` 가 이미 인덱싱까지 처리했으므로 생략 가능.
+상세: `_AGENT_COMMS/multi-worker-protocol.md § 11`.
+
 **워커 완료 시**:
 1. 큐 파일 status `in-progress → resolved`
 2. 응답 섹션에 작업 요약 (파일 수, 명령 결과, commit 해시 등)
@@ -248,12 +267,14 @@ _AGENT_COMMS/to_claude 스캔하고 open 큐 처리
 
 **병렬 spawn**:
 ```
-/spawn-claude "<볼트A> 볼트 index build -i"
-/spawn-claude "<볼트B> 볼트 index build -i"
-/spawn-claude "<볼트C> 볼트 index build -i"
+/spawn-claude "Cooking 볼트 index build -i"
+/spawn-claude "Python 볼트 index build -i"
+/spawn-claude "Discord 볼트 index build -i"
 ```
 
 각 워커 독립 작업 → 본 세션은 master-index-build 만 처리.
+
+> 이 예시가 안전한 이유: **서로 다른 볼트 · 인덱싱만 · 경로 변경 없음**. 위험한 것은 병렬 자체가 아니라 **경로 변경과 인덱싱이 같은 구간에 섞이는 것**이다 (R194).
 
 ## 관련 스킬·룰
 

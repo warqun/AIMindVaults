@@ -32,6 +32,7 @@
 
 **배포 미대상 (개인 자산 OK)**:
 - `_STATUS.md` (사용자 볼트 레지스트리 — 배포 시 빈 템플릿화 또는 제외)
+- `_collections.json` (viz 컬렉션·즐겨찾기 정의 — **배포 제외 확정 2026-08-27, R197**). 노트 참조에 사용자 볼트명·노트 경로가 그대로 들어간다. 게다가 배포본은 사용자가 업데이트를 pull 받는 저장소라, 추적하면 사용자가 ★ 를 누른 뒤 매 업데이트마다 충돌을 손으로 풀어야 한다. **파일이 없어도 동작에 문제가 없다** — server 가 기본 즐겨찾기 컬렉션을 응답하고 첫 저장 때 파일을 만든다 (실측 확인).
 - `_SESSION_HANDOFF_*.md` (세션 컨텍스트)
 - `_ROOT_VERSION.md` (변경 이력)
 - `_AGENT_COMMS/` (에이전트 간 소통 — 배포 미포함)
@@ -124,4 +125,4 @@ if ($found) { Write-Warning "개인 자산 인용 발견: $($found -join ', ')" 
 
 - 인시던트 발견: 2026-04-25 사용자 보고 ("온보딩 § 2 볼트 구성에 개인 정보 노출")
 - 관련 룰: `.claude/rules/core/distribution-sync.md` (배포 동기화 일반)
-- 배포 변경 로그: `Vaults/Projects_Infra/Project_AIMindVaults/Contents/Project/plan/distribution/20260317_배포_동기화_규칙.md`
+- 배포 변경 로그: `{프로젝트 볼트}/Contents/Project/plan/distribution/20260317_배포_동기화_규칙.md`

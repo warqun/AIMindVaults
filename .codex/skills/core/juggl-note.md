@@ -23,7 +23,7 @@ tags:
   - [DomainTag3]
   - [DomainTag4]
   - [DomainTag5]
-created: YYYY-MM-DD
+created: YYYY-MM-DDTHH:MM:SS   # 생성 시각까지 (로컬). 한 번 쓰면 수정 금지 — R189
 agent: claude
 ---
 ```
