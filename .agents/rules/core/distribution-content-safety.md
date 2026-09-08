@@ -104,7 +104,7 @@
 
 ```powershell
 # 배포 대상 문서 변경 시 개인 자산 키워드 스캔
-$personal = @('JissouGame', 'CombatToolKit', 'TileMapToolKit', 'MachineAssembly', 'CookingLab', 'Project_MyVaults', 'Unity_Documentation')
+$personal = (Get-Content '_STATUS.md' | Select-String -Pattern '^\| ([A-Za-z0-9_]+) \|' | ForEach-Object { $_.Matches[0].Groups[1].Value }) | Where-Object { $_ -notin @('AIHubVault','BasicContentsVault','CoreHub') }
 $file = '<배포 대상 파일 경로>'
 $content = Get-Content $file -Raw
 $found = $personal | Where-Object { $content -match $_ }
