@@ -1,11 +1,5 @@
 {
   "mcpServers": {
-    "blender": {
-      "command": "C:\\Users\\c\\.local\\bin\\uvx.exe",
-      "args": [
-        "blender-mcp"
-      ]
-    },
     "youtube-transcript": {
       "command": "npx",
       "args": [

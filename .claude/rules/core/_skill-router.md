@@ -28,14 +28,6 @@
 | 임시 파일 · 재귀 삭제 | 임시 파일, MAX_PATH, 무한 재귀, flatten-and-delete, robocopy | `.claude/rules/core/temp-file-management.md` (core 주입됨) |
 | Obsidian 인스턴스 제어 | Obsidian 창, 옵시디언 창, ob 창, 인스턴스, instance, N개로 맞춰, N개로 줄여, N개로 늘려, Obsidian 정리, 옵시디언 닫아, Obsidian 몇 개 | `/obsidian-windows` Skill + `.claude/rules/custom/obsidian-instance-control.md` (custom 주입됨) |
 | 에이전트 작업 위임 | 위임, 떠넘겨, 백그라운드로, 별도 인스턴스로, 워커, delegate, 병렬 작업, 동시 작업, 다른 클로드, 다른 에이전트가, 큐로 던져, 긴 작업이라 따로, 이건 다른 세션에서 | `/delegate-task` Skill (큐 작성 + spawn + 트리거 + 추적 + 완료 통합 워크플로우) |
-| Canvas 작성 (Obsidian Advanced Canvas) | 캔버스, 구조도, 다이어그램, advanced canvas, Obsidian Canvas, .canvas, 노드 + 엣지, 시스템 도식 | `/canvas-create` Skill + `.agents/rules/custom/Canvas/canvas-design.md` Read |
-| 학습 플레이리스트 정리 | 개발학습 정리, 개발학습, 학습 플레이리스트, 플레이리스트 정리, 새로 추가된 영상 | `/dev-learning-digest` Skill |
-| Unity 개발 | Unity, 유니티, C#, MonoBehaviour, ScriptableObject, unity-cli, mcp-unity, Serena, find_symbol, replace_symbol_body, 심볼 기반 편집, 프리팹, 인스펙터 | `/unity-dev` Skill (룰 3종 `.agents/rules/custom/Unity/` 를 물린다) |
-| Godot 개발 | Godot, 고닷, GDScript, `.gd`, `.tscn`, 노드, 씬, 시그널, `@onready`, `@export`, CharacterBody2D, TileMapLayer, 헤드리스, selftest | `.agents/rules/custom/Godot/godot-style.md` Read (구조 판단은 Godot 볼트 `Concepts/Godot_모범_사례.md`) |
-| Unity DOTS | DOTS, ECS, Entities, ISystem, IJobEntity, IJobChunk, EntityCommandBuffer, Burst, Job System, 잡 시스템 | `/unity-dots` Skill |
-| 게임 시스템 설계 | 게임 시스템 설계, 클래스 구조, SO 구조, 의존성 맵, 데미지 파이프라인, 스킬 시스템 설계, ECS vs OOP, 아키텍처 결정 | `/game-architect` Skill |
-| Blender · 3D 모델링 | Blender, 블렌더, 3D 모델링, 메시, UV, 머티리얼, 리토폴로지, FBX, 익스포트, 뷰포트 | `/blender-workflow` Skill + `.agents/rules/custom/Blender/blender-mcp.md` Read |
-| AI 3D 에셋 생성 | Meshy, 메시, Tripo, 트리포, Text to 3D, Image to 3D, 리텍스처, retexture, 리깅, 텍스처 생성, AI 3D, 게임레디 에셋 | `/meshy-workflow` Skill + `.agents/rules/custom/Meshy/meshy-api.md` Read · Tripo 는 [[20260908_Tripo_사용_규약]] Read |
 | viz · 디바이스 간 동기화 | viz, 시각화, 동기화, sync-banner, sync-status, viz `.exe`, Generate Visualization, viz_snapshots, Viz-Snapshot, 디바이스 정합, KPI 불일치, 캘린더 헤더, master_index 차이, vault_index, 자동 동기화, AIMV_VIZ_AUTO | `.claude/rules/core/viz-device-sync.md` (core 주입됨) |
 
 ## 매칭 실패 시
@@ -54,6 +46,6 @@
 
 도메인별 Skill 매핑은 사용자 환경에 따라 다르다. 사용자가 본인 환경 (게임 엔진, 3D 도구, 외부 API, 메시징 봇 등) 의 도메인 Skill 을 추가할 때 위 트리거 매핑 테이블에 직접 등록한다.
 
-**2026-09-08**: 게임개발 도메인 5행 등록 (Unity 개발 · Unity DOTS · 게임 시스템 설계 · Blender · AI 3D 에셋). 종전엔 `/unity-dev` · `/blender-workflow` · `/meshy-workflow` 스킬이 **존재하는데 키워드로 안 걸려** 사람이 직접 쳐야 발동했다. 자기 환경에 없는 스킬 행은 지운다.
+**개인 도메인 행 (게임 엔진·3D·학습 플레이리스트 등) 은 `.agents/rules/custom/_skill-router-custom.md` 에 둔다** — custom/ 은 상시 주입되므로 효과는 같고 배포본에는 안 나간다 (2026-09-14, 배포본에 Blender 행이 새어 나가 분리).
 
 custom/에 유지된 규칙 (상시 주입): `agent-ownership.md`, `multivault-personalization.md`

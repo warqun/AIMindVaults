@@ -141,7 +141,5 @@ Claude Code 는 MCP(Model Context Protocol) 서버로 외부 도구와 연동한
 
 - **연결 서버 구성은 디바이스·세션별로 변동** — 세션 시작 시 실제 연결 목록 기준으로 판단한다. 문서의 고정 목록에 의존하지 않는다.
 - 도메인별 MCP 규칙 (R125 카테고리화 이후 경로):
-  - Unity: `.claude/rules/custom/Unity/unity-tools.md` (unity-cli → Serena → mcp-unity 우선순위 강제) + `Unity/serena-mcp.md` + `Unity/unity-scripting-style.md`
-  - Blender: `.claude/rules/custom/Blender/blender-mcp.md`
-  - Notion: `.claude/rules/custom/Notion/notion-sync.md`
-  - 기타 도메인 (3D 생성 API, 메시징 봇 등): `.claude/rules/custom/<도메인>/`
+  - `.claude/rules/custom/<도메인>/` (예: 게임 엔진, 3D 도구, 외부 API, 메시징 봇). 정본은 `.agents/rules/custom/<도메인>/`, agents-sync 가 미러한다
+  - 트리거 행은 `.agents/rules/custom/_skill-router-custom.md` 에 등록

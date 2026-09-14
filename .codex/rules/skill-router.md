@@ -16,11 +16,6 @@
 
 | 작업 유형 | 트리거 키워드 | Read 대상 |
 |---------|-------------|----------|
-| Unity 스크립팅 | Unity, C#, 유니티, 스크립트, 스킬 시스템, mcp-unity, unity-cli, Serena, find_symbol, replace_symbol_body, 심볼 기반 편집 | `.agents/rules/custom/Unity/unity-tools.md` + `unity-scripting-style.md` + `serena-mcp.md` |
-| Blender 작업 | Blender, 블렌더, 3D 모델링, bpy, Hyper3D, Polyhaven, Sketchfab | `.agents/rules/custom/Blender/blender-mcp.md` |
-| Meshy API | Meshy, AI 텍스처, 3D 생성, Meshy 크레딧, text-to-3d, image-to-3d | `.agents/rules/custom/Meshy/meshy-api.md` |
-| Discord 운영 | Discord, 디스코드, 디코, 봇, AIMindVaults Admin Bot, 채널, Forum, Community, allowed_mentions | `.agents/rules/custom/Discord/discord-bot.md` |
-| Notion 기록 | Notion, 노션, 작업 관리 DB, 개발 현황 공유, Notion 기록 | `.agents/rules/custom/Notion/notion-sync.md` |
 | 배포·Git push, sync 기능 수정 | 배포, SellingVault, git push, 동기화 배포, 영문 배포, distribute, deploy, cli.js sync, pre-sync, _WORKSPACE_VERSION, sync-version | `.agents/rules/custom/Distribution/distribution-deploy.md` + `sync-version-priority.md` |
 | Multi-Hub | Core Hub, Preset Hub, CoreHub, core-sync, core-sync-all, hub-source.json, hub-marker.json, multi-hub, 코어 허브, bump-version --broadcast, hubId, hubType, hub-resolver | `{프로젝트 볼트}/Contents/Project/plan/architecture/20260419_Multi_Hub_아키텍처_설계.md` + `20260420_Multi_Hub_Phase1_구현_결과.md` |
 | 새 볼트 생성 | 볼트 생성, create-vault, 새 볼트, 볼트 분리, 신규 볼트 | `.codex/skills/create-aimind-vault/SKILL.md` + `.codex/rules/create-vault-safety.md` + `.agents/rules/custom/CreateVault/vault-individualization.md` |
