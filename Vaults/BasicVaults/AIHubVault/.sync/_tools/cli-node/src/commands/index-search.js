@@ -104,6 +104,12 @@ function getNoteScore(note, keywords) {
   for (const q of keywords) {
     const ql = q.toLowerCase();
     if (note.title && note.title.toLowerCase().includes(ql)) score += 10;
+    // R182 — frontmatter aliases 매칭 (title 급 가중치, 니모닉·별칭 검색용)
+    if (note.aliases) {
+      for (const a of note.aliases) {
+        if (String(a).toLowerCase().includes(ql)) { score += 10; break; }
+      }
+    }
     if (note.tags) {
       for (const t of note.tags) {
         const tl = t.toLowerCase();

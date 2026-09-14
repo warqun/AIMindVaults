@@ -58,6 +58,7 @@ import { fileURLToPath } from 'node:url';
 import { mirrorDirectory } from '../lib/fs-mirror.js';
 import { isHub, readHubMarker } from '../lib/hub-resolver.js';
 import * as log from '../lib/logger.js';
+import { localDate } from '../lib/local-time.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -219,7 +220,7 @@ export async function createHub(opts) {
   log.info('\n[3/5] Writing hub-marker.json...');
   const markerPath = join(targetPath, '.sync', 'hub-marker.json');
   const relCoreHub = relative(targetPath, sourceRoot).split(/[/\\]/).join('/');
-  const today = new Date().toISOString().slice(0, 10);
+  const today = localDate();
   const marker = {
     hubId: opts.hubId,
     hubType: 'preset',

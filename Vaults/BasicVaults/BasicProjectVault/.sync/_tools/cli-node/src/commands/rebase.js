@@ -19,6 +19,7 @@ import { join, resolve, relative, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { isHub, readHubMarker, resolveHub } from '../lib/hub-resolver.js';
 import * as log from '../lib/logger.js';
+import { localDate } from '../lib/local-time.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -83,7 +84,7 @@ export async function rebase(opts = {}) {
   const currentHubId = currentHubMarker?.hubId || '(legacy scan)';
   const currentSource = currentResolution.source;
 
-  const today = new Date().toISOString().slice(0, 10);
+  const today = localDate();
 
   log.info('====================================================');
   log.info(' Rebase — Satellite Hub Change');

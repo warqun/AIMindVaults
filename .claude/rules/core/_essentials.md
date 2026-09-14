@@ -24,11 +24,19 @@ node "{볼트경로}/.sync/_tools/cli-node/bin/cli.js" index search -r "{볼트�
 
 fallback 조건: `vault_index.json` 없음 / 인덱서 0건인데 존재 가능성 높음 / 비콘텐츠 파일(`.obsidian/`, `_tools/`).
 
-### 터미널 실행 위임
+### 터미널 실행 — 맡긴 범위 안에서는 직접 돌린다 (2026-09-08 개정)
 
-- 확신 코드를 제시 → 사용자 실행 → 결과 받아 다음 단계.
-- 자가 디버깅 반복 금지 (run → fail → retry).
-- 예외: 사용자가 "직접 실행해" 명시한 경우.
+종전 규칙은 "코드를 제시하고 사용자가 실행" 이었다. 그건 **토큰 절약 장치**였는데,
+개발을 맡긴 뒤에도 적용하면 구현 → 검증 → 수정 고리가 매번 끊긴다.
+
+| 상황 | 규칙 |
+|------|------|
+| 사용자가 구현·수정·조사를 맡긴 범위 | **직접 실행한다.** 빌드·테스트·인덱싱·셀프체크는 확인까지가 그 작업이다 |
+| 맡기지 않은 것을 확인만 하고 싶을 때 | 명령을 제시하고 사용자 실행 |
+| 되돌리기 어렵거나 외부로 나가는 명령 | 실행 전 승인 (`agent-ownership.md § 위험도 기준`) |
+
+**같은 실패를 반복하지 않는다.** 한 원인으로 2회 실패하면 멈추고, 무엇을 시도했고
+무엇이 막혔는지 보고한다. 금지되는 것은 실행이 아니라 **근거 없는 재시도**다.
 
 ### 금지
 
@@ -70,6 +78,19 @@ node "{볼트경로}/.sync/_tools/cli-node/bin/cli.js" index build -r "{볼트�
 - `[workspace]` — `_Standards/`, `_tools/`, `.codex/`, `.claude/`, 볼트 루트만. `Contents/**` 수정 금지.
 
 Contents 모드 내부: `[Contents/Domain]`(지식) 또는 `[Contents/Project]`(작업) 분기.
+
+### 상태·핸드오프 기록은 모드 밖이다 (2026-09-08 — 문언 충돌 해소)
+
+§ 7 은 세션 종료 시 `_STATUS.md`·핸드오프 갱신을 요구하는데 그 파일들은 볼트 루트라
+"`[Contents]` 모드에서는 볼트 루트 수정 금지" 와 정면으로 부딪힌다. 그대로 읽으면
+콘텐츠 작업은 규칙을 어기지 않고는 끝낼 수 없다.
+
+**다음 4종은 어느 모드에서도 기록할 수 있다** — 작업이 아니라 작업의 기록이다.
+
+- `_STATUS.md` (루트·볼트) · `_SESSION_HANDOFF_*.md` · `AGENT_STATUS.md` · `_AGENT_COMMS/`
+
+그 외 볼트 루트 파일 (`CLAUDE.md`, `_VAULT-INDEX.md`, `_WORKSPACE_VERSION.md` 등) 은
+종전대로 `[workspace]` 다.
 
 ### [workspace] 모드 — 어느 Hub 에서 편집할지 (Multi-Hub 강제)
 
@@ -177,7 +198,7 @@ Obsidian CLI 우선: 조회/검색/히스토리 복구는 `node cli.js bridge` �
 | 단어 결합 (영어) | 단어마다 첫 대문자 | `SkillSystem`, `PluginDev`, `KnowledgeGraph` |
 | 약어 단독 | 전체 대문자 | `MCP`, `API`, `JSON`, `ESTA`, `URL`, `KPI`, `URP` |
 | 약어 + 단어 결합 | **약어 보존 PascalCase** | `JSONParser`, `XMLSchema`, `APIGateway`, `URLEncoder` |
-| vault 이름 (언더스코어 포함) | 그대로 유지 | `AI_Coding`, `Project_MyApp`, `Web_Frontend` |
+| vault 이름 (언더스코어 포함) | 그대로 유지 | `AI_Coding`, `Project_AIMindVaults`, `AI_Gen4Game` |
 | **다국어 (한국어/일본어/중국어 등)** | **그대로 유지** (강제 영어 정규화 X) | `보안`, `에이전트`, `조리도구`, `채소_과일`, `G식백과` |
 | 숫자 포함 | 그대로 유지 | `Unity6`, `USA_2026`, `Gen4Game`, `3D`, `2D` |
 

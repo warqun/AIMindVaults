@@ -32,6 +32,17 @@ Claude 는 자동 주입 메커니즘이 있고, Codex 는 없으므로 세션 �
 - 명시 지시 전 금지: 파일 변경, 자동화 등록/실행, 쓰기성 스크립트 실행, 외부 상태 변경.
 - 지시가 모호하면 변경 작업을 시작하지 않고 짧게 확인한다.
 
+### 한 번 맡기면 그 안은 다시 안 묻는다 (2026-09-08)
+
+위 조항은 **상담·검토를 작업으로 오인하지 않기 위한 것**이지, 맡긴 일을 잘게 쪼개
+매 단계 재승인하라는 뜻이 아니다.
+
+- 개발·수정 지시를 받으면 **그 범위 안의 하위 구현·빌드·테스트·검증은 승인된 것**이다.
+  파일을 고칠 때마다, 테스트를 돌릴 때마다 다시 묻지 않는다
+- 범위 밖으로 나가거나, 되돌리기 어렵거나, 외부로 나가는 것 (push·배포·게시·비용) 만
+  다시 묻는다 — `.agents/rules/custom/agent-ownership.md § 위험도 기준`
+- **Claude 와 Codex 에 같은 기준을 적용한다.** 에이전트 이름으로 권한을 나누지 않는다
+
 ## 세션 시작 순서
 
 0. **`agents-sync --verify` 호출 (Mandatory, R122)** — `.agents/` 정본과 `.codex/` 미러 동기 상태 확인:
@@ -65,11 +76,27 @@ Claude 는 자동 주입 메커니즘이 있고, Codex 는 없으므로 세션 �
 
 1. 명시적 볼트 지정 우선
 2. 키워드 추론:
-   - `"<키워드>", "<동의어>" → <볼트 ID>` 형식으로 **본인이 만든 볼트만** 적는다.
-   - 기본 동봉 볼트: `"AI 워크플로우", "에이전트", "_Standards" → AIHubVault` ·
-     `"콘텐츠", "노트 작성", "지식 관리" → BasicContentsVault`
-   - 볼트를 추가할 때마다 이 목록에 한 줄씩 늘린다. **비워 두면 라우팅이 안 된다.**
-     실제 등록 볼트는 루트 `_STATUS.md` 의 볼트 레지스트리를 본다 (사용자 환경별로 다름).
+   - "AI 워크플로우", "에이전트", "_Standards" → AIHubVault
+   - "Unity", "유니티 엔진" → Unity
+   - "Unreal", "Unreal Engine", "언리얼", "언리얼 엔진", "UE5", "Blueprint", "블루프린트" → UnrealEngine
+   - "CapCut", "영상편집" → CapCut
+   - "YouTube", "유튜브", "채널 운영", "콘텐츠 제작", "콘텐츠 도메인", "쇼츠", "Shorts", "썸네일", "제목", "스크립트", "채널 성장" → ContentCreation
+   - "Notion", "노션 운영" → Notion
+   - "Obsidian 플러그인", "플러그인 개발" → ObsidianDev
+   - "전투 시스템", "CombatToolKit", "스킬 시스템", "이펙트 패키지", "뱀서" → CombatToolKit
+   - "타일맵", "TileMap", "맵 생성", "청크", "절차적 생성" → TileMapToolKit
+   - "JissouGame", "지쏘우", "jissou" → JissouGame
+   - "게임 기획", "게임 디자인" → GameDesign
+   - "Git", "버전관리" → Git
+   - "개발 기초", "컴퓨터구조", "운영체제", "네트워크", "HTTP", "DB", "데이터베이스", "인증", "JWT", "클라우드 기초", "인프라 기초" → DevFoundation
+   - "Blender", "3D" → Blender
+   - "AI 에셋", "생성형 AI" → AI_Gen4Game
+   - "공장 자동화", "자동화 기계 조립", "기계 조립", "공작현장", "렌치볼트", "육각렌치볼트", "체결부품", "공구", "토크", "공차" → MachineAssembly
+   - "PLC", "시퀀스 제어", "래더", "Ladder", "FBD", "Structured Text", "IEC 61131", "HMI", "SCADA", "Motion Control", "서보", "인버터", "필드버스", "Fieldbus", "Profinet", "EtherCAT", "Modbus", "CC-Link", "OPC UA", "Safety PLC", "자동화 설비 제어", "산업 자동화", "FA", "공장 PLC", "Siemens TIA", "Mitsubishi GX", "Studio 5000", "LS XG5000" → IndustrialControl
+   - "빛과 색", "색채학", "명암", "색온도", "필름룩", "RAW", "LOG" → LightAndColor
+   - "아트 인사이트", "미적 감각", "안목", "취향", "유행과 트렌드", "올드와 클래식", "상황과 감정" → ArtInsight
+   - "운동", "헬스", "피트니스", "근력운동", "유산소", "스트레칭", "가동성", "루틴", "회복", "부상 예방" → Exercise
+   - "학습법", "공부법", "메타러닝", "기억법", "암기", "복습", "학습 시스템", "노트법", "스페이스드 리피티션", "deliberate practice" → Learning
 3. 파일 경로 포함 시 → 경로에서 볼트 추출
 4. 루트 파일만 대상이면 → 루트에서 작업
 5. 모호하면 → 사용자에게 확인
@@ -81,15 +108,18 @@ Claude 는 자동 주입 메커니즘이 있고, Codex 는 없으므로 세션 �
 - `.claude/`, `.codex/`
 - `_STATUS.md`, `_ROOT_VERSION.md`
 - `_AGENT_COMMS/` (에이전트 간 소통 공간 — 볼트 아님)
+- `_AGENT_TASKS/` (사람이 던지면 CLI 가 실제로 도는 큐 — 볼트 아님. 규약은 `_AGENT_TASKS/README.md`. **이 폴더의 작업이 이 폴더에 새 작업 파일을 만들 수 없다** — 재귀 금지)
 - `docs/`
 
 볼트 내부 파일은 대상 볼트 진입 후에만 수정한다.
 
 ## 에이전트 소유권 규칙
 
-`.claude/rules/custom/agent-ownership.md` 참조.
-- Codex: 단일 볼트 내 노트 편집, 반복 작업, 백그라운드 정리
-- 동시 수정 금지: `_STATUS.md`, `_WORKSPACE_VERSION.md`, `.obsidian/`
+`.codex/rules/custom/agent-ownership.md` 참조.
+- **소유권은 에이전트 이름이 아니라 작업 범위로 정한다** (2026-09-08 개정). 지시를 받은
+  세션이 그 작업을 끝까지 소유하고, 그 안에서 구조 변경·스크립트 수정·룰 작성을 다 한다
+- 동시 수정 금지: `_STATUS.md`, `_WORKSPACE_VERSION.md`, `.obsidian/` — **그 세션 소유자만 쓴다.**
+  소유자가 아니면 `_AGENT_COMMS/to_{소유자}/` 로 남긴다
 
 ## Serena MCP — 시맨틱 코드 분석 도구
 
@@ -103,7 +133,8 @@ Unity 작업이 아닐 때는 Serena MCP를 호출하지 않는다. 일반 노�
 
 | 프로젝트 | 경로 |
 |----------|------|
-| `<프로젝트명>` | `<프로젝트 절대경로>` |
+| GameMaker | `C:\Dev_Game\GameMaker` |
+| CoreCombat | `C:\Dev_Game\CoreCombat` |
 
 ### 주요 도구
 

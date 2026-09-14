@@ -159,7 +159,7 @@ export async function registerVaults(opts = {}) {
     log.info('  1. Launch Obsidian. Vault switcher should list all AIMindVaults vaults.');
     log.info('  2. First time opening each vault: click "Trust author and enable plugins".');
     log.info('  3. Shell Commands auto-sync runs on vault open (on-layout-ready event).');
-    log.info('  4. If auto-sync fails, run `Sync This Vault.bat` from the vault `.sync/` folder.');
+    log.info('  4. If auto-sync fails, run `Sync This Vault.bat` from the vault root.');
     log.envVar('REGISTER_VAULTS_RESULT', 'APPLIED');
     log.envVar('REGISTER_VAULTS_ADDED', String(added));
     if (backupPath) log.envVar('REGISTER_VAULTS_BACKUP', backupPath);

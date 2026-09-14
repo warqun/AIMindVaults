@@ -11,6 +11,7 @@ import { detectVaultRoot, getVaultName, getDataDir, getIndexPath, toRelativePath
 import { parseFrontmatterLight } from '../lib/frontmatter.js';
 import { EXCLUDE_FILES, EXCLUDE_TYPES, MAX_SUMMARY_LENGTH, HASH_ALGORITHM, HASH_PREFIX_LENGTH } from '../lib/config.js';
 import * as log from '../lib/logger.js';
+import { localIso } from '../lib/local-time.js';
 
 /**
  * @param {object} opts
@@ -66,8 +67,8 @@ export async function indexBuild(opts = {}) {
     const relPath = toRelativePath(vaultRoot, filePath);
     const fileName = basename(filePath);
     const fileStat = await stat(filePath);
-    const fsMtime = fileStat.mtime.toISOString().slice(0, 19);
-    const birthtime = fileStat.birthtime.toISOString().slice(0, 19);
+    const fsMtime = localIso(fileStat.mtime);
+    const birthtime = localIso(fileStat.birthtime);
 
     // Incremental fast-path: fs.mtime 변경 안 됐으면 content 변경 가능성 0 → skip.
     // legacy entry (ex.fsMtime 부재) 는 ex.mtime 으로 비교 (backward compat).
@@ -169,7 +170,7 @@ export async function indexBuild(opts = {}) {
   // Write index
   const index = {
     vault: vaultName,
-    built: new Date().toISOString().slice(0, 19),
+    built: localIso(),
     notes,
     tag_index: tagIndex,
     link_graph: linkGraph,
@@ -289,6 +290,7 @@ function buildNoteObject(relPath, content, fm, hash, mtime, birthtime) {
     title,
     type: fm.type || '',
     tags: Array.isArray(fm.tags) ? fm.tags : fm.tags ? [fm.tags] : [],
+    aliases: Array.isArray(fm.aliases) ? fm.aliases : fm.aliases ? [fm.aliases] : [],
     headings,
     summary,
     links_to: linksTo,

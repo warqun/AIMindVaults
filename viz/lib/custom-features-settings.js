@@ -91,6 +91,49 @@ const POST_SUCCESS_HOOKS = {
  *   기타 → 에러 toast
  *   요청 진행 동안 버튼 disabled + "시작 중..." 라벨.
  */
+/**
+ * registry 의 `statusEndpoint` 를 가진 feature 들의 현황을 채운다 (R204).
+ *
+ * sub 안 `[data-feature-status="<id>"]` 을 대상으로 한다. 읽기 전용이라
+ * 토글·액션과 달리 클릭 위임이 아니라 렌더 직후 1회 fetch 다.
+ * 실패해도 설정 화면 전체를 막지 않는다 — 해당 줄만 사유를 남긴다.
+ */
+export async function fillFeatureStatuses(state) {
+  const targets = CUSTOM_FEATURES.filter((f) => f.statusEndpoint);
+  await Promise.all(targets.map(async (f) => {
+    // querySelectorAll — settings 캐러셀이 패널을 **클론**해 같은 자리표시자가 여럿이다.
+    // 첫 하나만 채우면 실제로 보이는 클론에는 "확인 중" 이 남는다 (2026-09-03 실측).
+    const els = [...state.container.querySelectorAll(`[data-feature-status="${f.id}"]`)];
+    if (els.length === 0) return;
+    let text;
+    try {
+      const r = await fetch(f.statusEndpoint);
+      if (!r.ok) throw new Error(`status ${r.status}`);
+      text = formatStatus(f.id, await r.json());
+    } catch (err) {
+      text = `현황 조회 실패 — ${err.message}`;
+    }
+    for (const el of els) el.textContent = text;
+  }));
+}
+
+/** feature 별 현황 문자열. 새 statusEndpoint feature 추가 시 여기에 분기 하나. */
+function formatStatus(id, data) {
+  if (id !== 'discordTrigger') return JSON.stringify(data);
+  const parts = [];
+  parts.push(data.queued == null ? '대기 큐 확인 불가' : `대기 큐 ${data.queued}건`);
+  if (data.held) parts.push(`보류 ${data.held}건 (사람 판단 대기)`);
+  if (!data.lastRun) {
+    parts.push('실행 이력 없음');
+  } else if (data.lastRun.exit == null) {
+    // exit 줄이 없다 = 진행 중이거나 래퍼가 중단된 것. 성공으로 읽으면 안 된다.
+    parts.push(`마지막 ${data.lastRun.at} — 진행 중 또는 미완`);
+  } else {
+    parts.push(`마지막 ${data.lastRun.at} — ${data.lastRun.ok ? '성공' : `실패 (exit ${data.lastRun.exit})`}`);
+  }
+  return parts.join(' · ');
+}
+
 export function attachSettingsHandlers(state) {
   const c = state.container;
   // idempotent — settings.js renderAll 이 매번 호출돼도 한 번만 부착.

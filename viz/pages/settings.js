@@ -48,6 +48,7 @@ import {
 import {
   renderSettingsSection as renderCustomFeaturesSection,
   attachSettingsHandlers as attachCustomFeaturesHandlers,
+  fillFeatureStatuses as fillCustomFeatureStatuses,
 } from '../lib/custom-features-settings.js';
 
 const PRESETS_KEY = 'aimv_viz_presets';
@@ -464,6 +465,10 @@ function attachHandlers(state) {
     vizPrefs: state.vizPrefs,
     showToast,
   });
+
+  // R204 — 읽기 전용 현황 (대기 큐 건수 · 마지막 실행 결과) 채우기.
+  // await 하지 않는다 — 현황 조회가 느리거나 실패해도 설정 화면 렌더를 막지 않는다.
+  fillCustomFeatureStatuses({ container: c });
 }
 
 function toColorInput(v) {

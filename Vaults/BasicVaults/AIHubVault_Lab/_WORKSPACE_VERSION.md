@@ -3,7 +3,7 @@ type: workspace-version
 tags:
   - CoreHub
   - Multi-Hub
-updated: 2026-05-31
+updated: 2026-09-14
 ---
 
 # CoreHub Workspace Version
@@ -14,6 +14,15 @@ updated: 2026-05-31
 
 | 버전 | 변경 내용 |
 | ---- | -------- |
+| 202609140001 | Core 전파 수신 (CoreHub 202609140001) — deploy: 대상 항목에 dest 지원 + Discord 무인 인박스 키트를 _tools/agent-daemon/ 으로 배포, __pycache__ 전역 제외 |
+| 202609080005 | Core 전파 수신 (CoreHub 202609080005) — agents-sync: custom/ 최상위 룰도 미러 — agent-ownership 등이 .codex 에 아예 없었다 |
+| 202609080004 | Core 전파 수신 (CoreHub 202609080004) — agents-sync 가 Codex 스킬 진입점(SKILL.md)을 생성 — 파일 미러만으로는 Codex 스킬 목록에 안 떴다 |
+| 202609080003 | Core 전파 수신 (CoreHub 202609080003) — register-vaults 안내 문구 정정 — Sync This Vault 는 볼트 루트가 아니라 볼트 .sync/ 에 설치된다 |
+| 202609080002 | Core 전파 수신 (CoreHub 202609080002) — 런처 refresh 를 rename 원자 교체로 — 실행 중인 Sync All Vaults.sh 를 제자리 덮어써서 종료 직전 syntax error 가 나던 것 + npm 호출 DEP0190 경고 제거 |
+| 202609080001 | Core 전파 수신 (CoreHub 202609080001) — sync-all: Windows npm.cmd spawn 을 shell 경유로 (CVE-2024-27980 패치 이후 EINVAL) — 새 사용자 첫 sync 에서 Preset Hub npm install 이 전부 실패하던 것 |
+| 202608080001 | Core 전파 수신 (CoreHub 202608080001) — R190 — 인덱서 타임스탬프 UTC → 로컬 전환 (local-time.js 신설, 날짜 하루 밀림 해소) |
+| 202608060001 | Core 전파 수신 (CoreHub 202608060001) — post-edit-review 볼트 전용 type 합집합 (CLAUDE.md 선언 union) + 인덱서 aliases 인덱싱/검색 가중치 (R182) |
+| 202608030001 | Core 전파 수신 (CoreHub 202608030001) — agents-sync: 커맨드 전용 custom 도메인 감지 (rules/custom + commands/custom 합집합) |
 | 202605310001 | Core 전파 수신 (CoreHub 202605310001) — R156 translate-to-en.js 등록 (viz 한국어→영문 자동 변환 스크립트) |
 | 202606010001 | R154 — Custom Juggl 추가 (Custom 6→7). community-plugins.json 등록 + plugins/juggl/ 4 파일 복사 + hub-marker description 갱신 + CLAUDE.md 역할 섹션 갱신. 사용자 결정: Juggl 핵심 아닌 Custom 이지만 모든 Preset Hub 에 기본 제공. |
 | 202605270002 | Core 전파 수신 (CoreHub 202605270003) — R140 — Script_Registry 등록 (Viz-Snapshot.ps1 디바이스 간 점검 공유 자동화) |

@@ -60,7 +60,7 @@ export async function deployDist(opts) {
 
   for (const entry of DEPLOY_TARGETS) {
     const srcPath = join(source, entry.path);
-    const tgtPath = join(target, entry.path);
+    const tgtPath = join(target, entry.dest || entry.path);
 
     if (!existsSync(srcPath)) {
       if (verbose) log.warn(`Source missing, skip: ${entry.path}`);

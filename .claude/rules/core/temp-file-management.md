@@ -66,7 +66,7 @@ rmdir "<폭탄경로>"; rmdir C:\TEMP_EMPTY
 
 ### 참조
 
-상세 이슈: 프로젝트 볼트의 이슈 노트 참조 (`clone_vault` 재귀복사 사례).
+상세 이슈: Project_AIMindVaults `20260408_clone_vault_재귀복사_폭탄_이슈.md`
 
 ## 금지 사항
 

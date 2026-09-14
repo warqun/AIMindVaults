@@ -58,6 +58,15 @@ export const DEPLOY_TARGETS = [
     'setup_new_environment.ps1',
   ]},
   { type: 'dir', path: 'viz', excludeFiles: ['nul', 'loadIndex.test.js', 'buildOption.test.js'] },
+  // Discord 무인 인박스 키트 — 원본은 프로젝트 볼트 안, 배포본은 _tools/agent-daemon/ (2026-09-14)
+  { type: 'dir', path: 'Vaults/Projects_Infra/Project_AIMindVaults/Contents/Project/scripts/discord',
+    dest: '_tools/agent-daemon/discord',
+    excludeFiles: ['discord_config.json', 'bootstrap_phase1.py', 'enforce_english_only.py',
+                   'post_welcome_pins.py', 'snapshot_server.py'] },
+  { type: 'dir', path: 'Vaults/Projects_Infra/Project_AIMindVaults/Contents/Project/scripts/daemon',
+    dest: '_tools/agent-daemon/daemon',
+    excludeFiles: ['devlearning-digest.md', 'devlearning-digest.json'] },
+  { type: 'file', path: '_AGENT_TASKS/README.md' },
   // Individual files
   { type: 'file', path: '.claude/rules/MANIFEST.md' },
   { type: 'file', path: '.claude/commands/MANIFEST.md' },
@@ -83,7 +92,7 @@ export const DEPLOY_PROTECTED_FILES = [
 
 /** Directories excluded within all deploy mirror operations. */
 export const DEPLOY_EXCLUDE_DIRS = [
-  '.git', '.vault_data', 'node_modules', '.trash', '.stfolder',
+  '.git', '.vault_data', 'node_modules', '.trash', '.stfolder', '__pycache__',
 ];
 
 /** Files excluded within all deploy mirror operations. */

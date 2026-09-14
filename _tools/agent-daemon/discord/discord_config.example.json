@@ -1,0 +1,11 @@
+{
+  "token_path": "C:/Users/<사용자명>/.secrets/aimv_agent_bot_token.txt",
+  "channels": {
+    "queue": "<#task-queue 채널 ID>",
+    "log_claude": "<#log-claude 채널 ID>",
+    "log_codex": "<#log-codex 채널 ID>"
+  },
+  "allowed_authors": ["<본인 디스코드 사용자 ID>"],
+  "inbox_file": "_INBOX.md",
+  "cursor_file": ".vault_data/discord_cursor.json"
+}

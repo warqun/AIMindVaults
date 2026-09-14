@@ -45,6 +45,7 @@
 
 import { presetColorByCategory } from '../lib/buildOption.js';
 import { openNote, openVault } from '../lib/obsidian-uri.js';
+import { starButtonHtml, attachNoteStars } from '../lib/note-star.js';
 
 const SORT_OPTIONS = ['count', 'name', 'recent', 'owner'];
 const SORT_LABELS = { count: '노트 수', name: '이름', recent: '최근', owner: '볼트별' };
@@ -193,7 +194,7 @@ function noteCardHtml(n, catColor) {
         <span class="vault-chip" data-open-vault="${escapeHtml(n.vault_id)}" title="Obsidian 으로 볼트 열기">${escapeHtml(n.vault_id)}</span>
         ${typeChip}
         <span class="date">${escapeHtml(date)}</span>
-        <button class="open-btn" data-open-note="${escapeHtml(n.vault_id)}|${escapeHtml(n.path)}" title="Obsidian 으로 노트 열기">↗</button>
+        ${starButtonHtml(n.vault_id, n.path)}<button class="open-btn" data-open-note="${escapeHtml(n.vault_id)}|${escapeHtml(n.path)}" title="Obsidian 으로 노트 열기">↗</button>
       </div>
       <div class="ttl" title="${escapeHtml(title)}">${escapeHtml(title)}</div>
       <div class="path" title="${escapeHtml(n.path)}">${escapeHtml(n.path)}</div>
@@ -436,9 +437,12 @@ export async function initPage(container, data /*, userConfig */) {
   if (collapseAllBtn) collapseAllBtn.addEventListener('click', onCollapseAll);
   if (expandAllBtn) expandAllBtn.addEventListener('click', onExpandAll);
   container.addEventListener('click', onObsidianOpenClick, true);
+  // R195 — ★ 즐겨찾기 토글
+  const detachStars = attachNoteStars(container);
 
   return {
     destroy() {
+      detachStars();
       searchEl.removeEventListener('input', onSearchInput);
       filterSeg.removeEventListener('click', onFilterClick);
       sortSeg.removeEventListener('click', onSortClick);

@@ -85,7 +85,7 @@ node "{볼트경로}/.sync/_tools/cli-node/bin/cli.js" index build -r "{볼트�
    - 빌드 완료 후 `vault_index.json` 생성을 확인
 5. **Obsidian `obsidian.json` 등록** (강제 — 누락 시 viz / `obsidian://advanced-uri/` 링크 `Vault not found` 에러, 2026-06-05 incident):
 ```bash
-node "{CoreHub경로}/.sync/_tools/cli-node/bin/cli.js" register-vaults -r "{멀티볼트 루트}" --apply
+node "{CoreHub경로}/.sync/_tools/cli-node/bin/cli.js" register-vaults -r "C:/AIMindVaults" --apply
 ```
    - **Obsidian 재시작은 회피할 수 없다** (2026-08-26 조사 확정). Obsidian 은 `obsidian.json` 을 **시작 시점에 읽고**, 새 항목은 재시작해야 인식한다. 이미 등록된 볼트만 `obsidian://` URI 로 재시작 없이 전환된다. 즉 실행 중인 인스턴스에 새 볼트를 밀어 넣는 방법은 없다.
    - 전제: **모든 Obsidian 인스턴스 종료**. 실행 중이면 CLI 가 차단한다 (`--force` / `--skip-process-check` 사용 금지). 차단 이유는 두 가지 — ① Obsidian 이 종료 시 메모리 상태를 써서 외부 추가분이 손실될 위험 ② 어차피 실행 중인 인스턴스는 새 항목을 못 읽는다.

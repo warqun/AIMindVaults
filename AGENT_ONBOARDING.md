@@ -68,16 +68,18 @@ AIMindVaults/                    ← 멀티볼트 루트
 ├── AGENT_ONBOARDING_CODEX.md    ← Codex 전용 온보딩
 ├── _STATUS.md                   ← 볼트 레지스트리 (타입, 작업 에이전트, 날짜)
 ├── _SESSION_HANDOFF_{에이전트}.md ← 이전 세션 맥락
+├── .agents/                     ← 에이전트 공용 정본 (rules/commands/hooks — agents-sync 가 미러 생성)
 ├── .claude/
-│   ├── rules/core/              ← 강제 규칙 15개
+│   ├── rules/core/              ← 강제 규칙 (상시 주입, 배포 동기화 대상)
 │   ├── rules/custom/            ← 개인 규칙 (배포 미대상)
-│   ├── commands/core/           ← 스킬 17개
+│   ├── rules-archive/…          ← (.claude/rules-archive/) 자동 주입 제외 — Skill Router 경유 Read
+│   ├── commands/core/           ← 스킬 (배포 동기화 대상)
 │   └── commands/custom/         ← 개인 스킬
 ├── .codex/
 │   ├── CODEX.md                 ← Codex 내부 라우팅 허브
 │   ├── AGENT_STATUS.md          ← Codex 상태
-│   ├── rules/                   ← Codex 전용 규칙 4개
-│   └── skills/                  ← Codex 전용 스킬 7개
+│   ├── rules/                   ← Codex 전용 규칙
+│   └── skills/                  ← Codex 전용 스킬
 └── Vaults/
     └── {볼트}/
         ├── Contents/            ← 콘텐츠 (노트)
@@ -156,7 +158,7 @@ AIMindVaults/                    ← 멀티볼트 루트
 
 ### Workspace 모드
 - 대상: `.sync/`, `.claude/`, `.codex/`, 볼트 루트 파일
-- **AIHubVault에서만 수행** (강제). 다른 볼트는 동기화로 자동 전파.
+- **Hub 에서만 수행** (강제) — Core 계층은 CoreHub, Custom 계층은 Preset Hub (AIHubVault*). 위성 볼트는 동기화로 자동 전파.
 - 수정 후 `_WORKSPACE_VERSION.md`에 버전 기록 필수 (형식: `YYYYMMDDNNNN`).
 - 버전 기록 없이 작업 완료 보고 금지.
 
@@ -320,7 +322,7 @@ node "{볼트경로}/.sync/_tools/cli-node/bin/cli.js" index build -r "{볼트�
 Start-Process 'obsidian://open?vault=볼트명&file=볼트루트기준_상대경로'
 ```
 
-- `vault`: Obsidian에 등록된 볼트 폴더명 (예: `AIHubVault`, `BasicContentsVault`)
+- `vault`: Obsidian에 등록된 볼트 폴더명 (예: `AIHubVault`)
 - `file`: 볼트 루트 기준 상대 경로, `.md` 확장자 생략 (예: `Contents/Domain/Example_Note`)
 - 경로 구분자: `/` 사용. 한글 파일명 그대로 사용 가능.
 - `Start-Process <파일경로.md>`, `code`, `Invoke-Item` 등은 VS Code로 열리므로 금지.
@@ -358,20 +360,22 @@ Start-Process 'obsidian://open?vault=볼트명&file=볼트루트기준_상대경
 
 ## 규칙 상세 참조
 
+> 2026-04-18 Phase 1: 핵심 규칙은 `.claude/rules/core/_essentials.md` 로 통합 상시 주입되고, 세부 원본은 `.claude/rules-archive/` 에서 `_skill-router.md` 트리거 시 로드된다.
+
 | 규칙 | 파일 |
 |------|------|
-| 볼트 라우팅 | `.claude/rules/core/vault-routing.md` |
-| 편집 모드 분리 | `.claude/rules/core/edit-mode-separation.md` |
-| 노트 작성 | `.claude/rules/core/note-writing.md` |
-| 세션 종료 | `.claude/rules/core/session-exit.md` |
+| 통합 코어 (라우팅·편집 모드·노트 작성·세션 종료·토큰 절약·Post-Edit Review) | `.claude/rules/core/_essentials.md` |
+| 트리거 라우팅 | `.claude/rules/core/_skill-router.md` |
+| 배포 콘텐츠 안전 | `.claude/rules/core/distribution-content-safety.md` |
 | 배포 동기화 | `.claude/rules/core/distribution-sync.md` |
-| Post-Edit Review | `.claude/rules/core/post-edit-review.md` |
-| 스크립트 관리 | `.claude/rules/core/script-management.md` |
-| 스크립트 생성 승인 | `.claude/rules/core/script-creation-approval.md` |
 | 인코딩 안전 | `.claude/rules/core/encoding-safety.md` |
-| 토큰 절약 | `.claude/rules/core/token-optimization.md` |
-| 임시 파일 관리 | `.claude/rules/core/temp-file-management.md` |
 | Juggl 스타일 | `.claude/rules/core/juggl-style-sync.md` |
 | Obsidian 설정 | `.claude/rules/core/obsidian-config-safety.md` |
-| 볼트 개별화 | `.claude/rules/core/vault-individualization.md` |
+| 스크립트 생성 승인 | `.claude/rules/core/script-creation-approval.md` |
+| 스크립트 관리 | `.claude/rules/core/script-management.md` |
+| 셸 리다이렉트 안전 | `.claude/rules/core/shell-redirect-safety.md` |
+| 임시 파일 관리 | `.claude/rules/core/temp-file-management.md` |
 | 유저 가이드 | `.claude/rules/core/user-guidance.md` |
+| 볼트 개별화 | `.claude/rules/core/vault-individualization.md` |
+| viz 디바이스 동기화 | `.claude/rules/core/viz-device-sync.md` |
+| 세부 원본 (볼트 라우팅·편집 모드·노트 작성·세션 종료·Post-Edit Review·토큰 절약 등) | `.claude/rules-archive/` |

@@ -29,6 +29,7 @@ import { fileURLToPath } from 'node:url';
 import { tmpdir } from 'node:os';
 import * as log from '../lib/logger.js';
 import { parseFrontmatterLight } from '../lib/frontmatter.js';
+import { localIso } from '../lib/local-time.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -526,7 +527,7 @@ export async function tagMigrate(opts = {}) {
   // ── Backup dir (only if apply) ──
   let backupRoot = null;
   if (apply) {
-    const stamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+    const stamp = localIso().replace(/:/g, '-');
     backupRoot = opts.backupDir
       ? resolve(opts.backupDir)
       : join(tmpdir(), `aimv_tag_migrate_${stamp}`);

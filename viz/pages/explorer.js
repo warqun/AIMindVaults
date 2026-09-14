@@ -35,6 +35,7 @@
 
 import { renderMarkdown, splitFrontmatter } from '../lib/markdown.js';
 import { openNote, openVault } from '../lib/obsidian-uri.js';
+import { starButtonHtml, attachNoteStars } from '../lib/note-star.js';
 
 const CATEGORY_COLOR_VAR = {
   BasicVaults: '--basic',
@@ -153,7 +154,7 @@ function renderPathTreeInto(target, node, vaultId, depth, state, filterText, cur
   for (const f of node.files.sort((a, b) => (a.title || a.path).localeCompare(b.title || b.path))) {
     if (filterText && !((f.title || '') + ' ' + f.path).toLowerCase().includes(filterText)) continue;
     const padPx = 14 + Math.min(depth, 6) * 14;
-    const fileEl = el('div', `node file`, `<span class="ic"></span>${escapeHtml(f.title || f.path.split('/').pop())}<button class="open-obs" data-open-note="${escapeHtml(f.vault_id)}|${escapeHtml(f.path)}" title="Obsidian 으로 노트 열기">↗</button>`);
+    const fileEl = el('div', `node file`, `<span class="ic"></span>${escapeHtml(f.title || f.path.split('/').pop())}${starButtonHtml(f.vault_id, f.path)}<button class="open-obs" data-open-note="${escapeHtml(f.vault_id)}|${escapeHtml(f.path)}" title="Obsidian 으로 노트 열기">↗</button>`);
     fileEl.style.paddingLeft = `${padPx}px`;
     fileEl.dataset.kind = 'note';
     fileEl.dataset.vaultId = f.vault_id;
@@ -326,11 +327,15 @@ export async function initPage(container, data, userConfig) {
   }
   container.addEventListener('click', onObsidianOpenClick, true);
 
+  // R195 — ★ 즐겨찾기 토글. 마크업은 starButtonHtml, 재렌더 후 칠하기는 모듈 내부 observer 담당.
+  const detachStars = attachNoteStars(treeEl);
+
   return {
     destroy() {
       searchEl.removeEventListener('input', onSearch);
       treeEl.removeEventListener('click', onTreeClick);
       container.removeEventListener('click', onObsidianOpenClick, true);
+      detachStars();
       container.innerHTML = '';
     },
     refresh(newData) {

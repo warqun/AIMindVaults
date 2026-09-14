@@ -3,7 +3,7 @@ type: workspace-version
 tags:
   - AIMindVault
   - Meta
-updated: 2026-05-31
+updated: 2026-08-08
 ---
 
 # Workspace Version
@@ -14,6 +14,9 @@ updated: 2026-05-31
 
 | 버전           | 변경 내용 |
 | ------------ | ----- |
+| 202608080001 | Core 전파 수신 (CoreHub 202608080001) — R190 — 인덱서 타임스탬프 UTC → 로컬 전환 (local-time.js 신설, 날짜 하루 밀림 해소) |
+| 202608060001 | Core 전파 수신 (CoreHub 202608060001) — post-edit-review 볼트 전용 type 합집합 (CLAUDE.md 선언 union) + 인덱서 aliases 인덱싱/검색 가중치 (R182) |
+| 202608030001 | Core 전파 수신 (CoreHub 202608030001) — agents-sync: 커맨드 전용 custom 도메인 감지 (rules/custom + commands/custom 합집합) |
 | 202605310001 | Core 전파 수신 (CoreHub 202605310001) — R156 translate-to-en.js 등록 (viz 한국어→영문 자동 변환 스크립트) |
 | 202605270002 | Core 전파 수신 (CoreHub 202605270003) — R140 — Script_Registry 등록 (Viz-Snapshot.ps1 디바이스 간 점검 공유 자동화) |
 | 202605270001 | Core 전파 수신 (CoreHub 202605270002) — R139 — core-sync-all 이 Preset Hub _WORKSPACE_VERSION bump (위성 sync version skip 버그 fix). R138 위성 미전파 잔여 해소. |

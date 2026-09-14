@@ -14,7 +14,8 @@
  */
 
 export const VAULT_NAME_MASK = {
-  JissouGame: 'IndieGame',
+  // 비어 있음 = 마스킹 없음. JissouGame -> IndieGame 임시 마스킹은
+  // 2026-08-26 에 복구 완료 (홍보영상 촬영용, 2026-05-08 도입).
 };
 
 /**

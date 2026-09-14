@@ -8,7 +8,7 @@
  */
 
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
-import { copyFile, chmod, mkdir, rename, unlink } from 'node:fs/promises';
+import { copyFile, chmod, mkdir, unlink } from 'node:fs/promises';
 import { basename, dirname, join, resolve } from 'node:path';
 import { findAIMindVaultsRoot, findHubsByType } from './hub-resolver.js';
 
@@ -49,17 +49,10 @@ async function copyTemplate(source, target, opts = {}) {
 
   if (!dryRun) {
     await mkdir(dirname(target), { recursive: true });
-    // 같은 폴더에 쓰고 rename 으로 바꿔 끼운다. 제자리 덮어쓰기를 하면 **지금 실행 중인
-    // 런처 자신**을 갈아 끼우게 되고, 셸이 읽던 파일 오프셋이 어긋나 마지막 줄에서
-    // `syntax error near unexpected token` 이 난다 (2026-09-08 클린 클론 실측 —
-    // sync 는 성공했는데 종료 문구만 깨졌다). rename 은 디렉터리 엔트리만 바꾸므로
-    // 실행 중인 셸은 원래 내용을 끝까지 읽는다.
-    const tmp = `${target}.tmp-${process.pid}`;
-    await copyFile(source, tmp);
+    await copyFile(source, target);
     if (executable) {
-      try { await chmod(tmp, 0o755); } catch {}
+      try { await chmod(target, 0o755); } catch {}
     }
-    await rename(tmp, target);
   }
   return { copied: 1, unchanged: 0 };
 }

@@ -62,7 +62,7 @@ Start-Process 'obsidian://advanced-uri?vault=볼트명&filepath=볼트_내_상�
 ## 제한사항
 
 - **파일명에 `#`, `%`, `&`, `?`, `+` 포함 시 열 수 없음** — Obsidian URI 구조적 한계
-- 상세: 플러그인 개발 볼트 `20260320_Obsidian_URI_Hash_최종보고서.md`
+- 상세: ObsidianDev 볼트 `20260320_Obsidian_URI_Hash_최종보고서.md`
 - 해당 파일은 Obsidian 내에서 리네이밍 후 재시도
 
 ## 참조

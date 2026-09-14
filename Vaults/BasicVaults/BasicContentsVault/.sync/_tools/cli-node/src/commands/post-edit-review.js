@@ -67,6 +67,19 @@ function loadNoteTypes(filePath) {
   return { types, aliases };
 }
 
+// \uBCFC\uD2B8 \uC804\uC6A9 type \u2014 vault CLAUDE.md \uC758 "\uBCFC\uD2B8 \uC804\uC6A9 type \uC120\uC5B8" \uB77C\uC778\uC5D0\uC11C backtick \uD1A0\uD070 \uCD94\uCD9C.
+// note-types.yaml rules 3 \u2014 \uCF54\uC5B4 \uC0AC\uC804\uACFC \uD569\uC9D1\uD569. \uB77C\uC778\uC758 \uAD04\uD638 \uC774\uD6C4\uB294 \uC8FC\uC11D\uC73C\uB85C \uBCF4\uACE0 \uC81C\uC678.
+function loadVaultTypes(vaultRoot) {
+  const claudeMdPath = join(vaultRoot, 'CLAUDE.md');
+  if (!existsSync(claudeMdPath)) return [];
+  const types = [];
+  for (const line of readFileSync(claudeMdPath, 'utf8').split(/\r?\n/)) {
+    if (!line.includes('\uBCFC\uD2B8 \uC804\uC6A9 type \uC120\uC5B8')) continue;
+    for (const m of line.split('(')[0].matchAll(/`([a-z][a-z0-9-]*)`/g)) types.push(m[1]);
+  }
+  return types;
+}
+
 // \uBCF8\uBB38\uC5D0\uC11C \uC704\uD0A4\uB9C1\uD06C [[...]] \uCE74\uC6B4\uD2B8
 function countWikilinks(body) {
   const m = body.match(/\[\[[^\]]+\]\]/g);
@@ -274,6 +287,12 @@ export async function postEditReview(opts = {}) {
     const typesPath = defaultNoteTypesPath();
     if (existsSync(typesPath)) typeOpts = loadNoteTypes(typesPath);
   } catch (e) { /* note-types.yaml 부재 시 frontmatter 검증 스킵 */ }
+  // R182 — 볼트 전용 type 합집합 (ZK Domain Preset 등, note-types.yaml rules 3)
+  if (typeOpts) {
+    try {
+      for (const t of loadVaultTypes(vaultRoot)) typeOpts.types.add(t);
+    } catch { /* CLAUDE.md 파싱 실패 시 코어 사전만으로 검증 */ }
+  }
 
   // 4. Collect and validate files
   const files = await collectMdFiles(target);

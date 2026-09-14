@@ -50,8 +50,12 @@ import { mountHeader } from './components/header.js';
 import { initTheme } from './components/theme.js';
 import { loadUserConfig } from './lib/user-config.js';
 import { applyTheme as applyThemeEngine } from './lib/theme-engine.js';
+import { customPageIds, customPageTitles } from './lib/custom-features-router.js';
 
-const VALID_PAGES = ['home', 'connections', 'network', 'distribution', 'tags', 'explorer', 'rules', 'settings', 'calendar', 'additions'];
+// R193 — core 페이지 + custom-features registry 의 page surface 자동 병합.
+// 커스텀 페이지 추가는 registry 만 건드리면 된다 (여기 무수정).
+const CORE_PAGES = ['home', 'connections', 'network', 'distribution', 'tags', 'explorer', 'rules', 'settings', 'calendar', 'additions'];
+const VALID_PAGES = [...CORE_PAGES, ...customPageIds()];
 const PAGE_TITLES = {
   home: '홈',
   connections: '커넥션',
@@ -63,6 +67,7 @@ const PAGE_TITLES = {
   settings: 'Settings',
   calendar: '캘린더 작업량',
   additions: '날짜별 추가 항목',
+  ...customPageTitles(), // R193 — 커스텀 페이지 제목 자동 병합
 };
 
 const state = {

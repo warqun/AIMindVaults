@@ -8,6 +8,7 @@
  * 상태별 표시:
  *   - idle    : 표시 안 함
  *   - running : spinner + `[step]` + message (accent 테두리)
+ *   - running stale : started_at 경과 임계 초과 (starting 2분 / 전체 30분) → ⚠ "동기화 응답 없음" (주황 테두리, R169)
  *   - done    : 직전 running 이었던 경우만 표시 → ✓ + 메시지 + reload 링크 (녹색 테두리, 5s 후 fade)
  *   - failed  : ✗ + 에러 메시지 (80자 ellipsis + title 에 full err, 빨강 테두리, fade 없음)
  *
@@ -23,7 +24,7 @@
  *   `if (typeof window !== 'undefined')` — DOMContentLoaded 또는 즉시 startSyncBanner 호출.
  *
  * 사용자 노출 메시지 (UI):
- *   "동기화 중", "동기화 완료", "동기화 실패", "알 수 없는 오류" — § 6.12 카탈로그 참조.
+ *   "동기화 중", "동기화 완료", "동기화 실패", "동기화 응답 없음", "알 수 없는 오류" — § 6.12 카탈로그 참조.
  *
  * 참조:
  *   Spec:    [[20260513_시스템스펙_04_시각화]] § 6 SSE / sync
@@ -33,6 +34,8 @@
 
 const POLL_INTERVAL_MS = 3000;
 const DONE_FADE_AFTER_MS = 5000;
+const STALE_STARTING_MS = 2 * 60 * 1000; // 'starting' 은 수 초 내 다음 step 전환이 정상 — 초과 시 spawn 실패로 판정 (R169)
+const STALE_RUNNING_MS = 30 * 60 * 1000; // running 전체 상한 — 대형 sync_all 장기 실행 허용치 (R169)
 
 let bannerEl = null;
 let lastStatus = null;
@@ -94,9 +97,21 @@ function render(state) {
 
   if (status === 'running') {
     const step = state.step ? `[${escapeHtml(state.step)}]` : '';
-    const msg = state.message ? escapeHtml(state.message) : '동기화 중';
-    el.innerHTML = `${spinnerHtml()} <span><strong>동기화 중</strong> ${step} ${msg}</span>`;
-    el.style.borderColor = 'var(--accent, #4a9eff)';
+    // R169 — stale 감지: 백그라운드 PS 가 status 갱신 없이 죽으면 spinner 가 영원히 남는다.
+    // started_at 경과가 임계 초과면 경고 표시로 전환. status 파일은 건드리지 않고 (read-only)
+    // polling 은 유지 — 이후 done 수신 시 자연 복구.
+    const startedMs = Date.parse(state.started_at || '');
+    const elapsedMs = Number.isFinite(startedMs) ? Date.now() - startedMs : 0;
+    const isStale = (state.step === 'starting' && elapsedMs > STALE_STARTING_MS)
+      || elapsedMs > STALE_RUNNING_MS;
+    if (isStale) {
+      el.innerHTML = `<span style="color:#fbbf24">⚠</span> <span><strong>동기화 응답 없음</strong> ${step} 백그라운드 동기화가 중단된 것으로 보입니다</span>`;
+      el.style.borderColor = '#fbbf24';
+    } else {
+      const msg = state.message ? escapeHtml(state.message) : '동기화 중';
+      el.innerHTML = `${spinnerHtml()} <span><strong>동기화 중</strong> ${step} ${msg}</span>`;
+      el.style.borderColor = 'var(--accent, #4a9eff)';
+    }
     el.style.opacity = '1';
     el.style.display = 'flex';
   } else if (status === 'done') {

@@ -29,6 +29,7 @@ import { fileURLToPath } from 'node:url';
 import * as log from '../lib/logger.js';
 import { updateTimeseries } from '../lib/timeseries.js';
 import { parseFrontmatterLight } from '../lib/frontmatter.js';
+import { localIso } from '../lib/local-time.js';
 import {
   findOwnedTagsFiles,
   parseOwnedTagsTable,
@@ -280,7 +281,7 @@ export async function masterIndexBuild(opts = {}) {
 
   // Write master index
   const masterIndex = {
-    built: new Date().toISOString().slice(0, 19),
+    built: localIso(),
     vault_count: Object.keys(masterVaults).length,
     note_count: masterNotes.length,
     vaults: masterVaults,

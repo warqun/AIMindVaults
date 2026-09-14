@@ -1,6 +1,7 @@
 import { readFile, writeFile, mkdir, readdir, access } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { join, relative, dirname } from 'node:path';
+import { localDate, localIso } from '../lib/local-time.js';
 
 const SYNC_MAP = [
   { source: '.agents/rules/core', targets: ['.claude/rules/core', '.codex/rules/core'] },
@@ -25,13 +26,14 @@ function findAIMindVaultsRoot(startDir) {
 }
 
 async function listDomains(root) {
-  const customRules = join(root, '.agents/rules/custom');
-  try {
-    const entries = await readdir(customRules, { withFileTypes: true });
-    return entries.filter(e => e.isDirectory()).map(e => e.name);
-  } catch {
-    return [];
+  const names = new Set();
+  for (const rel of ['.agents/rules/custom', '.agents/commands/custom']) {
+    try {
+      const entries = await readdir(join(root, rel), { withFileTypes: true });
+      for (const e of entries) if (e.isDirectory()) names.add(e.name);
+    } catch { /* 없으면 무시 */ }
   }
+  return [...names].sort();
 }
 
 function commentPrefix(ext) {
@@ -45,7 +47,7 @@ function commentPrefix(ext) {
 function buildHeader(relSource, ext) {
   const cp = commentPrefix(ext);
   if (!cp) return null;
-  const now = new Date().toISOString().slice(0, 19).replace('T', ' ');
+  const now = localIso().replace('T', ' ');
   return `${cp[0]}DO NOT EDIT — sync copy of ${relSource} from agents-sync (${now})${cp[1]}\n\n`;
 }
 
@@ -125,7 +127,7 @@ async function updateManifestTimestamp(root) {
   const manifestPath = join(root, '.agents/_MANIFEST.md');
   try {
     const content = await readFile(manifestPath, 'utf-8');
-    const today = new Date().toISOString().slice(0, 10);
+    const today = localDate();
     const updated = content.replace(/^last_updated:.*$/m, `last_updated: ${today}`);
     if (updated !== content) {
       await writeFile(manifestPath, updated, 'utf-8');

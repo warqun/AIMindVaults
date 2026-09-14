@@ -35,6 +35,7 @@
  */
 
 import { isSystemVault, filterVisibleNotes, filterUserVaultsMap } from '../lib/system-vaults.js';
+import { customHomeCards } from '../lib/custom-features-router.js';
 
 const KIND_COLOR = {
   VAULT: 'var(--personal)',
@@ -562,7 +563,16 @@ function renderCards(root, data) {
   const viewSlot = root.querySelector('[data-slot="view-cards"]');
   const toolSlot = root.querySelector('[data-slot="tool-cards"]');
   if (viewSlot) viewSlot.innerHTML = VIEW_CARDS.map((c) => cardHtml(c, data)).join('');
-  if (toolSlot) toolSlot.innerHTML = TOOL_CARDS.map((c) => cardHtml(c, data)).join('');
+  // R193 — custom-features registry 의 page surface 중 homeCard 인 것을 도구 카드 뒤에 자동 추가.
+  // 커스텀 페이지가 늘어도 여기는 무수정.
+  const customCards = customHomeCards().map((p) => ({
+    page: p.id,
+    title: p.title,
+    desc: () => p.sub.split('.')[0],
+    stat: () => '커스텀 기능',
+    glyph: `<svg viewBox="0 0 240 80"><g fill="currentColor" opacity="0.5"><rect x="20" y="14" width="70" height="8" rx="2"/><rect x="20" y="30" width="52" height="8" rx="2"/><rect x="20" y="46" width="62" height="8" rx="2"/><rect x="20" y="62" width="44" height="8" rx="2"/></g><g fill="currentColor" opacity="0.75"><path d="M120 16 l4 9 10 1 -7 7 2 10 -9 -5 -9 5 2 -10 -7 -7 10 -1z"/></g><g fill="currentColor" opacity="0.3"><rect x="150" y="18" width="70" height="6" rx="1"/><rect x="150" y="34" width="56" height="6" rx="1"/><rect x="150" y="50" width="64" height="6" rx="1"/></g></svg>`,
+  }));
+  if (toolSlot) toolSlot.innerHTML = [...TOOL_CARDS, ...customCards].map((c) => cardHtml(c, data)).join('');
 }
 
 function cardHtml(c, data) {
@@ -596,7 +606,7 @@ function renderActivity(root, act) {
   }).join('') || '<div class="page-placeholder" style="min-height:60px;grid-column:1/-1;">데이터 없음</div>';
 
   const total = days.reduce((s, d) => s + (d.count || 0), 0);
-  summary.textContent = `이번 주 합계 ${total} 노트 갱신`;
+  summary.textContent = `이번 주 합계 ${total} 노트 생성`;
 
   const recent = Array.isArray(act?.recent) ? act.recent : [];
   const recentCard = root.querySelector('[data-slot="recent-items"]');
@@ -612,7 +622,7 @@ function renderActivity(root, act) {
       return `<div class="bar">
         <span class="name"><span class="kind">${escapeHtml(r.kind || 'NOTE')}</span>${escapeHtml(r.title || '')}</span>
         <span class="track"><span class="fill" style="width:${widthPct}%;background:${color}"></span></span>
-        <span class="num">${escapeHtml(formatDate(r.mtime))}</span>
+        <span class="num">${escapeHtml(formatDate(r.date || r.created || r.mtime))}</span>
       </div>`;
     }).join('');
   }

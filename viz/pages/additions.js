@@ -48,7 +48,9 @@
 import { renderMarkdown, splitFrontmatter } from '../lib/markdown.js';
 import { presetColorByCategory } from '../lib/buildOption.js';
 import { openNote, openVault } from '../lib/obsidian-uri.js';
+import { starButtonHtml, attachNoteStars } from '../lib/note-star.js';
 import { isSystemVault, filterVisibleNotes } from '../lib/system-vaults.js';
+import { SORTS, SORT_LABELS, DEFAULT_SORT, sortNotes, timeLabel } from '../lib/note-sort.js';
 
 const VIEWS = ['notes', 'vaults', 'tags', 'connections'];
 const BASES = ['mtime', 'created'];
@@ -65,23 +67,26 @@ function escapeHtml(s) {
 function parseQueryFromHash() {
   const h = window.location.hash || '';
   const q = h.indexOf('?');
-  if (q < 0) return { date: '', basis: 'mtime', view: 'notes' };
+  if (q < 0) return { date: '', basis: 'mtime', view: 'notes', sort: DEFAULT_SORT };
   const params = new URLSearchParams(h.slice(q + 1));
   const d = params.get('date') || '';
   const bRaw = (params.get('basis') || 'mtime').toLowerCase();
   const vRaw = (params.get('view') || 'notes').toLowerCase();
+  const sRaw = params.get('sort') || DEFAULT_SORT;
   return {
     date: /^\d{4}-\d{2}-\d{2}$/.test(d) ? d : '',
     basis: BASES.includes(bRaw) ? bRaw : 'mtime',
     view: VIEWS.includes(vRaw) ? vRaw : 'notes',
+    sort: SORTS.includes(sRaw) ? sRaw : DEFAULT_SORT,
   };
 }
 
-function buildHash({ date, basis, view }) {
+function buildHash({ date, basis, view, sort }) {
   const parts = [];
   if (date) parts.push(`date=${date}`);
   if (basis && basis !== 'mtime') parts.push(`basis=${basis}`);
   if (view && view !== 'notes') parts.push(`view=${view}`);
+  if (sort && sort !== DEFAULT_SORT) parts.push(`sort=${sort}`);
   return parts.length ? `#additions?${parts.join('&')}` : '#additions';
 }
 
@@ -97,11 +102,7 @@ function buildVaultCategoryMap(masterVaults) {
   return map;
 }
 
-function timeFromMtime(stamp) {
-  if (!stamp) return '—';
-  const m = String(stamp).match(/T(\d{2}:\d{2})/);
-  return m ? m[1] : '—';
-}
+const timeFromMtime = timeLabel;
 
 async function fetchAdditions(date, basis) {
   const params = new URLSearchParams();
@@ -152,6 +153,13 @@ function basisSegHtml(activeBasis) {
   }).join('');
 }
 
+function sortSegHtml(activeSort) {
+  return SORTS.map((s) => {
+    const on = s === activeSort ? ' on' : '';
+    return `<button class="${on.trim()}" data-sort-btn="${s}">${escapeHtml(SORT_LABELS[s])}</button>`;
+  }).join('');
+}
+
 /**
  * 페이지 골격 HTML. 상단 toolbar (date / basis / view / 검색 / 카테고리 필터 / meta) +
  * main 영역에 4 view-pane (notes + preview, vaults grid, tags bars, connections list) 동시 mount.
@@ -172,6 +180,10 @@ function shellHtml(state) {
         <div class="tool-group">
           <span class="tool-label">뷰</span>
           <div class="seg" data-role="viewSeg">${viewSegHtml(state.view)}</div>
+        </div>
+        <div class="tool-group" data-role="sortGroup">
+          <span class="tool-label">정렬</span>
+          <div class="seg" data-role="sortSeg">${sortSegHtml(state.sort)}</div>
         </div>
         <div class="tool-group" data-role="searchGroup">
           <span class="tool-label">검색</span>
@@ -228,7 +240,7 @@ function noteCardHtml(n, catColor, basis) {
           <span class="vault-chip" data-open-vault="${escapeHtml(n.vault_id)}" title="Obsidian 으로 볼트 열기">${escapeHtml(n.vault_id)}</span>
           ${typeChip}
           <span class="time">${escapeHtml(time)}</span>
-          <button class="open-obs" data-open-note="${escapeHtml(n.vault_id)}|${escapeHtml(n.path)}" title="Obsidian 으로 노트 열기">↗</button>
+          ${starButtonHtml(n.vault_id, n.path)}<button class="open-obs" data-open-note="${escapeHtml(n.vault_id)}|${escapeHtml(n.path)}" title="Obsidian 으로 노트 열기">↗</button>
         </div>
         <div class="ttl">${escapeHtml(title)}</div>
         <div class="path" title="${escapeHtml(n.path)}">${escapeHtml(n.path)}</div>
@@ -404,6 +416,7 @@ export async function initPage(container, data /* , userConfig */) {
     date: initialQuery.date,
     basis: initialQuery.basis,
     view: initialQuery.view,
+    sort: initialQuery.sort,
     notes: [],
     vaultBirths: [],     // 전체 vault-births 응답 (필터는 view 단에서)
     catSet: new Set(),
@@ -419,6 +432,7 @@ export async function initPage(container, data /* , userConfig */) {
   const dateInput = container.querySelector('[data-role="date"]');
   const basisSeg = container.querySelector('[data-role="basisSeg"]');
   const viewSeg = container.querySelector('[data-role="viewSeg"]');
+  const sortSeg = container.querySelector('[data-role="sortSeg"]');
   const searchInput = container.querySelector('[data-role="search"]');
   const catWrap = container.querySelector('[data-role="catFilter"]');
   const notesListEl = container.querySelector('[data-role="notesList"]');
@@ -477,7 +491,7 @@ export async function initPage(container, data /* , userConfig */) {
 
   /* ───────── view 렌더 ───────── */
   function renderNotesView() {
-    const filtered = filterNotes();
+    const filtered = sortNotes(filterNotes(), state.sort, state.basis, vaultCatMap);
     if (filtered.length === 0) {
       notesListEl.innerHTML = '<div class="page-placeholder" style="min-height:120px;">표시할 노트가 없습니다.</div>';
     } else {
@@ -605,7 +619,7 @@ export async function initPage(container, data /* , userConfig */) {
 
   /* ───────── URL 동기화 ───────── */
   function setHashFromState({ skipReload } = {}) {
-    const newHash = buildHash({ date: state.date, basis: state.basis, view: state.view });
+    const newHash = buildHash({ date: state.date, basis: state.basis, view: state.view, sort: state.sort });
     if (window.location.hash !== newHash) {
       // skipReload 시 hashchange 핸들러가 불필요한 재로드 안 하도록 internal flag
       state._suppressHashReload = !!skipReload;
@@ -649,6 +663,19 @@ export async function initPage(container, data /* , userConfig */) {
     setHashFromState({ skipReload: true });
     load();
   }
+  function syncSortSeg() {
+    sortSeg.querySelectorAll('button').forEach((b) => b.classList.toggle('on', b.getAttribute('data-sort-btn') === state.sort));
+  }
+  function onSortClick(ev) {
+    const btn = ev.target.closest('button[data-sort-btn]');
+    if (!btn) return;
+    const next = btn.getAttribute('data-sort-btn');
+    if (!SORTS.includes(next) || next === state.sort) return;
+    state.sort = next;
+    syncSortSeg();
+    setHashFromState({ skipReload: true });
+    renderNotesView();   // 정렬은 클라이언트 전용 — 재조회 불필요
+  }
   function onViewClick(ev) {
     const btn = ev.target.closest('button[data-view-btn]');
     if (!btn) return;
@@ -685,13 +712,17 @@ export async function initPage(container, data /* , userConfig */) {
     const dateChanged = q.date && q.date !== state.date;
     const basisChanged = q.basis !== state.basis;
     const viewChanged = q.view !== state.view;
+    const sortChanged = q.sort !== state.sort;
     state.date = q.date || state.date;
     state.basis = q.basis;
     state.view = q.view;
+    state.sort = q.sort;
+    if (sortChanged) syncSortSeg();
     if (state._suppressHashReload) {
       state._suppressHashReload = false;
       // 동기화만 — fetch 안 함
       if (basisChanged || viewChanged) renderAll();
+      else if (sortChanged) renderNotesView();
       return;
     }
     if (dateChanged || basisChanged) {
@@ -699,6 +730,8 @@ export async function initPage(container, data /* , userConfig */) {
       load();
     } else if (viewChanged) {
       renderAll();
+    } else if (sortChanged) {
+      renderNotesView();
     }
   }
 
@@ -721,10 +754,13 @@ export async function initPage(container, data /* , userConfig */) {
     }
   }
   container.addEventListener('click', onObsidianOpenClick, true);
+  // R195 — ★ 즐겨찾기 토글
+  const detachStars = attachNoteStars(container);
 
   dateInput.addEventListener('change', onDateInput);
   basisSeg.addEventListener('click', onBasisClick);
   viewSeg.addEventListener('click', onViewClick);
+  sortSeg.addEventListener('click', onSortClick);
   searchInput.addEventListener('input', onSearch);
   catWrap.addEventListener('change', onCatChange);
   notesListEl.addEventListener('click', onNotesListClick);
@@ -734,6 +770,7 @@ export async function initPage(container, data /* , userConfig */) {
 
   return {
     destroy() {
+      detachStars();
       state.loadGen++;
       container.removeEventListener('click', onObsidianOpenClick, true);
       dateInput.removeEventListener('change', onDateInput);

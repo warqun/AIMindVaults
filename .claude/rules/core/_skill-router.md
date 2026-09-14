@@ -15,7 +15,8 @@
 
 | 작업 유형 | 트리거 키워드 | 호출 대상 |
 |---------|-------------|---------------|
-| Multi-Hub | Core Hub, Preset Hub, CoreHub, core-sync, core-sync-all, hub-source.json, hub-marker.json, multi-hub, 코어 허브, bump-version --broadcast, hubId, hubType, hub-resolver | `{프로젝트 볼트}/Contents/Project/plan/architecture/20260419_Multi_Hub_아키텍처_설계.md` + `20260420_Multi_Hub_Phase1_구현_결과.md` Read |
+| 배포·Git push, sync 기능 수정 | 배포, SellingVault, git push, 동기화 배포, 영문 배포, distribute, deploy, cli.js sync, pre-sync, _WORKSPACE_VERSION, sync-version, pre-sync 트램펄린 | `/distribute` Skill |
+| Multi-Hub | Core Hub, Preset Hub, CoreHub, core-sync, core-sync-all, hub-source.json, hub-marker.json, multi-hub, 코어 허브, bump-version --broadcast, hubId, hubType, hub-resolver | `Vaults/Projects_Infra/Project_AIMindVaults/Contents/Project/plan/architecture/20260419_Multi_Hub_아키텍처_설계.md` + `20260420_Multi_Hub_Phase1_구현_결과.md` Read |
 | 새 볼트 생성 (위성) | 볼트 생성, create-vault, 새 볼트, 볼트 분리 | `/create-vault` Skill (R160 core 격상) — `vault-individualization.md` 는 core 상시 주입 (R160) 이므로 명시 Read 불필요 |
 | 새 Preset Hub 생성 | Preset Hub 생성, 프리셋 허브 만들기, create-preset-hub, create-hub, 신규 Hub, AIHubVault_ 생성, Hub 파생 | `/create-preset-hub` Skill |
 | 대량 편집 · 인코딩 | 대량 수정, 일괄 변경, 인코딩, mojibake, 한글 깨짐, bulk rewrite | `.claude/rules/core/encoding-safety.md` + `.claude/rules/core/temp-file-management.md` (core 주입됨) |
@@ -28,6 +29,13 @@
 | Obsidian 인스턴스 제어 | Obsidian 창, 옵시디언 창, ob 창, 인스턴스, instance, N개로 맞춰, N개로 줄여, N개로 늘려, Obsidian 정리, 옵시디언 닫아, Obsidian 몇 개 | `/obsidian-windows` Skill + `.claude/rules/custom/obsidian-instance-control.md` (custom 주입됨) |
 | 에이전트 작업 위임 | 위임, 떠넘겨, 백그라운드로, 별도 인스턴스로, 워커, delegate, 병렬 작업, 동시 작업, 다른 클로드, 다른 에이전트가, 큐로 던져, 긴 작업이라 따로, 이건 다른 세션에서 | `/delegate-task` Skill (큐 작성 + spawn + 트리거 + 추적 + 완료 통합 워크플로우) |
 | Canvas 작성 (Obsidian Advanced Canvas) | 캔버스, 구조도, 다이어그램, advanced canvas, Obsidian Canvas, .canvas, 노드 + 엣지, 시스템 도식 | `/canvas-create` Skill + `.agents/rules/custom/Canvas/canvas-design.md` Read |
+| 학습 플레이리스트 정리 | 개발학습 정리, 개발학습, 학습 플레이리스트, 플레이리스트 정리, 새로 추가된 영상 | `/dev-learning-digest` Skill |
+| Unity 개발 | Unity, 유니티, C#, MonoBehaviour, ScriptableObject, unity-cli, mcp-unity, Serena, find_symbol, replace_symbol_body, 심볼 기반 편집, 프리팹, 인스펙터 | `/unity-dev` Skill (룰 3종 `.agents/rules/custom/Unity/` 를 물린다) |
+| Godot 개발 | Godot, 고닷, GDScript, `.gd`, `.tscn`, 노드, 씬, 시그널, `@onready`, `@export`, CharacterBody2D, TileMapLayer, 헤드리스, selftest | `.agents/rules/custom/Godot/godot-style.md` Read (구조 판단은 Godot 볼트 `Concepts/Godot_모범_사례.md`) |
+| Unity DOTS | DOTS, ECS, Entities, ISystem, IJobEntity, IJobChunk, EntityCommandBuffer, Burst, Job System, 잡 시스템 | `/unity-dots` Skill |
+| 게임 시스템 설계 | 게임 시스템 설계, 클래스 구조, SO 구조, 의존성 맵, 데미지 파이프라인, 스킬 시스템 설계, ECS vs OOP, 아키텍처 결정 | `/game-architect` Skill |
+| Blender · 3D 모델링 | Blender, 블렌더, 3D 모델링, 메시, UV, 머티리얼, 리토폴로지, FBX, 익스포트, 뷰포트 | `/blender-workflow` Skill + `.agents/rules/custom/Blender/blender-mcp.md` Read |
+| AI 3D 에셋 생성 | Meshy, 메시, Tripo, 트리포, Text to 3D, Image to 3D, 리텍스처, retexture, 리깅, 텍스처 생성, AI 3D, 게임레디 에셋 | `/meshy-workflow` Skill + `.agents/rules/custom/Meshy/meshy-api.md` Read · Tripo 는 [[20260908_Tripo_사용_규약]] Read |
 | viz · 디바이스 간 동기화 | viz, 시각화, 동기화, sync-banner, sync-status, viz `.exe`, Generate Visualization, viz_snapshots, Viz-Snapshot, 디바이스 정합, KPI 불일치, 캘린더 헤더, master_index 차이, vault_index, 자동 동기화, AIMV_VIZ_AUTO | `.claude/rules/core/viz-device-sync.md` (core 주입됨) |
 
 ## 매칭 실패 시
@@ -36,17 +44,16 @@
 - 필요한 규칙이 있을 것 같은데 테이블에 없음 → 사용자에게 "이 작업에 적용할 규칙이 있는지" 확인 후 진행.
 - 새로운 작업 유형이 자주 발생 → 사용자 승인 후 이 테이블에 추가.
 
-## 도메인 Skill 은 사용자가 등록한다
+## Phase 2-A 완료 (2026-04-18)
 
-이 라우터에는 **모든 사용자에게 공통인 인프라 행만** 실려 있다. 본인 환경의 도메인
-(게임 엔진, 3D 도구, 외부 API, 메시징 봇 등) Skill 을 `.agents/commands/custom/` 에
-추가했다면 위 트리거 매핑 테이블에 **직접 한 행을 넣는다.**
+도메인 규칙들을 Skill 로 전환 완료. 일반 인프라 Skill 매핑:
 
-**넣지 않으면 스킬이 있어도 키워드로 안 걸린다** — 슬래시 명령을 직접 쳐야만 발동하고,
-`custom/` 의 룰 파일은 상시 주입이 아니라서 작업 중 한 번도 안 읽힌다.
+| Skill | 통합된 archive 규칙 |
+|-------|-------------------|
+| `/distribute` | distribution-deploy + sync-version-priority |
 
-```
-| <작업 유형> | <트리거 키워드 쉼표 나열> | `/<스킬명>` Skill + `<Read 할 룰 경로>` |
-```
+도메인별 Skill 매핑은 사용자 환경에 따라 다르다. 사용자가 본인 환경 (게임 엔진, 3D 도구, 외부 API, 메시징 봇 등) 의 도메인 Skill 을 추가할 때 위 트리거 매핑 테이블에 직접 등록한다.
+
+**2026-09-08**: 게임개발 도메인 5행 등록 (Unity 개발 · Unity DOTS · 게임 시스템 설계 · Blender · AI 3D 에셋). 종전엔 `/unity-dev` · `/blender-workflow` · `/meshy-workflow` 스킬이 **존재하는데 키워드로 안 걸려** 사람이 직접 쳐야 발동했다. 자기 환경에 없는 스킬 행은 지운다.
 
 custom/에 유지된 규칙 (상시 주입): `agent-ownership.md`, `multivault-personalization.md`

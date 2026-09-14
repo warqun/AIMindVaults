@@ -268,7 +268,7 @@ node -e "const fs=require('fs'),path=require('path');const j=require('./.vault_d
 **병렬 spawn**:
 ```
 /spawn-claude "Cooking 볼트 index build -i"
-/spawn-claude "Python 볼트 index build -i"
+/spawn-claude "MachineAssembly 볼트 index build -i"
 /spawn-claude "Discord 볼트 index build -i"
 ```
 

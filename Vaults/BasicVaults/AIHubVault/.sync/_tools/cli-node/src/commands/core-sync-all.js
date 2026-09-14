@@ -31,6 +31,7 @@ import {
 } from '../lib/hub-resolver.js';
 import { checkVersionRange } from '../lib/version-range.js';
 import * as log from '../lib/logger.js';
+import { localDate, localStamp } from '../lib/local-time.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -185,7 +186,7 @@ function parseLatestVersion(filePath) {
  * Generate next version: YYYYMMDDNNNN (same convention as bump-version.js).
  */
 function nextVersion(latestVersion) {
-  const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+  const today = localStamp();
   if (latestVersion && latestVersion.startsWith(today)) {
     const seq = parseInt(latestVersion.slice(8), 10);
     return today + String(seq + 1).padStart(4, '0');
@@ -209,7 +210,7 @@ async function bumpPresetWorkspaceVersion(presetHub, coreVersion, message) {
   if (!existsSync(verFile)) return null;
   const latest = parseLatestVersion(verFile);
   const newVersion = nextVersion(latest);
-  const today = new Date().toISOString().slice(0, 10);
+  const today = localDate();
 
   try {
     const content = readFileSync(verFile, 'utf8');
@@ -242,7 +243,7 @@ async function bumpPresetWorkspaceVersion(presetHub, coreVersion, message) {
  */
 async function appendCoreVersionEntry(coreHubRoot, info) {
   const filePath = join(coreHubRoot, '_CORE_VERSION.md');
-  const today = new Date().toISOString().slice(0, 10);
+  const today = localDate();
 
   const targetsStr = info.targets.map(t => t.hubId || '?').join(', ') || '(none)';
   const row = `| ${info.version} | ${targetsStr} | ${info.result} | ${info.copied} | ${info.failed} | ${info.note || ''} |`;

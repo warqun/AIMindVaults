@@ -5,7 +5,7 @@
 
 ## 1. viz 가 하는 일
 
-멀티볼트의 `master_index.json` (전 볼트 통합 인덱스) + 각 볼트의 `vault_index.json` + 일자별 `timeseries.json` 을 읽어 **브라우저 SPA** 로 시각화. 10 페이지 (home / additions / calendar / connections / network / tags / explorer / rules / settings / distribution).
+멀티볼트의 `master_index.json` (전 볼트 통합 인덱스) + 각 볼트의 `vault_index.json` + 일자별 `timeseries.json` 을 읽어 **브라우저 SPA** 로 시각화. core 10 페이지 (home / additions / calendar / connections / network / tags / explorer / rules / settings / distribution) + **커스텀 페이지** (registry 로 등록, 현재 collections).
 
 진입 방법:
 - 사용자: `Generate Visualization.exe` 더블클릭 → 자동 동기화 + chrome `--app` 띄움
@@ -19,7 +19,7 @@ viz/
 ├── router.js               URL hash 라우터 + SSE 클라이언트 + 페이지 매핑
 ├── server.js               Node HTTP — 정적 파일 + 9 API + SSE + fs.watch
 ├── styles/                 전역 CSS (테마 변수, 페이지별 클래스)
-├── pages/                  10 페이지 (URL hash 1:1)
+├── pages/                  core 10 페이지 + 커스텀 페이지 (URL hash 1:1)
 │   ├── home.js             KPI 카드 + 미니 카드 + 시각화/탐색 카드
 │   ├── additions.js        추가 시계열 4 뷰 (notes/vaults/tags/connections)
 │   ├── calendar.js         일별 작업량 heatmap
@@ -49,8 +49,10 @@ viz/
 ├── _build/                 빌드 + 런처 (PowerShell)
 │   ├── Start-Visualization.ps1   exe 런처 — port 순회 + sync + chrome 띄움
 │   ├── build-exe.ps1             ps2exe → .exe
-│   ├── build-icon.ps1            viz.ico 생성
+│   ├── build-icon.ps1            viz.ico 생성 (assets/ 로고 원본 → ICO)
+│   ├── assets/                   로고 원본 PNG (투명본 = 아이콘 생성 입력)
 │   ├── create-shortcut.ps1       .lnk 생성
+│   ├── set-shortcut-aumid.ps1   바로가기 AUMID 를 Chrome 앱 창과 일치 (R205)
 │   └── tools/ps2exe              MIT 동봉
 ├── Generate Visualization.exe    런처 (Win)
 ├── Generate Visualization.bat    Win 폴백
@@ -73,8 +75,13 @@ viz/
 | `#rules` | `pages/rules.js` | 룰/스킬/후크 뷰어 |
 | `#settings` | `pages/settings.js` | UserConfig 편집 (4 패널 캐러셀) |
 | `#distribution` | `pages/distribution.js` | 분포 분석 (카테고리·타입·태그) |
+| `#collections` | `pages/collections.js` | **커스텀** — 즐겨찾기 + 노트 묶음 (R193). 정의는 루트 `_collections.json` (git 추적) |
 
 페이지 매핑 정본: `router.js` 의 `PAGE_TITLES` + `pages` map. 헤더 라벨은 `components/header.js` 의 `PAGE_TITLES_LOCAL` (양쪽 동기 필요).
+
+**커스텀 페이지 (R193)**: `lib/custom-features.js` registry 에 `surfaces: [{ type: 'page', page: '<hash>', title, homeCard }]` 를 넣으면 `lib/custom-features-router.js` adapter 가 `router.js` VALID_PAGES/PAGE_TITLES · `header.js` PAGE_TITLES_LOCAL · `home.js` 도구 카드에 **자동 병합**한다. 페이지 파일은 `pages/<page>.js` 에 router 표준 시그니처로 두면 끝 — 위 3 파일 무수정. 코드 안에 `@custom-feature: <id>` 주석 마커를 남기면 `node scripts/list-custom-features.js` 가 registry 와 cross-check 한다.
+
+**노트 ★ 즐겨찾기 (R195)**: 노트를 보여주는 페이지는 `lib/note-star.js` 로 한 줄에 즐겨찾기 토글을 붙인다 — 행 마크업에 `starButtonHtml(vault, path)` 를 `data-open-note` 버튼 옆에 넣고, `initPage` 에서 `attachNoteStars(container)` 1회 호출 + destroy 에서 반환값 호출. 재렌더 후 다시 칠하는 것은 모듈 내부 MutationObserver 가 처리하므로 페이지가 신경 쓸 게 없다. 현재 explorer · tags · calendar · additions 4 페이지 적용.
 
 ## 4. 데이터 흐름
 
@@ -136,15 +143,37 @@ lib/loadIndex.js  ── 시스템 Hub 필터 (system-vaults.js) ──┐
 | `Generate Visualization.{bat,command,sh}` | OS 별 폴백 진입 |
 | `_build/Start-Visualization.ps1` | 정본 런처 — port 순회 + 백그라운드 sync + chrome `--app` |
 | `_build/build-exe.ps1` | ps2exe 빌드 |
-| `_build/build-icon.ps1` | viz.ico 생성 |
+| `_build/build-icon.ps1` | viz.ico 생성 — `_build/assets/logo_source_transparent.png` 에서 검정 단색화 + 크롭 + 9사이즈 (R191) |
 | `_build/create-shortcut.ps1` | .lnk 생성 |
+| `_build/set-shortcut-aumid.ps1` | 바로가기 AUMID 설정 (R205) — **로컬 바로가기 속성이라 git 에 안 담긴다.** 새 디바이스·재설치·바로가기 재생성 때마다 실행 |
 
 빌드:
 ```powershell
 cd viz/_build
-.\build-icon.ps1     # viz.ico
-.\build-exe.ps1      # Generate Visualization.exe
+.\build-icon.ps1     # viz.ico  ← 로고 원본은 _build/assets/logo_source_transparent.png
+.\build-exe.ps1      # Generate Visualization.exe (아이콘이 exe 에 박히므로 icon 변경 후 필수)
 ```
+
+### 작업표시줄 버튼이 둘로 갈릴 때 (R205)
+
+런처가 `chrome --app=<url>` 로 창을 여므로 **작업표시줄에 뜨는 창은 exe 가 아니라 Chrome 앱 창**이다.
+Windows 는 AppUserModelID 로 버튼을 묶는데 고정 바로가기(AUMID 없음)와 Chrome 앱 창(`Chrome.localhost_/`)이
+달라 별개 버튼이 된다.
+
+```powershell
+.\set-shortcut-aumid.ps1 -Report   # 현재 값 확인
+.\set-shortcut-aumid.ps1           # 맞춤 (고정·시작메뉴·바탕화면)
+```
+
+`create-shortcut.ps1` 이 자동으로 호출하지만, **작업표시줄 고정은 사용자가 직접 하는 행위**라
+고정한 뒤 한 번 더 실행해야 한다. 즉시 반영 안 되면 `Stop-Process -Name explorer -Force`.
+
+아이콘 자체(지구본 → AMV)는 별개 문제였다 — `index.html` 파비콘 선언 + server 의 `/favicon.ico`
+라우트가 없어서였다. 정적 서빙이 `/lib/`·`/pages/` 등으로 화이트리스트돼 루트 `viz.ico` 가 404 였다.
+Chrome 이 파비콘을 프로필에 캐시하므로 **파일을 고쳐도 기존 프로필은 옛 아이콘을 계속 쓴다** —
+일반 탭으로 한 번 열면 갱신된다.
+
+로고를 바꾸려면 `_build/assets/logo_source_transparent.png` 를 교체한 뒤 위 두 스크립트를 순서대로 실행한다. `build-icon.ps1` 만 돌리면 `viz.ico` 는 바뀌지만 **exe 내장 아이콘은 그대로**다.
 
 ## 8. 작업 진입 (정본 전용 추가 자료)
 

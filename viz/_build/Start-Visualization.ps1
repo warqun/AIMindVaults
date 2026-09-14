@@ -16,7 +16,10 @@
 #      - git pull --ff-only origin main (변동 감지)
 #      - 변동 있으면 sync-all --skip-npm (CoreHub cli.js), 없으면 skip (R149.2)
 #      - viz SPA sync-banner.js 가 /api/sync-status polling
-#   5. R133 master_index 자동 빌드 (sync-all 미실행 사용자 대응 안전망)
+#      - spawn 인자에 -ExecutionPolicy Bypass 포함 — 유효 정책 Restricted 머신에서 -File 차단 방지 (R169)
+#      - cold start (fresh clone) 자동 부트스트랩: CoreHub npm install 선행 → sync-all full
+#        (--skip-npm 제거, 볼트 로컬 node_modules 자동 설치) → exit code 검증 (실패 시 failed 정직 보고) (R170)
+#   5. R133 master_index 자동 빌드 — AUTO_SYNC off 전용 안전망 (R170: on 이면 4 의 bg sync 가 전담)
 #   6. R149.1 chrome --app port polling 후 즉시 실행 (이전 4s 고정 대기 → 1-2s)
 #   7. server.js 를 hidden 프로세스 spawn (stdout/stderr 임시 파일 격리)
 #   8. .exe 본체 즉시 종료 — server.js 의 idle 자동 종료 (AIMV_VIZ_IDLE_MS) 가 정리
@@ -199,8 +202,9 @@ if ($isOurInstance) {
 
 # 공통 경로 (R146 + R133 양쪽에서 사용)
 $masterIndexPath = Join-Path $myRoot '.vault_data\master_index.json'
-$coreCliPath = Join-Path $myRoot 'Vaults\BasicVaults\CoreHub\.sync\_tools\cli-node\bin\cli.js'
-$coreNodeModules = Join-Path $myRoot 'Vaults\BasicVaults\CoreHub\.sync\_tools\cli-node\node_modules'
+$coreCliDir = Join-Path $myRoot 'Vaults\BasicVaults\CoreHub\.sync\_tools\cli-node'
+$coreCliPath = Join-Path $coreCliDir 'bin\cli.js'
+$coreNodeModules = Join-Path $coreCliDir 'node_modules'
 
 # R149 — 디바이스 자동 동기화 백그라운드 + UI 상태 표시
 # R146 의 wait 동기 방식 (35-57s 사용자 대기) 을 비동기 백그라운드로 전환.
@@ -234,6 +238,9 @@ if (($env:AIMV_VIZ_AUTO_PULL -eq 'true') -or ($env:AIMV_VIZ_AUTO_SYNC -eq 'true'
 `$statusFile = '$statusFile'
 `$myRoot = '$myRoot'
 `$coreCliPath = '$coreCliPath'
+`$coreCliDir = '$coreCliDir'
+`$coreNodeModules = '$coreNodeModules'
+`$masterIndexPath = '$masterIndexPath'
 `$nodeExe = '$($nodeCmd.Source)'
 `$autoPull = '$($env:AIMV_VIZ_AUTO_PULL)'
 `$autoSync = '$($env:AIMV_VIZ_AUTO_SYNC)'
@@ -253,6 +260,24 @@ function Set-SyncStatus(`$status, `$step, `$message, `$error_val, `$completed) {
 
 `$started_at = (Get-Date).ToString('o')
 
+# R170 — cold start 감지: fresh clone 은 node_modules·인덱스가 .gitignore 라 없음.
+# 이 경우 R149.2 sync skip 을 무시하고 전체 부트스트랩 (npm install + sync-all full) 을 태운다.
+`$coldStart = (-not (Test-Path `$coreNodeModules)) -or (-not (Test-Path `$masterIndexPath))
+
+# 0. CoreHub CLI 의존성 (R170 — 새 디바이스 최초 1회. 없으면 sync-all 자체가 못 뜸)
+if (-not (Test-Path `$coreNodeModules)) {
+    Set-SyncStatus 'running' 'npm_install' 'CoreHub CLI 의존성 설치 중 (새 디바이스 최초 1회)' `$null `$false
+    `$npmLog = Join-Path `$env:TEMP 'aimv_viz_npm_install.log'
+    Push-Location `$coreCliDir
+    & npm.cmd install --no-audit --no-fund *> `$npmLog
+    `$npmExit = `$LASTEXITCODE
+    Pop-Location
+    if (`$npmExit -ne 0) {
+        Set-SyncStatus 'failed' 'npm_install' "CoreHub CLI 의존성 설치 실패 — 로그: `$npmLog" "npm exit `$npmExit" `$true
+        return
+    }
+}
+
 # 1. git pull + 변동 감지
 `$pullChanged = `$false
 if (`$autoPull -eq 'true') {
@@ -262,9 +287,11 @@ if (`$autoPull -eq 'true') {
         `$gitExe = (Get-Command git -ErrorAction Stop).Source
         if (Test-Path (Join-Path `$myRoot '.git')) {
             & `$gitExe -C `$myRoot pull --ff-only origin main *> `$pullLog
-            # R149.2 — 변동 감지: 'Already up to date' 가 아니면 변동 있음
+            `$pullExit = `$LASTEXITCODE
+            # R149.2 — 변동 감지: pull 성공 + 'Already up to date' 아님 = 변동 있음.
+            # R170 — pull 실패 (네트워크·diverged) 출력을 변동으로 오판하지 않음. fail-safe 로 계속.
             `$pullContent = Get-Content `$pullLog -Raw -ErrorAction SilentlyContinue
-            if (`$pullContent -and (`$pullContent -notmatch 'Already up to date')) {
+            if (`$pullExit -eq 0 -and `$pullContent -and (`$pullContent -notmatch 'Already up to date')) {
                 `$pullChanged = `$true
             }
         }
@@ -273,18 +300,29 @@ if (`$autoPull -eq 'true') {
     }
 }
 
-# 2. sync-all (변동 있을 때만)
+# 2. sync-all (변동 있을 때만 — cold start 는 무조건)
 if (`$autoSync -eq 'true') {
-    if (-not `$pullChanged -and `$autoPull -eq 'true') {
+    if (-not `$coldStart -and -not `$pullChanged -and `$autoPull -eq 'true') {
         # R149.2 — git pull 변동 0 → sync-all skip (이미 최신)
         Set-SyncStatus 'done' 'done' '이미 최신 (git pull 변동 없음 → sync 건너뜀)' `$null `$true
         return
     }
-    Set-SyncStatus 'running' 'sync_all' 'sync-all --skip-npm (vault 인덱싱 + master 빌드)' `$null `$false
+    # R170 — --skip-npm 제거: 볼트 로컬 node_modules 부재 시 sync-all 이 자동 설치
+    # (존재 시 즉시 skip 이라 웜 패스 비용 0). cold start 는 장기 소요 안내 메시지로 구분.
+    `$syncMsg = if (`$coldStart) { '새 디바이스 초기화 — 전체 볼트 의존성 설치 + 인덱스 빌드 (수 분 소요 가능)' } else { 'sync-all (vault 인덱싱 + master 빌드)' }
+    Set-SyncStatus 'running' 'sync_all' `$syncMsg `$null `$false
     `$syncLog = Join-Path `$env:TEMP 'aimv_viz_sync_all.log'
     try {
         if ((Test-Path `$coreCliPath)) {
-            & `$nodeExe `$coreCliPath sync-all --skip-npm *> `$syncLog
+            & `$nodeExe `$coreCliPath sync-all --root `$myRoot *> `$syncLog
+            if (`$LASTEXITCODE -ne 0) {
+                # R170 — 부분 실패 포함 exit != 0 은 정직하게 failed 보고 (기존: 무조건 done)
+                Set-SyncStatus 'failed' 'sync_all' "동기화 일부 실패 — 로그: `$syncLog" "sync-all exit `$LASTEXITCODE" `$true
+                return
+            }
+        } elseif (`$coldStart) {
+            Set-SyncStatus 'failed' 'sync_all' 'CoreHub CLI 를 찾을 수 없습니다 — 클론 상태 확인 필요' `$null `$true
+            return
         }
     } catch {
         Set-SyncStatus 'failed' 'sync_all' '동기화 실패' `$_.Exception.Message `$true
@@ -298,7 +336,7 @@ Set-SyncStatus 'done' 'done' '동기화 완료 — 새 데이터 보려면 reloa
     # R149.1 — UTF-8 with BOM 저장 (PowerShell 5.1 이 BOM 없으면 cp949 로 해석 → 한글 mojibake).
     [System.IO.File]::WriteAllText($bgScriptPath, $bgScript, [System.Text.UTF8Encoding]::new($true))
     Start-Process -FilePath 'powershell.exe' `
-        -ArgumentList @('-NoProfile', '-WindowStyle', 'Hidden', '-File', $bgScriptPath) `
+        -ArgumentList @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-WindowStyle', 'Hidden', '-File', $bgScriptPath) `
         -WindowStyle Hidden | Out-Null
 } else {
     # 자동 동기화 둘 다 off — idle 표시
@@ -313,10 +351,12 @@ Set-SyncStatus 'done' 'done' '동기화 완료 — 새 데이터 보려면 reloa
     [System.IO.File]::WriteAllText($statusFile, $idleStatus, [System.Text.UTF8Encoding]::new($false))
 }
 
-# R133 — viz 시작 시 인덱스 검증 + 자동 빌드 (sync-all 안 쓴 사용자 대응 안전망)
-# master_index.json 부재 시 CoreHub cli.js 로 자동 master-build. R146 가 정상 동작했으면 이미 존재.
+# R133 — viz 시작 시 인덱스 검증 + 자동 빌드 (AUTO_SYNC off 사용자 대응 안전망)
+# master_index.json 부재 시 CoreHub cli.js 로 자동 master-build.
+# R170 — AUTO_SYNC on 이면 백그라운드 sync-all 이 npm install + 볼트 인덱스 + master 빌드를
+# 전담하므로 이 동기(-Wait) fallback 은 건너뜀 (cold start 에서 차단성 MessageBox·중복 빌드 방지).
 
-if (-not (Test-Path $masterIndexPath)) {
+if (($env:AIMV_VIZ_AUTO_SYNC -ne 'true') -and -not (Test-Path $masterIndexPath)) {
     if ((Test-Path $coreCliPath) -and (Test-Path $coreNodeModules)) {
         $buildLog = Join-Path $env:TEMP 'aimv_viz_first_build.log'
         $buildErr = Join-Path $env:TEMP 'aimv_viz_first_build_err.log'

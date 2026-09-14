@@ -39,6 +39,10 @@ $lnk.Description      = 'AIMindVaults Vault 시각화 도구'
 $lnk.WindowStyle      = 7  # Minimized — .exe 가 콘솔 없이 실행되어도 깜빡임 방지
 $lnk.Save()
 
+# R205 — AUMID 를 Chrome 앱 창과 맞춘다. 안 맞추면 작업표시줄에서
+# 고정 아이콘과 실행 창이 별개 버튼으로 갈린다 (런처가 chrome --app 으로 창을 열기 때문).
+& (Join-Path $buildDir 'set-shortcut-aumid.ps1')
+
 Write-Host "[OK] 바탕화면 바로가기 생성: $lnkPath"
 Write-Host "     대상: $exePath"
 Write-Host "     아이콘: $icoPath"

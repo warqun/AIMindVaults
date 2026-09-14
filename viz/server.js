@@ -30,6 +30,8 @@
  *   - /api/timeseries    — timeseries.json snapshots
  *   - /api/vault-births  — vault 생성 일자 (R136: vault_index 의 가장 오래된 노트 created 우선 + fs.statSync birthtime fallback)
  *   - /api/sync-status   — .vault_data/.sync-status.json (R149 백그라운드 sync 상태)
+ *   - /api/inbox-status  — 무인 인박스 대기 큐 건수 + 마지막 실행 결과 (R204, 읽기 전용)
+ *   - /favicon.ico       — viz.ico (R205, chrome --app 작업표시줄 아이콘)
  *   - /api/viz-prefs     — GET/POST .vault_data/viz-prefs.json (R163 디바이스별 viz 동작 토글 — gitAutoSync 등)
  *   - /api/viz-sync-now  — POST 수동 git pull + sync-all 트리거 (R163, 자동 동기화 off 시에도 호출 가능)
  *   - /sse               — Server-Sent Events
@@ -52,12 +54,14 @@
  */
 
 import { createServer } from 'node:http';
-import { readFile, stat, readdir, mkdir, writeFile } from 'node:fs/promises';
+import { readFile, stat, readdir, mkdir, writeFile, rename } from 'node:fs/promises';
 import { watch } from 'node:fs';
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve, extname, sep, basename } from 'node:path';
 import { defaultsFromFeatures, featureIdSet } from './lib/custom-features.js';
+import { defaultCollectionsFile, normalizeCollectionsFile } from './lib/collections.js';
+import { filterVisibleNotes } from './lib/system-vaults.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const VIZ_DIR = dirname(__filename);
@@ -66,6 +70,9 @@ const MASTER_INDEX_PATH = join(ROOT_DIR, '.vault_data', 'master_index.json');
 const TIMESERIES_PATH = join(ROOT_DIR, '.vault_data', 'timeseries.json');
 const SYNC_STATUS_PATH = join(ROOT_DIR, '.vault_data', '.sync-status.json');
 const VIZ_PREFS_PATH = join(ROOT_DIR, '.vault_data', 'viz-prefs.json');
+// R193 — 컬렉션은 디바이스 간 정합이 필요해 **루트 git 추적 파일**에 둔다.
+// .vault_data/ 는 .gitignore 대상이라 viz-prefs 처럼 쓸 수 없다.
+const COLLECTIONS_PATH = join(ROOT_DIR, '_collections.json');
 const CORE_CLI_PATH = join(ROOT_DIR, 'Vaults', 'BasicVaults', 'CoreHub', '.sync', '_tools', 'cli-node', 'bin', 'cli.js');
 
 const DEFAULT_PORT = parseInt(process.env.AIMV_VIZ_PORT ?? '8765', 10);
@@ -245,11 +252,13 @@ async function handleApiNote(req, res) {
 
 /* ───────────── /api/activity (W1) ─────────────
  * 홈 페이지의 "최근 7일 작업량" + "최근 추가된 항목" 데이터 집계.
- * master_index.json 의 vaults 경로를 따라 각 vault_index.json 의 notes[].mtime 을 모아 집계.
+ * master_index.json 의 vaults 경로를 따라 각 vault_index.json 의 notes 를 모아 집계.
+ * R166 — stamp = created(frontmatter) 우선, 없을 때만 mtime fallback. fresh-clone 시
+ *   OS 파일 mtime 이 클론 시점으로 리셋되어 패널이 오늘로 쏠리는 문제 회피 (디바이스 무관).
  * 응답 형식:
  *   { computedAt: ISO,
  *     weekly: [{ date: 'YYYY-MM-DD', label: '월'|'화'|...|'오늘', count: N }, ... 7 items],
- *     recent: [{ kind: 'NOTE', vault_id, title, type, mtime, ageDays }, ... up to 8] }
+ *     recent: [{ kind: 'NOTE', vault_id, title, type, date, mtime, created, ageDays }, ... up to 8] }
  */
 async function handleApiActivity(res) {
   try {
@@ -267,16 +276,26 @@ async function handleApiActivity(res) {
       if (r.status !== 'fulfilled') continue;
       const [vid, vidx] = r.value;
       for (const n of (vidx.notes || [])) {
-        if (!n.mtime) continue;
+        // R166 — created(frontmatter) 우선 stamp. fresh-clone 시 OS 파일 mtime 이
+        //   클론 시점으로 전부 리셋되어 "최근 7일/추가" 패널이 오늘로 쏠리는 문제 회피.
+        //   created 는 frontmatter 에서만 와서 git 동기화 → 디바이스 무관.
+        const stamp = n.created || n.mtime;
+        if (!stamp) continue;
         allNotes.push({
           vault_id: vid,
           title: n.title || basename(n.path || ''),
           path: n.path,
           type: n.type || '(untyped)',
-          mtime: n.mtime,
+          mtime: n.mtime || null,
+          created: n.created || null,
+          stamp,
         });
       }
     }
+
+    // R166 — 홈 나머지(KPI)와 동일한 visible 필터(시스템 Hub + 메타 노트 제외) 적용.
+    //   미적용 시 Domain.md·CONTENTS_* 같은 스캐폴드 노트가 "최근 추가"에 새어 들어옴.
+    const visibleNotes = filterVisibleNotes(allNotes);
 
     const now = Date.now();
     const today = new Date(now); today.setHours(0, 0, 0, 0);
@@ -291,21 +310,26 @@ async function handleApiActivity(res) {
     }
     const dateIndex = new Map(weekDays.map((d, i) => [d.date, i]));
 
-    for (const n of allNotes) {
-      const m = String(n.mtime).match(/^(\d{4}-\d{2}-\d{2})/);
+    for (const n of visibleNotes) {
+      const m = String(n.stamp).match(/^(\d{4}-\d{2}-\d{2})/);
       if (!m) continue;
       const idx = dateIndex.get(m[1]);
       if (idx !== undefined) weekDays[idx].count += 1;
     }
 
-    const recent = allNotes
+    const recent = visibleNotes
       .slice()
-      .sort((a, b) => (a.mtime < b.mtime ? 1 : a.mtime > b.mtime ? -1 : 0))
+      .sort((a, b) => {
+        if (a.stamp !== b.stamp) return a.stamp < b.stamp ? 1 : -1;
+        // created 는 date-only (T00:00:00) → 같은 날 동률 시 mtime 2차 정렬
+        const am = a.mtime || '', bm = b.mtime || '';
+        return bm > am ? 1 : (bm < am ? -1 : 0);
+      })
       .slice(0, 8)
       .map((n) => {
-        const t = Date.parse(n.mtime);
+        const t = Date.parse(n.stamp);
         const ageDays = Number.isFinite(t) ? Math.max(0, Math.floor((now - t) / dayMs)) : 0;
-        return { kind: 'NOTE', vault_id: n.vault_id, title: n.title, type: n.type, mtime: n.mtime, ageDays };
+        return { kind: 'NOTE', vault_id: n.vault_id, title: n.title, type: n.type, date: String(n.stamp).slice(0, 10), mtime: n.mtime, created: n.created, ageDays };
       });
 
     res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-cache' });
@@ -527,6 +551,57 @@ async function handleApiSyncStatus(res) {
   res.end(JSON.stringify(payload));
 }
 
+/* ───────────── /api/inbox-status (R204) ─────────────
+ * 무인 인박스의 읽기 전용 현황 — 대기 큐 건수 + 마지막 실행 결과.
+ * 출처는 둘 다 **이미 있는 것**이라 새 상태 파일을 만들지 않는다.
+ *   대기 건수 : `_INBOX.md` 의 `## 대기 중` 구간 `- [ ]` 개수
+ *   보류 건수 : 같은 구간 `- [?]` 개수 — 무인이 못 풀어 사람 판단을 기다리는 항목 (지시서 § 4)
+ *   마지막 실행: `.vault_data/logs/inbox-task_*.log` 최신 파일의 `=== exit=N @ ... ===`
+ * @custom-feature: discordTrigger
+ */
+const INBOX_MD_PATH = join(ROOT_DIR, 'Vaults', 'Projects_Game', 'Project_GodotVamSurLike', '_INBOX.md');
+const TASK_LOG_DIR = join(ROOT_DIR, '.vault_data', 'logs');
+
+async function readInboxQueued() {
+  const raw = await readFile(INBOX_MD_PATH, 'utf-8');
+  const start = raw.indexOf('## 대기 중');
+  if (start < 0) return 0;
+  const rest = raw.slice(start + 1);
+  const end = rest.indexOf('\n## ');
+  const body = end < 0 ? rest : rest.slice(0, end);
+  return {
+    queued: (body.match(/^- \[ \]/gm) || []).length,
+    held: (body.match(/^- \[\?\]/gm) || []).length,
+  };
+}
+
+async function readLastRun() {
+  const names = (await readdir(TASK_LOG_DIR))
+    .filter((n) => n.startsWith('inbox-task_') && n.endsWith('.log'))
+    .sort();
+  if (names.length === 0) return null;
+  const name = names[names.length - 1];
+  const text = await readFile(join(TASK_LOG_DIR, name), 'utf-8');
+  const m = [...text.matchAll(/=== exit=(-?\d+) @ (\d{8}_\d{6}) ===/g)].pop();
+  // 스탬프는 파일명에서도 얻을 수 있다 — exit 줄이 없으면 (중단·진행 중) 그쪽을 쓴다.
+  const stamp = m ? m[2] : name.slice('inbox-task_'.length, -'.log'.length);
+  const at = `${stamp.slice(0, 4)}-${stamp.slice(4, 6)}-${stamp.slice(6, 8)} `
+    + `${stamp.slice(9, 11)}:${stamp.slice(11, 13)}`;
+  return { at, exit: m ? Number(m[1]) : null, ok: m ? Number(m[1]) === 0 : null, log: name };
+}
+
+async function handleApiInboxStatus(res) {
+  const payload = { queued: null, held: null, lastRun: null };
+  try { Object.assign(payload, await readInboxQueued()); } catch (err) {
+    if (err.code !== 'ENOENT') console.warn(`[/api/inbox-status] inbox read failed: ${err.message}`);
+  }
+  try { payload.lastRun = await readLastRun(); } catch (err) {
+    if (err.code !== 'ENOENT') console.warn(`[/api/inbox-status] log read failed: ${err.message}`);
+  }
+  res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-cache' });
+  res.end(JSON.stringify(payload));
+}
+
 /* ───────────── /api/viz-prefs (R163) ─────────────
  * `.vault_data/viz-prefs.json` — 디바이스별 viz 동작 토글 (gitAutoSync 등).
  * GET → 현재 값 (파일 부재 시 default). POST → whitelist 키만 머지 + 저장.
@@ -588,6 +663,78 @@ async function handleApiVizPrefs(req, res) {
   try {
     await mkdir(dirname(VIZ_PREFS_PATH), { recursive: true });
     await writeFile(VIZ_PREFS_PATH, JSON.stringify(next, null, 2), 'utf-8');
+  } catch (err) {
+    res.writeHead(500, { 'Content-Type': 'text/plain; charset=utf-8' });
+    res.end(`Write failed: ${err.message}`);
+    return;
+  }
+  res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+  res.end(JSON.stringify(next));
+}
+
+/* ───────────── /api/collections (R193) ─────────────
+ * 루트 `_collections.json` — 즐겨찾기 + 노트 묶음. git 추적이라 디바이스 간 정합 자동.
+ * GET  → 현재 파일 (부재 시 기본값. 이때 파일을 만들지는 않는다 — 첫 저장 때 생긴다).
+ * POST → 전체 교체. normalizeCollectionsFile 로 정규화하므로 깨진 입력은 걸러진다.
+ */
+/**
+ * `{ file, corrupt }` 반환.
+ *
+ * **파일 부재와 파싱 실패를 구분한다.** 둘 다 기본값으로 뭉개면, git merge conflict 로 파일이
+ * 깨졌을 때 viz 가 "컬렉션 없음" 을 보여주고 사용자가 ★ 를 한 번 누르는 순간 POST 가 그 파일을
+ * 기본값으로 덮어써 **양쪽 디바이스 데이터가 함께 사라진다** (2026-08-27 재현 확인).
+ * git 추적 파일이라 충돌은 실제로 일어날 수 있는 상태다.
+ */
+async function readCollections() {
+  let raw;
+  try {
+    raw = await readFile(COLLECTIONS_PATH, 'utf-8');
+  } catch {
+    return { file: defaultCollectionsFile(), corrupt: false }; // 아직 없음 = 첫 실행
+  }
+  try {
+    return { file: normalizeCollectionsFile(JSON.parse(raw)), corrupt: false };
+  } catch (err) {
+    return { file: defaultCollectionsFile(), corrupt: true, reason: err.message };
+  }
+}
+
+async function handleApiCollections(req, res) {
+  const current = await readCollections();
+
+  if (req.method === 'GET') {
+    // 깨진 파일이면 그 사실을 실어 보낸다. UI 가 "빈 목록" 으로 오해하지 않게.
+    const body = current.corrupt
+      ? { ...current.file, corrupt: true, message: `_collections.json 을 읽을 수 없습니다 (${current.reason}). git merge conflict 인지 확인하세요. 고치기 전까지 저장이 차단됩니다.` }
+      : current.file;
+    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-cache' });
+    res.end(JSON.stringify(body));
+    return;
+  }
+
+  // 읽지 못한 파일은 덮어쓰지 않는다 — 손상 파일 위에 기본값을 얹으면 복구 불가.
+  if (current.corrupt) {
+    res.writeHead(409, { 'Content-Type': 'application/json; charset=utf-8' });
+    res.end(JSON.stringify({ error: `_collections.json 이 손상돼 저장을 거부했습니다 (${current.reason}). 파일을 고친 뒤 다시 시도하세요.` }));
+    return;
+  }
+  let body;
+  try {
+    // 노트 목록이 커질 수 있어 viz-prefs 의 64KB 보다 넉넉히 잡는다.
+    const raw = await readRequestBody(req, 2 * 1024 * 1024);
+    body = raw ? JSON.parse(raw) : {};
+  } catch (err) {
+    res.writeHead(400, { 'Content-Type': 'text/plain; charset=utf-8' });
+    res.end(`Bad Request: ${err.message}`);
+    return;
+  }
+  const next = normalizeCollectionsFile(body);
+  next.updatedAt = new Date().toISOString();
+  try {
+    // 원자적 쓰기 — 중간에 죽어도 기존 파일이 반쪽으로 남지 않게.
+    const tmp = `${COLLECTIONS_PATH}.tmp`;
+    await writeFile(tmp, JSON.stringify(next, null, 2) + String.fromCharCode(10), 'utf-8');
+    await rename(tmp, COLLECTIONS_PATH);
   } catch (err) {
     res.writeHead(500, { 'Content-Type': 'text/plain; charset=utf-8' });
     res.end(`Write failed: ${err.message}`);
@@ -690,6 +837,7 @@ async function handleRequest(req, res) {
   if (req.method === 'POST') {
     if (pathname === '/api/viz-prefs') return handleApiVizPrefs(req, res);
     if (pathname === '/api/viz-sync-now') return handleApiVizSyncNow(req, res);
+    if (pathname === '/api/collections') return handleApiCollections(req, res);
     res.writeHead(405, { 'Content-Type': 'text/plain; charset=utf-8' });
     res.end('Method Not Allowed');
     return;
@@ -703,6 +851,7 @@ async function handleRequest(req, res) {
   if (pathname === '/' || pathname === '/index.html') {
     return serveFile(join(VIZ_DIR, 'index.html'), res, 'text/html; charset=utf-8');
   }
+  if (pathname === '/api/collections') return handleApiCollections(req, res);
   if (pathname === '/sse') return handleSSE(req, res);
   if (pathname === '/health') {
     const built = await getMasterBuilt();
@@ -721,7 +870,13 @@ async function handleRequest(req, res) {
   if (pathname === '/api/timeseries') return handleApiTimeseries(res);
   if (pathname === '/api/vault-births') return handleApiVaultBirths(res);
   if (pathname === '/api/sync-status') return handleApiSyncStatus(res);
+  if (pathname === '/api/inbox-status') return handleApiInboxStatus(res);
   if (pathname === '/api/viz-prefs') return handleApiVizPrefs(req, res);
+  // 정적 서빙은 /lib · /pages 등으로 화이트리스트돼 있어 루트의 viz.ico 가 404 였다.
+  // chrome --app 창이 파비콘을 못 찾으면 작업표시줄에 지구본이 뜬다 (R205).
+  if (pathname === '/favicon.ico' || pathname === '/viz.ico') {
+    return serveFile(join(VIZ_DIR, 'viz.ico'), res, 'image/x-icon');
+  }
   if (pathname === '/router.js') return serveFile(join(VIZ_DIR, 'router.js'), res);
   if (pathname.startsWith('/static/') || pathname.startsWith('/lib/') || pathname.startsWith('/pages/') || pathname.startsWith('/components/') || pathname.startsWith('/styles/')) {
     let sub;

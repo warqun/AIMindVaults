@@ -1,0 +1,15 @@
+{
+  "_comment": "_AGENT_TASKS 작업 무인 처리 권한 프로파일 (inbox-task 와 같은 기준). 사용자 결정(2026-09-02)으로 범위 제한 없이 넓게 간다 — 대신 되돌리기 어려운 명령만 deny 로 남긴다. bypassPermissions 로 실행되면 이 프로파일이 적용되지 않을 수 있으므로, 푸시 차단은 지시서 § 6·§ 7 과 Run-AgentTask 의 프롬프트 문구에도 이중으로 걸려 있다.",
+  "permissions": {
+    "deny": [
+      "Bash(git push:*)",
+      "Bash(git reset --hard:*)",
+      "Bash(git clean:*)",
+      "Bash(git rebase:*)",
+      "Bash(git branch -D:*)",
+      "Bash(npm publish:*)",
+      "Bash(schtasks:*)",
+      "Bash(taskkill:*)"
+    ]
+  }
+}

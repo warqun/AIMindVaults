@@ -45,3 +45,6 @@ _collections.json
 # sync 실행 로그 (사용자 로컬)
 sync.log
 **/sync.log
+
+# 디스코드 무인 인박스 — 개인 채널 ID (docs/discord-inbox.md)
+_tools/agent-daemon/discord/discord_config.json

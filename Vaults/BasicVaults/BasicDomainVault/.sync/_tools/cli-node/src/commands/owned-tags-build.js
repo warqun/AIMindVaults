@@ -31,6 +31,7 @@ import { dirname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import * as log from '../lib/logger.js';
 import { parseFrontmatterLight } from '../lib/frontmatter.js';
+import { localDate } from '../lib/local-time.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -248,7 +249,7 @@ const CATEGORY_LABEL = {
  * @returns {string}
  */
 export function renderRootOwnedTagsMd(vaultEntries, conflicts, meta) {
-  const today = (meta.builtIso || new Date().toISOString().slice(0, 10));
+  const today = (meta.builtIso || localDate());
   const lines = [];
 
   // Frontmatter
@@ -453,7 +454,7 @@ export async function ownedTagsBuild(opts = {}) {
   const content = renderRootOwnedTagsMd(vaultEntries, conflicts, {
     totalTags,
     totalVaults,
-    builtIso: new Date().toISOString().slice(0, 10),
+    builtIso: localDate(),
   });
 
   // 5) Write or preview

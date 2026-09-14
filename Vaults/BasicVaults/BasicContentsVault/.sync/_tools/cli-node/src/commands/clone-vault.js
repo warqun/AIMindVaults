@@ -21,6 +21,7 @@ import { fileURLToPath } from 'node:url';
 import { mirrorDirectory } from '../lib/fs-mirror.js';
 import { isHub, readHubMarker } from '../lib/hub-resolver.js';
 import * as log from '../lib/logger.js';
+import { localDate } from '../lib/local-time.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -237,7 +238,7 @@ export async function cloneVault(opts) {
     const hubSource = {
       hubPath: relHub || '.',
       hubId: hubBindMarker?.hubId || opts.hubId || 'core',
-      bindAt: new Date().toISOString().slice(0, 10),
+      bindAt: localDate(),
     };
     const hubSourcePath = join(targetPath, '.sync', 'hub-source.json');
     await writeFile(hubSourcePath, JSON.stringify(hubSource, null, 2) + '\n', 'utf8');

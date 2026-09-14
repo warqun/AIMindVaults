@@ -43,7 +43,9 @@
 
 import { presetColorByCategory } from '../lib/buildOption.js';
 import { openNote, openVault } from '../lib/obsidian-uri.js';
+import { starButtonHtml, attachNoteStars } from '../lib/note-star.js';
 import { filterVisibleNotes } from '../lib/system-vaults.js';
+import { SORTS, SORT_LABELS, DEFAULT_SORT, sortNotes, sortGroups, timeLabel } from '../lib/note-sort.js';
 
 const LOOKBACK_OPTIONS = [
   { key: '3m', label: '3개월', days: 90 },
@@ -119,11 +121,7 @@ function buildVaultCategoryMap(masterVaults) {
   return map;
 }
 
-function timeFromStamp(stamp) {
-  if (!stamp) return '—';
-  const m = String(stamp).match(/T(\d{2}:\d{2})/);
-  return m ? m[1] : '—';
-}
+const timeFromStamp = timeLabel;
 
 function loadSplitRatio() {
   if (typeof localStorage === 'undefined') return SPLIT_DEFAULT;
@@ -299,7 +297,7 @@ function buildHeatmapOption(state) {
 
 /* ───────────── 일별 작업 영역 ───────────── */
 
-function groupNotesByCategory(notes, vaultCatMap, basis) {
+function groupNotesByCategory(notes, vaultCatMap, basis, sort = DEFAULT_SORT) {
   const groups = new Map();
   for (const n of notes || []) {
     const cat = vaultCatMap[n.vault_id] || 'unknown';
@@ -308,15 +306,10 @@ function groupNotesByCategory(notes, vaultCatMap, basis) {
     }
     groups.get(cat).notes.push(n);
   }
-  const key = basis === 'created' ? 'created' : 'mtime';
   for (const g of groups.values()) {
-    g.notes.sort((a, b) => {
-      const ka = a[key] || a.mtime || '';
-      const kb = b[key] || b.mtime || '';
-      return ka.localeCompare(kb);
-    });
+    g.notes = sortNotes(g.notes, sort, basis, vaultCatMap);
   }
-  return [...groups.values()].sort((a, b) => b.notes.length - a.notes.length);
+  return sortGroups([...groups.values()], sort);
 }
 
 function dayCardHtml(n, catColor, basis) {
@@ -340,7 +333,7 @@ function dayCardHtml(n, catColor, basis) {
         </div>
         ${tags ? `<div class="tags">${tags}</div>` : ''}
       </div>
-      <button class="open-btn" data-open-note="${escapeHtml(n.vault_id)}|${escapeHtml(n.path)}" title="Obsidian 으로 노트 열기">↗</button>
+      ${starButtonHtml(n.vault_id, n.path)}<button class="open-btn" data-open-note="${escapeHtml(n.vault_id)}|${escapeHtml(n.path)}" title="Obsidian 으로 노트 열기">↗</button>
     </div>
   `;
 }
@@ -368,14 +361,17 @@ function emptyDayAreaHtml() {
   `;
 }
 
-function dayAreaHtml(date, entry, addedVaults, basis, notes, vaultCatMap, loading, error) {
+function dayAreaHtml(date, entry, addedVaults, basis, notes, vaultCatMap, loading, error, sort = DEFAULT_SORT) {
   const verb = basis === 'created' ? '생성' : '갱신';
   const total = entry ? entry.count : (Array.isArray(notes) ? notes.length : 0);
   const added = Array.isArray(addedVaults) ? addedVaults : [];
   const addedHtml = added.length > 0
     ? `<span class="day-added">+${added.length} 볼트 추가: ${added.map((v) => `<span class="vault-pill" data-open-vault="${escapeHtml(v)}">${escapeHtml(v)}</span>`).join(' ')}</span>`
     : '';
-  const linkHash = basis === 'created' ? `#additions?date=${date}&basis=created` : `#additions?date=${date}`;
+  const linkParams = [`date=${date}`];
+  if (basis === 'created') linkParams.push('basis=created');
+  if (sort !== DEFAULT_SORT) linkParams.push(`sort=${sort}`);
+  const linkHash = `#additions?${linkParams.join('&')}`;
   let bodyHtml;
   if (error) {
     bodyHtml = `<div class="day-empty"><div class="hint" style="color:var(--danger);">로드 실패: ${escapeHtml(error)}</div></div>`;
@@ -384,7 +380,7 @@ function dayAreaHtml(date, entry, addedVaults, basis, notes, vaultCatMap, loadin
   } else if (!Array.isArray(notes) || notes.length === 0) {
     bodyHtml = `<div class="day-empty"><div class="hint">이 날 ${verb}된 노트가 없습니다.</div></div>`;
   } else {
-    const groups = groupNotesByCategory(notes, vaultCatMap, basis);
+    const groups = groupNotesByCategory(notes, vaultCatMap, basis, sort);
     bodyHtml = `<div class="cat-sections">${groups.map((g) => dayCatSectionHtml(g, basis)).join('')}</div>`;
   }
   return `
@@ -412,6 +408,9 @@ function shellHtml(state) {
   const basisSegHtml = BASES.map((b) =>
     `<button data-basis="${b}" class="${b === state.basis ? 'on' : ''}">${escapeHtml(BASIS_LABELS[b])}</button>`
   ).join('');
+  const sortSegHtml = SORTS.map((s) =>
+    `<button data-sort="${s}" class="${s === state.sort ? 'on' : ''}">${escapeHtml(SORT_LABELS[s])}</button>`
+  ).join('');
   const titleVerb = state.basis === 'created' ? '생성' : '갱신';
   const splitPct = (state.splitRatio * 100).toFixed(2);
   return `
@@ -424,6 +423,10 @@ function shellHtml(state) {
         <div class="tool-group">
           <span class="tool-label">기간</span>
           <div class="seg" data-role="lookback">${segHtml}</div>
+        </div>
+        <div class="tool-group">
+          <span class="tool-label">일별 정렬</span>
+          <div class="seg" data-role="sortSeg">${sortSegHtml}</div>
         </div>
         <div class="tool-group">
           <span class="tool-label">사용자 정의</span>
@@ -513,6 +516,7 @@ export async function initPage(container, data /* , userConfig */) {
     vaultsByDate: new Map(),
     dataMinDate: null,
     basis: parseBasisFromHash(),
+    sort: DEFAULT_SORT,
     splitRatio: loadSplitRatio(),
     selectedDate: null,
     dailyNotes: [],
@@ -525,6 +529,7 @@ export async function initPage(container, data /* , userConfig */) {
   const chartEl = container.querySelector('#cal-heatmap');
   const segWrap = container.querySelector('[data-role="lookback"]');
   const basisSegWrap = container.querySelector('[data-role="basisSeg"]');
+  const sortSegWrap = container.querySelector('[data-role="sortSeg"]');
   const rangeLabel = container.querySelector('[data-role="range"]');
   const totalsLabel = container.querySelector('[data-role="totals"]');
   const metaLabel = container.querySelector('[data-role="meta"]');
@@ -558,7 +563,7 @@ export async function initPage(container, data /* , userConfig */) {
     const addedVaults = state.vaultsByDate.get(state.selectedDate) || [];
     dayArea.innerHTML = dayAreaHtml(
       state.selectedDate, entry, addedVaults, state.basis,
-      state.dailyNotes, vaultCatMap, state.dailyLoading, state.dailyError
+      state.dailyNotes, vaultCatMap, state.dailyLoading, state.dailyError, state.sort
     );
   }
 
@@ -664,6 +669,15 @@ export async function initPage(container, data /* , userConfig */) {
       fetchDailyNotes(state.selectedDate, state.basis);
     }
   }
+  function onSortClick(e) {
+    const btn = e.target.closest('button[data-sort]');
+    if (!btn) return;
+    const next = btn.getAttribute('data-sort');
+    if (!SORTS.includes(next) || next === state.sort) return;
+    state.sort = next;
+    sortSegWrap.querySelectorAll('button').forEach((b) => b.classList.toggle('on', b.getAttribute('data-sort') === next));
+    renderDayArea();   // 정렬은 클라이언트 전용 — 재조회 불필요
+  }
   const onResize = () => chart.resize();
 
   const customInput = container.querySelector('[data-role="customDays"]');
@@ -761,6 +775,7 @@ export async function initPage(container, data /* , userConfig */) {
 
   segWrap.addEventListener('click', onLookback);
   basisSegWrap.addEventListener('click', onBasisClick);
+  sortSegWrap.addEventListener('click', onSortClick);
   chart.on('click', onCellClick);
   window.addEventListener('resize', onResize);
   if (customApply) customApply.addEventListener('click', applyCustomDays);
@@ -778,6 +793,8 @@ export async function initPage(container, data /* , userConfig */) {
   // 초기 비율 적용 (DOM mount 후 1회)
   applySplitRatio(state.splitRatio);
   container.addEventListener('click', onObsidianOpenClick, true);
+  // R195 — ★ 즐겨찾기 토글
+  const detachStars = attachNoteStars(container);
 
   const themeObserver = new MutationObserver(() => {
     setTimeout(() => renderChart(), 50);
@@ -788,9 +805,11 @@ export async function initPage(container, data /* , userConfig */) {
 
   return {
     destroy() {
+      detachStars();
       aborted = true;
       segWrap.removeEventListener('click', onLookback);
       basisSegWrap.removeEventListener('click', onBasisClick);
+      sortSegWrap.removeEventListener('click', onSortClick);
       chart.off('click', onCellClick);
       window.removeEventListener('resize', onResize);
       if (customApply) customApply.removeEventListener('click', applyCustomDays);

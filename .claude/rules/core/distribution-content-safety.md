@@ -4,9 +4,7 @@
 
 ## 배경 (Incident)
 
-`AGENT_ONBOARDING.md § 2 볼트 구성` 표에 **제작자가 자기 환경에서 만든 볼트 이름**이 그대로 카테고리 예시로 들어가 있었다. 배포하면 새 사용자가 받는 문서에 작성자 개인 사정이 노출되고, 받는 쪽에선 **본인이 만들지도 않은 볼트 이름이 예시로 나와** 혼란스럽다.
-
-**이 룰 자신도 같은 규칙을 지킨다** — 아래 표는 실제 이름 대신 형태만 적는다.
+`AGENT_ONBOARDING.md § 2 볼트 구성` 표에 사용자 개인 볼트명 (JissouGame, CombatToolKit, TileMapToolKit, Unity_Documentation, Diary, GameDesign, GameArt, LightAndColor, AppFlowy, Funding 등) 이 그대로 카테고리 예시로 들어가 있어 SellingVault 로 배포 시 **새 사용자가 받는 문서에 작성자 개인 사정 노출** 됐을 가능성. 새 사용자 입장에선 본인이 만들지도 않은 볼트 이름이 카테고리 예시로 나와 혼란.
 
 ## 규칙
 
@@ -14,12 +12,12 @@
 
 다음 자산을 **배포 대상 문서** 본문·예시·테이블·코드 블록에 포함 금지:
 
-| 금지 자산 | 형태 |
-|----------|------|
-| 사용자 추가 볼트명 | 기본 동봉 볼트 (`AIHubVault` · `BasicContentsVault` · `Basic*Vault` · `CoreHub`) 외의 모든 볼트 이름 |
-| 사용자 추가 카테고리 | `Domains_<영역>` · `Lab_<영역>` · `Projects_<영역>` 중 **사용자가 실제로 만든** 것 |
-| 외부 readonly 자료 이름 | 사용자가 받아 둔 문서·SDK 볼트 이름 |
-| 개인 프로젝트명 | 사용자 운영용 프로젝트 볼트 이름 |
+| 금지 자산 | 예시 (실제 사용자 등록 자산) |
+|----------|------------------------|
+| 사용자 추가 볼트명 | JissouGame, CombatToolKit, TileMapToolKit, MachineAssembly, CookingLab 등 |
+| 사용자 추가 카테고리 | Domains_Manufacturing, Lab_Game, Projects_Game 등 사용자가 만든 카테고리 |
+| 외부 readonly 자료 이름 | Unity_Documentation 등 사용자가 다운받은 자료 |
+| 개인 프로젝트명 | Project_MyVaults 등 사용자 운영용 |
 | 개인 hostname / 사용자명 / 디바이스명 | (절대 인용 금지) |
 
 ### 배포 대상 문서 (식별)
@@ -104,7 +102,7 @@
 
 ```powershell
 # 배포 대상 문서 변경 시 개인 자산 키워드 스캔
-$personal = (Get-Content '_STATUS.md' | Select-String -Pattern '^\| ([A-Za-z0-9_]+) \|' | ForEach-Object { $_.Matches[0].Groups[1].Value }) | Where-Object { $_ -notin @('AIHubVault','BasicContentsVault','CoreHub') }
+$personal = @('JissouGame', 'CombatToolKit', 'TileMapToolKit', 'MachineAssembly', 'CookingLab', 'Project_MyVaults', 'Unity_Documentation')
 $file = '<배포 대상 파일 경로>'
 $content = Get-Content $file -Raw
 $found = $personal | Where-Object { $content -match $_ }
@@ -127,4 +125,4 @@ if ($found) { Write-Warning "개인 자산 인용 발견: $($found -join ', ')" 
 
 - 인시던트 발견: 2026-04-25 사용자 보고 ("온보딩 § 2 볼트 구성에 개인 정보 노출")
 - 관련 룰: `.claude/rules/core/distribution-sync.md` (배포 동기화 일반)
-- 배포 변경 로그: `{프로젝트 볼트}/Contents/Project/plan/distribution/20260317_배포_동기화_규칙.md`
+- 배포 변경 로그: `Vaults/Projects_Infra/Project_AIMindVaults/Contents/Project/plan/distribution/20260317_배포_동기화_규칙.md`

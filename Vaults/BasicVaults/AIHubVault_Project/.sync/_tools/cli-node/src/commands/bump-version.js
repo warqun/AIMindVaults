@@ -11,6 +11,7 @@ import { join, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { isHub, readHubMarker } from '../lib/hub-resolver.js';
 import * as log from '../lib/logger.js';
+import { localDate, localStamp } from '../lib/local-time.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -28,7 +29,7 @@ function detectHubRoot(explicit) {
  * If today's latest exists, increment NNNN; else start at 0001.
  */
 function nextVersion(latestVersion) {
-  const today = new Date().toISOString().slice(0, 10).replace(/-/g, ''); // YYYYMMDD
+  const today = localStamp(); // YYYYMMDD
   if (latestVersion && latestVersion.startsWith(today)) {
     const seq = parseInt(latestVersion.slice(8), 10);
     return today + String(seq + 1).padStart(4, '0');
@@ -59,7 +60,7 @@ function insertVersionRow(content, version, message) {
   lines.splice(headerSepIdx + 1, 0, newRow);
 
   // Update frontmatter `updated:` if present
-  const today = new Date().toISOString().slice(0, 10);
+  const today = localDate();
   for (let i = 0; i < lines.length && i < 30; i++) {
     if (/^updated:\s*/.test(lines[i])) {
       lines[i] = `updated: ${today}`;
